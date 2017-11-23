@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: niryo_description
+    relative_path: urdf/niryo.urdf
+  SRDF:
+    relative_path: config/niryo.srdf
+  CONFIG:
+    author_name: Edouard Renard
+    author_email: e.renard@niryo.com
+    generated_timestamp: 1482343386

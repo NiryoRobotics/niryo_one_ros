@@ -1,0 +1,18 @@
+<launch>
+    <!-- Launch Joystick and Blockly server -->
+  
+    <arg name="joy_enabled" default="true" />
+
+    <group if="$(arg joy_enabled)">
+        <param name="joy_node/deadzone" value="0.2" type="double"/>
+        <param name="joy_node/coalesce_interval" value="0.1" type="double"/>
+        <node name="joy_node" pkg="joy" type="joy_node" output="screen" respawn="false" />
+    </group>
+
+    <node name="user_interface" pkg="niryo_one_user_interface" type="user_interface.py" output="screen" respawn="false">
+        <param name="joystick_timer_rate_sec" type="double" value="0.15" />
+        <!-- this folder is in .gitignore -->
+        <param name="niryo_one_blockly_path" type="string" value="$(find niryo_one_user_interface)/tmp_blockly" /> 
+        <param name="niryo_one_blockly_tcp_port" type="int" value="1337" />
+    </node>
+</launch>

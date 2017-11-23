@@ -1,0 +1,1 @@
+rosrun moveit_kinematics create_ikfast_moveit_plugin.py niryo_one arm niryo_one_ikfast_arm_plugin /home/edouard/catkin_ws/src/niryo_one_ikfast_arm_plugin/src/niryo_one_arm_ikfast_solver.cpp

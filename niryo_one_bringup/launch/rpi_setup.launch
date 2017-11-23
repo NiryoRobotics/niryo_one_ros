@@ -1,0 +1,28 @@
+<launch>
+    
+    <arg name="execute_on_niryo_one_raspberry_pi_image" default="true" />
+  
+    <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
+    <arg name="urdf_without_meshes" default="true" />
+    <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/>
+
+    <!-- rosbridge websocket server -->
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+
+    <!-- Setup interface -->
+    <node name="niryo_one_rpi" pkg="niryo_one_rpi" type="niryo_one_rpi_node.py" output="screen">
+        <param name="launch_ros_processes"  type="boolean" value="true" />
+        <param name="process_state_publish_rate" type="double" value="0.33" />
+        <param name="wifi_manager_enabled"  type="boolean" value="true" />
+        <param name="hotspot_ssid"          type="string"  value="Niryo_One" /> <!-- MAC address will be added to make it unique -->
+        <param name="hotspot_password"      type="string"  value="password" />
+        <param name="filename_robot_name"   type="string"  value="/home/niryo/niryo_one_saved_values/robot_name_for_user.txt" />
+        <rosparam file="$(find niryo_one_bringup)/config/rpi_ros_processes.yaml" />
+        <param name="ros_log_size_treshold" type="int"    value="1024" /> <!-- 1024 MB -->
+        <param name="should_purge_ros_log_on_startup_file" type="string" 
+            value="/home/niryo/niryo_one_saved_values/purge_ros_log_at_startup.txt" />
+
+        <!-- don't change that unless you manually change ros log location --> 
+        <param name="ros_log_location"      type="string" value="/home/niryo_one/.ros/log" /> 
+    </node>
+</launch>

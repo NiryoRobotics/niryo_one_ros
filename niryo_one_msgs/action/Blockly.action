@@ -1,0 +1,10 @@
+# goal
+niryo_one_msgs/BlocklyCommand cmd
+---
+# result
+int32 status
+string message
+---
+# feedback
+string highlight_id
+

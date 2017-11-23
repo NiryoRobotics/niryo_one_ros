@@ -1,0 +1,89 @@
+#
+#
+# Config for all the end-effectors
+#
+#
+
+command_list:
+    # Gripper
+    open_gripper: 1
+    close_gripper: 2
+    # Vacuump pump
+    pull_air_vacuum_pump: 10
+    push_air_vacuum_pump: 11
+    # Tools controlled by digital I/Os
+    setup_digital_io: 20
+    activate_digital_io: 21
+    deactivate_digital_io: 22
+
+tool_list:
+    - name: "Gripper 1"
+      type: "gripper"
+      id: 11
+      available_commands:
+          - open_gripper
+          - close_gripper
+      specs:
+          open_position: 660 # 750
+          open_hold_torque: 128
+          close_position: 0 # 155 
+          close_hold_torque: 128
+          close_max_torque: 1023
+          open_speed: 300 
+          close_speed: 300
+    - name: "Gripper 2"
+      type: "gripper"
+      id: 12
+      available_commands:
+          - open_gripper
+          - close_gripper
+      specs:
+          open_position: 650
+          open_hold_torque: 128
+          close_position: 375
+          close_hold_torque: 128
+          close_max_torque: 1023
+          open_speed: 300 
+          close_speed: 300
+    - name: "Gripper 3"
+      type: "gripper"
+      id: 13
+      available_commands:
+          - open_gripper
+          - close_gripper
+      specs:
+          open_position: 530
+          open_hold_torque: 128
+          close_position: 180
+          close_hold_torque: 160
+          close_max_torque: 1023
+          open_speed: 300 
+          close_speed: 300
+    - name: "Electromagnet 1"
+      type: "electromagnet"
+      id: 30
+      available_commands:
+          - activate_digital_io
+          - deactivate_digital_io
+          - setup_digital_io
+      specs:
+          []
+    - name: "Vacuum Pump 1"
+      type: "vacuum_pump"
+      id: 31
+      available_commands:
+          - pull_air_vacuum_pump
+          - push_air_vacuum_pump
+      specs:
+          pull_air_position: 310
+          pull_air_hold_torque: 128
+          push_air_position: 1000    
+    - name: "DC Motor 1"
+      type: "dc_motor"
+      id: 32
+      available_commands:
+          []
+      specs:
+          []
+
+

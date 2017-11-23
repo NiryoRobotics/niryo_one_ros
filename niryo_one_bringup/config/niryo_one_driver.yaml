@@ -1,0 +1,66 @@
+#
+#  ### Params for Niryo One driver ###
+#
+
+#
+#  Stepper caracteristics
+#
+
+stepper_1_gear_ratio: 4.85
+stepper_2_gear_ratio: 6.65
+stepper_3_gear_ratio: 6.3
+stepper_4_gear_ratio: 5.0
+
+stepper_1_offset_position: 3.05433
+stepper_2_offset_position: 0.628319
+stepper_3_offset_position: -1.401
+stepper_4_offset_position: 2.791  #2.61799
+
+stepper_1_home_position: 0.0
+stepper_2_home_position: 0.628319
+stepper_3_home_position: -1.401
+stepper_4_home_position: 0.0
+
+stepper_1_direction: -1.0
+stepper_2_direction: -1.0
+stepper_3_direction: 1.0
+stepper_4_direction: -1.0
+
+stepper_1_max_effort: 90
+stepper_2_max_effort: 155
+stepper_3_max_effort: 120
+stepper_4_max_effort: 90
+
+#
+#  Communication with motors
+#
+
+# Dynamixel bus
+dxl_baudrate:         1000000
+dxl_uart_device_name: "/dev/serial0"
+
+# CAN bus
+spi_channel:        0
+spi_baudrate:       1000000
+gpio_can_interrupt: 25
+
+#
+#  Read/Write/Check frequencies 
+#  Those params have been chosen to get a good (connection performance + speed / CPU usage) ratio
+#
+
+ros_control_loop_frequency:              100.0
+
+niryo_one_hw_check_connection_frequency: 2.0
+publish_hw_status_frequency:             1.0
+publish_learning_mode_frequency:         1.0
+read_rpi_diagnostics_frequency:          0.25
+
+dxl_hardware_control_loop_frequency:     100.0
+dxl_hw_write_frequency:                  50.0
+dxl_hw_data_read_frequency:              15.0
+dxl_hw_status_read_frequency:            0.5
+
+can_hardware_control_loop_frequency:     1500.0
+can_hw_write_frequency:                  50.0
+can_hw_check_connection_frequency:       3.0
