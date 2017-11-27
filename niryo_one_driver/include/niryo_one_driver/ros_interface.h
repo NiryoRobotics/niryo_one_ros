@@ -39,6 +39,7 @@
 #include "niryo_one_msgs/PushAirVacuumPump.h"
 
 #include "niryo_one_msgs/HardwareStatus.h"
+#include "niryo_one_msgs/SoftwareVersion.h"
 #include "std_msgs/Bool.h"
 
 class RosInterface {
@@ -70,12 +71,16 @@ class RosInterface {
         ros::Publisher hardware_status_publisher;
         boost::shared_ptr<std::thread> publish_hardware_status_thread;
 
+        ros::Publisher software_version_publisher;
+        boost::shared_ptr<std::thread> publish_software_version_thread;
+
         ros::Publisher learning_mode_publisher;
         boost::shared_ptr<std::thread> publish_learning_mode_thread;
 
         // publish methods
         
         void publishHardwareStatus();
+        void publishSoftwareVersion();
         void publishLearningMode();
         
         // services

@@ -49,7 +49,8 @@ class FakeCommunication : public CommunicationBase {
                 std::vector<std::string> &motor_names, std::vector<int32_t> &temperatures,
                 std::vector<double> &voltages, std::vector<int32_t> &hw_errors);
         
-        void getFirmwareVersions(std::vector<std::string> &firmware_versions);
+        void getFirmwareVersions(std::vector<std::string> &motor_names,
+                std::vector<std::string> &firmware_versions);
         
         void sendPositionToRobot(const double cmd[6]); 
         void activateLearningMode(bool activate);

@@ -335,16 +335,21 @@ void NiryoOneCommunication::getHardwareStatus(bool *is_connection_ok, std::strin
     error_message += dxl_error_message;
 }
 
-void NiryoOneCommunication::getFirmwareVersions(std::vector<std::string> &firmware_versions)
+void NiryoOneCommunication::getFirmwareVersions(std::vector<std::string> &motor_names,
+        std::vector<std::string> &firmware_versions)
 {
     std::vector<std::string> can_firmware_versions;
+    std::vector<std::string> can_motor_names;
 
     if (can_enabled) {
-        canComm->getFirmwareVersions(can_firmware_versions);
+        canComm->getFirmwareVersions(can_motor_names, can_firmware_versions);
     }
 
+    motor_names.clear();
     firmware_versions.clear();
+
     firmware_versions.insert(firmware_versions.end(), can_firmware_versions.begin(), can_firmware_versions.end());
+    motor_names.insert(motor_names.end(), can_motor_names.begin(), can_motor_names.end());
 }
 
 void NiryoOneCommunication::getCurrentPosition(double pos[6])

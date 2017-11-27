@@ -15,8 +15,3 @@ string[] motor_names
 int32[] temperatures
 float64[] voltages
 int32[] hardware_errors
-
-# software versions
-string rpi_image_version
-string ros_niryo_one_version
-string[] stepper_firmware_versions

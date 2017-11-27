@@ -73,7 +73,8 @@ class CanCommunication {
                 int *calibration_needed, bool *calibration_in_progress,
                 std::vector<std::string> &motor_names, std::vector<int32_t> &temperatures,
                 std::vector<double> &voltages, std::vector<int32_t> &hw_errors);
-        void getFirmwareVersions(std::vector<std::string> &firmware_versions);
+        void getFirmwareVersions(std::vector<std::string> &motor_names,
+                std::vector<std::string> &firmware_versions);
         bool isConnectionOk();
         bool isOnLimitedMode();
         

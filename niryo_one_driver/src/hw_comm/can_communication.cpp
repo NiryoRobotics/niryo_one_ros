@@ -833,9 +833,14 @@ void CanCommunication::getHardwareStatus(bool *is_connection_ok, std::string &er
     }
 }
 
-void CanCommunication::getFirmwareVersions(std::vector<std::string> &firmware_versions)
+void CanCommunication::getFirmwareVersions(std::vector<std::string> &motor_names,
+        std::vector<std::string> &firmware_versions)
 {
+    motor_names.clear();
+    firmware_versions.clear();
+
     for (int i = 0; i < motors.size(); i++) {
+        motor_names.push_back(motors.at(i)->getName());
         firmware_versions.push_back(motors.at(i)->getFirmwareVersion());
     }
 }

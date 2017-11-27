@@ -110,7 +110,8 @@ void FakeCommunication::getHardwareStatus(bool *is_connection_ok, std::string &e
     //ROS_INFO("Get Hardware Status");
 }
 
-void FakeCommunication::getFirmwareVersions(std::vector<std::string> &firmware_versions)
+void FakeCommunication::getFirmwareVersions(std::vector<std::string> &motor_names,
+        std::vector<std::string> &firmware_versions)
 {
     // ROS_INFO("Get firmware versions")
 }

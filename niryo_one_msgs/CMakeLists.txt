@@ -22,6 +22,7 @@ add_message_files(
   HardwareStatus.msg
   LogStatus.msg
   DigitalIOState.msg
+  SoftwareVersion.msg
 )
 
 add_service_files(

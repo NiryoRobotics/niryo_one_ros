@@ -204,12 +204,9 @@ void RosInterface::publishHardwareStatus()
         std::vector<int32_t> temperatures;
         std::vector<double> voltages;
         std::vector<int32_t> hw_errors;
-        std::vector<std::string> firmware_versions;
 
         comm->getHardwareStatus(&connection_up, error_message, &calibration_needed, 
                 &calibration_in_progress, motor_names, temperatures, voltages, hw_errors);
-
-        comm->getFirmwareVersions(firmware_versions);
 
         niryo_one_msgs::HardwareStatus msg;
         msg.header.stamp = ros::Time::now();
@@ -222,13 +219,32 @@ void RosInterface::publishHardwareStatus()
         msg.temperatures = temperatures;
         msg.voltages = voltages;
         msg.hardware_errors = hw_errors;
-        msg.stepper_firmware_versions = firmware_versions;
-        msg.rpi_image_version = rpi_image_version;
-        msg.ros_niryo_one_version = ros_niryo_one_version;
 
         hardware_status_publisher.publish(msg);
 
         publish_hardware_status_rate.sleep();
+    }
+}
+
+void RosInterface::publishSoftwareVersion()
+{
+    double publish_software_version_frequency;
+    ros::param::get("~publish_software_version_frequency", publish_software_version_frequency);
+    ros::Rate publish_software_version_rate = ros::Rate(publish_software_version_frequency);
+
+    while (ros::ok()) {
+        std::vector<std::string> motor_names;
+        std::vector<std::string> firmware_versions;
+        comm->getFirmwareVersions(motor_names, firmware_versions);
+
+        niryo_one_msgs::SoftwareVersion msg;
+        msg.motor_names = motor_names;
+        msg.stepper_firmware_versions = firmware_versions;
+        msg.rpi_image_version = rpi_image_version;
+        msg.ros_niryo_one_version = ros_niryo_one_version;
+       
+        software_version_publisher.publish(msg);
+        publish_software_version_rate.sleep();
     }
 }
 
@@ -250,6 +266,9 @@ void RosInterface::startPublishers()
 {
     hardware_status_publisher = nh_.advertise<niryo_one_msgs::HardwareStatus>("niryo_one/hardware_status", 10);
     publish_hardware_status_thread.reset(new std::thread(boost::bind(&RosInterface::publishHardwareStatus, this))); 
+
+    software_version_publisher = nh_.advertise<niryo_one_msgs::SoftwareVersion>("niryo_one/software_version", 10);
+    publish_software_version_thread.reset(new std::thread(boost::bind(&RosInterface::publishSoftwareVersion, this)));
 
     learning_mode_publisher = nh_.advertise<std_msgs::Bool>("niryo_one/learning_mode", 10);
     publish_learning_mode_thread.reset(new std::thread(boost::bind(&RosInterface::publishLearningMode, this)));

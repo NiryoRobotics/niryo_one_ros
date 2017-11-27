@@ -45,7 +45,8 @@ class CommunicationBase {
                 std::vector<std::string> &motor_names, std::vector<int32_t> &temperatures,
                 std::vector<double> &voltages, std::vector<int32_t> &hw_errors) = 0;
         
-        virtual void getFirmwareVersions(std::vector<std::string> &firmware_versions) = 0;
+        virtual void getFirmwareVersions(std::vector<std::string> &motor_names,
+                std::vector<std::string> &firmware_versions) = 0;
         
         virtual void sendPositionToRobot(const double cmd[6]) = 0;
         virtual void activateLearningMode(bool activate) = 0;
