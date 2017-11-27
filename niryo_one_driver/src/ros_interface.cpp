@@ -201,12 +201,13 @@ void RosInterface::publishHardwareStatus()
         bool calibration_in_progress = false;
         std::string error_message;
         std::vector<std::string> motor_names;
+        std::vector<std::string> motor_types;
         std::vector<int32_t> temperatures;
         std::vector<double> voltages;
         std::vector<int32_t> hw_errors;
 
         comm->getHardwareStatus(&connection_up, error_message, &calibration_needed, 
-                &calibration_in_progress, motor_names, temperatures, voltages, hw_errors);
+                &calibration_in_progress, motor_names, motor_types, temperatures, voltages, hw_errors);
 
         niryo_one_msgs::HardwareStatus msg;
         msg.header.stamp = ros::Time::now();
@@ -216,6 +217,7 @@ void RosInterface::publishHardwareStatus()
         msg.calibration_needed = calibration_needed;
         msg.calibration_in_progress = calibration_in_progress;
         msg.motor_names = motor_names;
+        msg.motor_types = motor_types;
         msg.temperatures = temperatures;
         msg.voltages = voltages;
         msg.hardware_errors = hw_errors;

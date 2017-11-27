@@ -280,7 +280,8 @@ bool NiryoOneCommunication::isCalibrationInProgress()
 
 void NiryoOneCommunication::getHardwareStatus(bool *is_connection_ok, std::string &error_message, 
         int *calibration_needed, bool *calibration_in_progress,
-        std::vector<std::string> &motor_names, std::vector<int32_t> &temperatures, std::vector<double> &voltages,
+        std::vector<std::string> &motor_names, std::vector<std::string> &motor_types,
+        std::vector<int32_t> &temperatures, std::vector<double> &voltages,
         std::vector<int32_t> &hw_errors)
 {
     bool can_connection_ok = !can_enabled; // if CAN disabled, declare connection ok
@@ -288,6 +289,7 @@ void NiryoOneCommunication::getHardwareStatus(bool *is_connection_ok, std::strin
     bool can_calibration_in_progress = false;
     std::string can_error_message = "";
     std::vector<std::string> can_motor_names;
+    std::vector<std::string> can_motor_types;
     std::vector<int32_t> can_temperatures;
     std::vector<double> can_voltages;
     std::vector<int32_t> can_hw_errors;
@@ -297,26 +299,30 @@ void NiryoOneCommunication::getHardwareStatus(bool *is_connection_ok, std::strin
     bool dxl_calibration_in_progress = false;
     std::string dxl_error_message = "";
     std::vector<std::string> dxl_motor_names;
+    std::vector<std::string> dxl_motor_types;
     std::vector<int32_t> dxl_temperatures;
     std::vector<double> dxl_voltages;
     std::vector<int32_t> dxl_hw_errors;
 
     if (can_enabled) {
         canComm->getHardwareStatus(&can_connection_ok, can_error_message, &can_calibration_needed,
-                &can_calibration_in_progress, can_motor_names, can_temperatures, can_voltages, can_hw_errors);
+                &can_calibration_in_progress, can_motor_names, can_motor_types, can_temperatures, can_voltages, can_hw_errors);
     }
     if (dxl_enabled) {
         dxlComm->getHardwareStatus(&dxl_connection_ok, dxl_error_message, &dxl_calibration_needed,
-                &dxl_calibration_in_progress, dxl_motor_names, dxl_temperatures, dxl_voltages, dxl_hw_errors);
+                &dxl_calibration_in_progress, dxl_motor_names, dxl_motor_types, dxl_temperatures, dxl_voltages, dxl_hw_errors);
     }
 
     motor_names.clear();
+    motor_types.clear();
     temperatures.clear();
     voltages.clear();
     hw_errors.clear();
 
     motor_names.insert(motor_names.end(), can_motor_names.begin(), can_motor_names.end());
     motor_names.insert(motor_names.end(), dxl_motor_names.begin(), dxl_motor_names.end());
+    motor_types.insert(motor_types.end(), can_motor_types.begin(), can_motor_types.end());
+    motor_types.insert(motor_types.end(), dxl_motor_types.begin(), dxl_motor_types.end());
     temperatures.insert(temperatures.end(), can_temperatures.begin(), can_temperatures.end());
     temperatures.insert(temperatures.end(), dxl_temperatures.begin(), dxl_temperatures.end());
     voltages.insert(voltages.end(), can_voltages.begin(), can_voltages.end());

@@ -11,6 +11,7 @@ int32 calibration_needed
 bool calibration_in_progress
 
 string[] motor_names
+string[] motor_types
 
 int32[] temperatures
 float64[] voltages

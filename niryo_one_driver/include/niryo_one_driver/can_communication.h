@@ -71,7 +71,8 @@ class CanCommunication {
 
         void getHardwareStatus(bool *is_connection_ok, std::string &error_message, 
                 int *calibration_needed, bool *calibration_in_progress,
-                std::vector<std::string> &motor_names, std::vector<int32_t> &temperatures,
+                std::vector<std::string> &motor_names, std::vector<std::string> &motor_types,
+                std::vector<int32_t> &temperatures,
                 std::vector<double> &voltages, std::vector<int32_t> &hw_errors);
         void getFirmwareVersions(std::vector<std::string> &motor_names,
                 std::vector<std::string> &firmware_versions);

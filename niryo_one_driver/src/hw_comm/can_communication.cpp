@@ -812,7 +812,8 @@ void CanCommunication::setMaxEffort(std::vector<uint8_t> max_effort_list)
 
 void CanCommunication::getHardwareStatus(bool *is_connection_ok, std::string &error_message, 
         int *calibration_needed, bool *calibration_in_progress,
-        std::vector<std::string> &motor_names, std::vector<int32_t> &temperatures, std::vector<double> &voltages,
+        std::vector<std::string> &motor_names, std::vector<std::string> &motor_types,
+        std::vector<int32_t> &temperatures, std::vector<double> &voltages,
         std::vector<int32_t> &hw_errors)
 {
     *(is_connection_ok) = is_can_connection_ok;
@@ -821,12 +822,14 @@ void CanCommunication::getHardwareStatus(bool *is_connection_ok, std::string &er
     error_message = debug_error_message;
 
     motor_names.clear();
+    motor_types.clear();
     temperatures.clear();
     voltages.clear();
     hw_errors.clear();
 
     for (int i = 0 ; i < motors.size(); i++) {
         motor_names.push_back(motors.at(i)->getName());
+        motor_types.push_back("niryo_stepper");
         temperatures.push_back(motors.at(i)->getTemperatureState());
         voltages.push_back(0.0);
         hw_errors.push_back(motors.at(i)->getHardwareErrorState());

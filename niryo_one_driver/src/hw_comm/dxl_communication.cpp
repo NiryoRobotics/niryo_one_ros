@@ -432,7 +432,8 @@ void DxlCommunication::getCurrentPosition(double *axis_5_pos, double *axis_6_pos
 
 void DxlCommunication::getHardwareStatus(bool *is_connection_ok, std::string &error_message, 
         int *calibration_needed, bool *calibration_in_progress,
-        std::vector<std::string> &motor_names, std::vector<int32_t> &temperatures, std::vector<double> &voltages,
+        std::vector<std::string> &motor_names, std::vector<std::string> &motor_types,
+        std::vector<int32_t> &temperatures, std::vector<double> &voltages,
         std::vector<int32_t> &hw_errors)
 {
     *(is_connection_ok) = is_dxl_connection_ok;
@@ -441,6 +442,7 @@ void DxlCommunication::getHardwareStatus(bool *is_connection_ok, std::string &er
     error_message = debug_error_message;
 
     motor_names.clear();
+    motor_types.clear();
     temperatures.clear();
     voltages.clear();
     hw_errors.clear();
@@ -449,6 +451,10 @@ void DxlCommunication::getHardwareStatus(bool *is_connection_ok, std::string &er
     motor_names.push_back(m5_2.getName());
     motor_names.push_back(m6.getName());
     motor_names.push_back(tool.getName());
+
+    for (int i = 0 ; i < 4 ; i++) {
+        motor_types.push_back("dxl_xl_320");
+    }
 
     temperatures.push_back(m5_1.getTemperatureState());
     temperatures.push_back(m5_2.getTemperatureState());
