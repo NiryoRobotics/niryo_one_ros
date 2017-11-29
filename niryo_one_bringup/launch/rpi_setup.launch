@@ -23,6 +23,6 @@
             value="/home/niryo/niryo_one_saved_values/purge_ros_log_at_startup.txt" />
 
         <!-- don't change that unless you manually change ros log location --> 
-        <param name="ros_log_location"      type="string" value="/home/niryo_one/.ros/log" /> 
+        <param name="ros_log_location"      type="string" value="/home/niryo/.ros/log" /> 
     </node>
 </launch>
