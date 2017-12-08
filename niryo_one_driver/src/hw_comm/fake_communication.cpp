@@ -109,6 +109,9 @@ void FakeCommunication::getHardwareStatus(bool *is_connection_ok, std::string &e
         std::vector<int32_t> &hw_errors)
 {
     //ROS_INFO("Get Hardware Status");
+    *(is_connection_ok) = true;
+    *(calibration_needed) = false;
+    *(calibration_in_progress) = false;
 }
 
 void FakeCommunication::getFirmwareVersions(std::vector<std::string> &motor_names,
