@@ -310,6 +310,33 @@ Blockly.Blocks['niryo_one_set_pin_mode'] = {
     }
 };
 
+Blockly.Blocks['niryo_one_digital_read'] = {
+    init: function () {
+        this.appendValueInput("DIGITAL_READ_PIN")
+            .setCheck("niryo_one_gpio_select")
+            .appendField("Get Pin");
+        this.appendDummyInput()
+            .appendField("state");
+        this.setInputsInline(true);
+        this.setOutput(true, "niryo_one_gpio_state");
+        this.setColour("#3D4D9A");
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
+Blockly.Blocks['niryo_one_gpio_state'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("state")
+            .appendField(new Blockly.FieldDropdown([["HIGH", "PIN_HIGH"], ["LOW", "PIN_LOW"]]), "GPIO_STATE_SELECT");
+        this.setOutput(true, "niryo_one_gpio_state");
+        this.setColour("#3D4D9A");
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
 /*
  * Generators
  */
@@ -439,6 +466,18 @@ Blockly.Python['niryo_one_set_pin_mode'] = function (block) {
   value_pin = value_pin.replace('(', '').replace(')', '');
   var code = 'n.pin_mode(' + value_pin + ', ' + dropdown_pin_mode_select + ')\n';
   return code;
+};
+
+Blockly.Python['niryo_one_digital_read'] = function (block) {
+  var value_pin = Blockly.Python.valueToCode(block, 'DIGITAL_READ_PIN', Blockly.Python.ORDER_ATOMIC) || '(0)';
+  var code = 'n.digital_read' + value_pin;
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Python['niryo_one_gpio_state'] = function (block) {
+  var dropdown_gpio_state_select = block.getFieldValue('GPIO_STATE_SELECT');
+  var code = dropdown_gpio_state_select;
+  return [code, Blockly.Python.ORDER_NONE];
 };
 
 /*
