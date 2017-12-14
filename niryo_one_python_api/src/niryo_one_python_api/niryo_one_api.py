@@ -28,6 +28,7 @@ from niryo_one_msgs.msg import RobotMoveAction
 from niryo_one_msgs.msg import RobotMoveGoal
 
 from niryo_one_msgs.srv import SetInt
+from niryo_one_msgs.srv import GetDigitalIO
 from niryo_one_msgs.srv import SetDigitalIO
 
 from niryo_one_commander.command_type import CommandType as MoveCommandType
@@ -172,6 +173,13 @@ class NiryoOne:
                     SetDigitalIO, [pin, state])
             if result.status != 200:
                 raise NiryoOneException(result.message)
+ 
+        def digital_read(self, pin):
+            result = self.call_service('niryo_one/rpi/get_digital_io',
+                    GetDigitalIO, [pin])
+            if result.status != 200:
+                raise NiryoOneException(result.message)
+            return result.state
 
         def change_tool(self, tool_id):
             result = self.call_service('niryo_one/change_tool', 

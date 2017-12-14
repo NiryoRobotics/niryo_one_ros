@@ -6,15 +6,13 @@ import rospy
 import time
 rospy.init_node('niryo_one_example_python_api')
 
-print "start"
+print "--- Start"
 
 n = NiryoOne()
 
 try:
     # Test learning mode
     n.activate_learning_mode(False)
-    time.sleep(1)
-    n.activate_learning_mode(True)
 
     # Test electromagnet on GPIO 2
     pin = GPIO_1A
@@ -23,6 +21,8 @@ try:
     n.activate_electromagnet(TOOL_ELECTROMAGNET_1_ID, pin)
     time.sleep(2)
     n.deactivate_electromagnet(TOOL_ELECTROMAGNET_1_ID, pin)
+    
+    n.activate_learning_mode(True)
 
     # Test digital I/O
     pin = GPIO_1B
@@ -32,6 +32,12 @@ try:
     n.digital_write(pin, PIN_LOW)
     time.sleep(2)
     n.pin_mode(pin, PIN_MODE_INPUT)
+
+    pin = GPIO_1A
+    n.pin_mode(pin, PIN_MODE_INPUT)
+    for i in range(0,10):
+        print "Read pin GPIO 1_A : " + str(n.digital_read(pin))
+        time.sleep(0.2)
 
     # Test vacuum pump
     #n.change_tool(TOOL_VACUUM_PUMP_1_ID)
@@ -43,7 +49,7 @@ except NiryoOneException as e:
     # handle exception here
     # you can also make a try/except for each command separately
 
-print "end"
+print "--- End"
 
 
 
