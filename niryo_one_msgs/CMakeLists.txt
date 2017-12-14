@@ -39,6 +39,7 @@ add_service_files(
   PullAirVacuumPump.srv
   PushAirVacuumPump.srv
   SetDigitalIO.srv
+  GetDigitalIO.srv
 )
 
 add_action_files(

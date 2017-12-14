@@ -18,6 +18,7 @@
         <param name="hotspot_password"      type="string"  value="niryoone" />
         <param name="filename_robot_name"   type="string"  value="/home/niryo/niryo_one_saved_values/robot_name_for_user.txt" />
         <rosparam file="$(find niryo_one_bringup)/config/rpi_ros_processes.yaml" />
+        <param name="publish_io_state_frequency" type="double" value="10.0" />
         <param name="ros_log_size_treshold" type="int"    value="1024" /> <!-- 1024 MB -->
         <param name="should_purge_ros_log_on_startup_file" type="string" 
             value="/home/niryo/niryo_one_saved_values/purge_ros_log_at_startup.txt" />

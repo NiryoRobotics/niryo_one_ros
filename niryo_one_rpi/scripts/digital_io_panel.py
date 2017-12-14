@@ -19,8 +19,10 @@
 
 import rospy
 import RPi.GPIO as GPIO
+from threading import Lock
 
 from niryo_one_msgs.msg import DigitalIOState
+from niryo_one_msgs.srv import GetDigitalIO
 from niryo_one_msgs.srv import SetDigitalIO
 
 GPIO_1_A = 2
@@ -39,7 +41,8 @@ GPIO_2_C_NAME = '2C'
 
 class DigitalPin:
 
-    def __init__(self, pin, name, mode=GPIO.IN, state=GPIO.LOW):
+    def __init__(self, lock, pin, name, mode=GPIO.IN, state=GPIO.LOW):
+        self.lock = lock
         self.pin = pin
         self.name = name
         self.mode = mode
@@ -54,11 +57,13 @@ class DigitalPin:
     def set_mode(self, mode):
         self.mode = mode
         if mode == GPIO.OUT:
-            GPIO.setup(self.pin, GPIO.OUT)
+            with self.lock:
+                GPIO.setup(self.pin, GPIO.OUT)
             rospy.sleep(0.01)
             self.set_state(GPIO.LOW)
         else:
-            GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            with self.lock:
+                GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     def get_mode(self):
         return self.mode
@@ -67,12 +72,14 @@ class DigitalPin:
         if self.mode != GPIO.OUT:
             return False
         self.state = state
-        GPIO.output(self.pin, self.state)
+        with self.lock:
+            GPIO.output(self.pin, self.state)
         return True
 
     def get_state(self):
         if self.mode == GPIO.IN:
-            self.state = GPIO.input(self.pin)
+            with self.lock:
+                self.state = GPIO.input(self.pin)
         return self.state
 
 class DigitalIOPanel:
@@ -81,13 +88,16 @@ class DigitalIOPanel:
         GPIO.setwarnings(False) 
         GPIO.setmode(GPIO.BCM)
 
-        self.publish_io_state_frequency = 10.0
-        self.digitalIOs = [DigitalPin(GPIO_1_A, GPIO_1_A_NAME), DigitalPin(GPIO_1_B, GPIO_1_B_NAME), DigitalPin(GPIO_1_C, GPIO_1_C_NAME),
-                DigitalPin(GPIO_2_A, GPIO_2_A_NAME), DigitalPin(GPIO_2_B, GPIO_2_B_NAME), DigitalPin(GPIO_2_C, GPIO_2_C_NAME)]
+        lock = Lock()
+
+        self.publish_io_state_frequency = rospy.get_param("~publish_io_state_frequency")
+        self.digitalIOs = [DigitalPin(lock, GPIO_1_A, GPIO_1_A_NAME), DigitalPin(lock, GPIO_1_B, GPIO_1_B_NAME), DigitalPin(lock, GPIO_1_C, GPIO_1_C_NAME),
+                DigitalPin(lock, GPIO_2_A, GPIO_2_A_NAME), DigitalPin(lock, GPIO_2_B, GPIO_2_B_NAME), DigitalPin(lock, GPIO_2_C, GPIO_2_C_NAME)]
 
         self.digital_io_publisher = rospy.Publisher('niryo_one/rpi/digital_io_state', DigitalIOState, queue_size=1)
         rospy.Timer(rospy.Duration(1.0/self.publish_io_state_frequency), self.publish_io_state)
 
+        self.get_io_server = rospy.Service('niryo_one/rpi/get_digital_io', GetDigitalIO, self.callback_get_io) 
         self.set_io_mode_server = rospy.Service('niryo_one/rpi/set_digital_io_mode', SetDigitalIO, self.callback_set_io_mode)
         self.set_io_state_server = rospy.Service('niryo_one/rpi/set_digital_io_state', SetDigitalIO, self.callback_set_io_state)
 
@@ -110,7 +120,20 @@ class DigitalIOPanel:
 
     def create_response(self, status, message):
         return {'status': status, 'message': message} 
-    
+ 
+    def callback_get_io(self, req):
+        for io in self.digitalIOs:
+            if io.pin == req.pin:
+                return {
+                        'status': 200,
+                        'message': 'OK',
+                        'pin': io.pin,
+                        'name': io.name,
+                        'mode': io.get_mode(),
+                        'state': io.get_state()
+                        }
+        return self.create_response(400, "No GPIO found with this pin number (" + str(req.pin) + ")")
+
     def callback_set_io_mode(self, req):
         for io in self.digitalIOs:
             if io.pin == req.pin:
