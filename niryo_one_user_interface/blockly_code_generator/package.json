@@ -1,6 +1,6 @@
 {
   "name": "blockly_code_generator_server",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Blockly code generator for Niryo One.",
   "main": "blockly_code_generator_server.js",
   "preferGlobal": true,

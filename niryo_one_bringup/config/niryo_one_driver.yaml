@@ -6,7 +6,7 @@
 #  Stepper caracteristics
 #
 
-stepper_1_gear_ratio: 4.85
+stepper_1_gear_ratio: 6.0625
 stepper_2_gear_ratio: 6.65
 stepper_3_gear_ratio: 6.3
 stepper_4_gear_ratio: 5.0

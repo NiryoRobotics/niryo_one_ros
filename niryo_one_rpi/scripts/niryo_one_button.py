@@ -54,7 +54,6 @@ class NiryoButton:
     def shutdown(self):
         rospy.loginfo("Shutdown button, cleanup GPIO")
         self.button_timer.shutdown()
-        GPIO.cleanup()
 
     def send_led_state(self, state):
         rospy.wait_for_service('/niryo_one/rpi/set_led_state')
@@ -67,6 +66,16 @@ class NiryoButton:
     def send_shutdown_command(self):
         rospy.loginfo("SHUTDOWN")
         self.send_led_state(1)
+        rospy.loginfo("Activate learning mode")
+        try:
+            rospy.wait_for_service('/niryo_one/activate_learning_mode', 1)
+        except rospy.ROSException, e:
+            pass
+        try:
+            activate_learning_mode = rospy.ServiceProxy('/niryo_one/activate_learning_mode', SetInt)
+            activate_learning_mode(1)
+        except rospy.ServiceException, e:
+            pass
         rospy.loginfo("Command 'sudo shutdown now'")
         try:
             output = subprocess.check_output(['sudo', 'shutdown', 'now'])

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>niryo_one_commander</name>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <description>Interface between user and Moveit! to easily control Niryo One (arm + tools). Validates params, checks if previous trajectory has not finished, ...</description>
   <author>Edouard Renard</author>
   <maintainer email="e.renard@niryo.com">Edouard Renard</maintainer>
