@@ -1,7 +1,9 @@
 # Niryo One Modbus/TCP Server
 
 The Modbus/TCP server is running on port 5020 by default.
+
 It has been built on top of the [pymodbus](http://pymodbus.readthedocs.io/en/latest/index.html) library.
+
 This enables you to make Niryo One communicate with a PLC, or another computer in the same network.
 
 All 4 Modbus datastores are implemented : _Coil_, _Discrete Input_, _Holding Register_, _Input Register_. Each datastore has a different set of functionalities. Note that **each datastore contains a completely different set of data**.
@@ -14,10 +16,12 @@ Address tables start at 0.
 ## Coil
 
 Each address contains a 1bit value.
+
 READ/WRITE (the stored values correspond to the last given command, not the current robot state)
+
 Accepted Modbus functions :
-  * 0x01: READ_COILS
-  * 0x05: WRITE_SINGLE_COIL
+  * 0x01: READ\_COILS
+  * 0x05: WRITE\_SINGLE\_COIL
 
 This datastore can be used to set Digital I/O mode and state. Digital I/O numbers used for Modbus:
 * 0 : 1A
@@ -36,9 +40,11 @@ This datastore can be used to set Digital I/O mode and state. Digital I/O number
 ## Discrete Input
 
 Each address contains a 1bit value.
+
 READ-ONLY
+
 Accepted Modbus functions :
-* 0x02: READ_DISCRETE_INPUTS
+* 0x02: READ\_DISCRETE\_INPUTS
 
 This datastore can be used to read Digital I/O mode and state. See _Coil_ section above for digital I/O number mapping.
 
@@ -50,10 +56,12 @@ This datastore can be used to read Digital I/O mode and state. See _Coil_ sectio
 ## Holding Register
 
 Each address contains a 16bit value.
+
 READ/WRITE (the stored values correspond to the last given command, not the current robot state)
+
 Accepted Modbus functions :
-* 0x03: READ_HOLDING_REGISTERS
-* 0x06: WRITE_SINGLE_REGISTER
+* 0x03: READ\_HOLDING\_REGISTERS
+* 0x06: WRITE\_SINGLE\_REGISTER
 
 |Address| Description |
 |-------|-------------|
@@ -65,9 +73,11 @@ Accepted Modbus functions :
 ## Input Register
 
 Each address contains a 16bit value.
+
 READ-ONLY
+
 Accepted Modbus functions :
-* 0x04: READ_INPUT_REGISTERS
+* 0x04: READ\_INPUT\_REGISTERS
 
 |Address| Description |
 |-------|-------------|

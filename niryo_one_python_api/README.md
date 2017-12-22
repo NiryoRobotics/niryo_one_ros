@@ -4,7 +4,7 @@ To use Python API :
 
 1. Connect to Niryo One via ssh
 
-2. Create a Python file 
+2. Create a Python file
 
 ```
 touch test_python_api.py
@@ -26,6 +26,133 @@ n = NiryoOne()
 try:
     # Your code here
 except NiryoOneException as e:
-    print e 
+    print e
     # Handle errors here
 ```
+
+### Documentation - Class methods
+
+##### activate\_learning\_mode
+
+Params: 
+* activate (0 or 1)
+
+Activate or deactivate learning mode (= disable/enable torque on motors).
+
+##### move\_joints
+
+Params:
+* joints (array of 6 joints)
+
+Move the arm with a joint command.
+
+##### move\_pose
+
+Params:
+* position x (m)
+* position y (m)
+* position z (m)
+* rotation x (rad)
+* rotation y (rad)
+* rotation z (rad)
+
+Move the arm with a pose command.
+
+##### shift\_pose
+
+Params:
+* axis (0: pos.x, 1: pos.y, 2: pos.z, 3: rot.x, 4: rot.y, 5: rot.z)
+* value (m)
+
+Move the arm by shifting the current pose on <axis> by <value>.
+
+##### pin\_mode
+
+Params:
+* pin (GPIO number)
+* mode (0: OUTPUT, 1: INPUT)
+
+Set a digital I/O pin on INPUT or OUTPUT mode.
+
+##### digital\_write
+
+Params:
+* pin (GPIO number)
+* state (0: LOW, 1: HIGH)
+
+Set a digital I/O pin to LOW or HIGH. Note that the pin must have been previously set as OUTPUT.
+
+##### digital\_read
+
+Params:
+* pin (GPIO number)
+
+Returns the current pin state (0: LOW, 1: HIGH).
+
+##### change\_tool
+
+Params:
+* tool id (0 to detach current tool)
+
+Change current attached tool. **Before you execute any action on a tool, you have to select it with this method.**
+
+##### open\_gripper
+
+Params:
+* tool id
+* open speed (between 0 and 1000, recommended : between 100 and 500)
+
+Open gripper at selected speed.
+
+##### close\_gripper
+
+Params:
+* tool id
+* close speed (between 0 and 1000, recommended : between 100 and 500)
+
+Close gripper at selected speed. The gripper will stop when it detects the object to grab.
+
+##### pull\_air\_vacuum\_pump
+
+Params:
+* tool id
+
+Activate vacuum pump (pick object).
+
+##### push\_air\_vacuum\_pump
+
+Params: 
+* tool id
+
+Deactivate vacuum pump (place object)
+
+##### setup\_electromagnet
+
+Params:
+* tool id
+* pin (GPIO number)
+
+Setup electromagnet on digital I/O <pin> (set the pin mode to OUTPUT). You need to select and setup the electromagnet before using it.
+
+##### activate\_electromagnet
+
+Params:
+* tool id
+* pin (GPIO number)
+
+Activate electromagnet on digital I/O <pin> (pick object). This will set the pin state to HIGH.
+
+##### deactivate\_electromagnet
+
+Params:
+* tool id
+* pin (GPIO number)
+
+Deactivate electromagnet on digital I/O <pin> (place object). This will set the pin state to LOW.
+
+##### wait
+
+Params:
+* time (seconds)
+
+Blocks and wait for <time> seconds.
