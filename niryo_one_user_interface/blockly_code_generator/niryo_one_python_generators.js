@@ -100,7 +100,7 @@ Blockly.Blocks['niryo_one_open_gripper'] = {
             .appendField("Open Gripper");
         this.appendDummyInput()
             .appendField("at speed")
-            .appendField(new Blockly.FieldNumber(300, 100, 800, 1), "OPEN_SPEED");
+            .appendField(new Blockly.FieldDropdown([["1/5", "100"], ["2/5", "250"], ["3/5", "500"], ["4/5", "750"], ["5/5", "1000"]]), "OPEN_SPEED");
         this.setInputsInline(true);
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
@@ -117,7 +117,7 @@ Blockly.Blocks['niryo_one_close_gripper'] = {
             .appendField("Close Gripper");
         this.appendDummyInput()
             .appendField("at speed")
-            .appendField(new Blockly.FieldNumber(300, 100, 800, 1), "CLOSE_SPEED");
+            .appendField(new Blockly.FieldDropdown([["1/5", "100"], ["2/5", "250"], ["3/5", "500"], ["4/5", "750"], ["5/5", "1000"]]), "CLOSE_SPEED");
         this.setInputsInline(true);
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
