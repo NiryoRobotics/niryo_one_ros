@@ -50,6 +50,9 @@
 #define DXL_CONTROL_MODE_VELOCITY 2
 #define DXL_CONTROL_MODE_TORQUE   3
 
+// according to xl-320 datasheet : 1 speed ~ 0.111 rpm ~ 1.8944 dxl position per second
+#define DXL_STEPS_FOR_1_SPEED 1.8944 // 0.111 * 1024 / 60
+
 class DxlCommunication {
 
     public:

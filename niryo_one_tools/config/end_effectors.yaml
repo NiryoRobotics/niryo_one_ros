@@ -24,9 +24,9 @@ tool_list:
           - open_gripper
           - close_gripper
       specs:
-          open_position: 660 # 750
+          open_position: 600
           open_hold_torque: 128
-          close_position: 0 # 155 
+          close_position: 230
           close_hold_torque: 128
           close_max_torque: 1023
           open_speed: 300 
@@ -38,9 +38,9 @@ tool_list:
           - open_gripper
           - close_gripper
       specs:
-          open_position: 650
+          open_position: 640
           open_hold_torque: 128
-          close_position: 375
+          close_position: 400
           close_hold_torque: 128
           close_max_torque: 1023
           open_speed: 300 
@@ -52,9 +52,9 @@ tool_list:
           - open_gripper
           - close_gripper
       specs:
-          open_position: 530
+          open_position: 500
           open_hold_torque: 128
-          close_position: 180
+          close_position: 300
           close_hold_torque: 160
           close_max_torque: 1023
           open_speed: 300 
@@ -75,9 +75,9 @@ tool_list:
           - pull_air_vacuum_pump
           - push_air_vacuum_pump
       specs:
-          pull_air_position: 310
+          pull_air_position: 250
           pull_air_hold_torque: 128
-          push_air_position: 1000    
+          push_air_position: 760
     - name: "DC Motor 1"
       type: "dc_motor"
       id: 32

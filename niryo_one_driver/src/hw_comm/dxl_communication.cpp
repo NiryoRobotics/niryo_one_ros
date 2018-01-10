@@ -353,10 +353,13 @@ void DxlCommunication::hardwareControlWrite()
 
             // write_tool
             if (write_tool_enable && is_tool_connected) {
+                ros::Duration(0.005).sleep();
                 int write_tool_velocity_result = xl320->setGoalVelocity(tool.getId(), tool.getVelocityCommand());
+                ros::Duration(0.005).sleep();
                 int write_tool_position_result = xl320->setGoalPosition(tool.getId(), tool.getPositionCommand());
+                ros::Duration(0.005).sleep();
                 int write_tool_torque_result = xl320->setGoalTorque(tool.getId(), tool.getTorqueCommand());
-
+                
                 if (write_tool_velocity_result != COMM_SUCCESS || 
                         write_tool_position_result != COMM_SUCCESS ||
                         write_tool_torque_result != COMM_SUCCESS) {
@@ -566,27 +569,17 @@ int DxlCommunication::openGripper(uint8_t id, uint16_t open_position, uint16_t o
     // set gripper pos, vel and torque
     tool.setVelocityCommand(open_speed);
     tool.setPositionCommand(open_position);
-    tool.setTorqueCommand(512);
+    tool.setTorqueCommand(1023);
     write_tool_enable = true;
 
-    // wait until gripper is opened - or timeout
-    bool is_opened = false;
-    uint16_t current_position;
-    ros::Time time_start_open_gripper = ros::Time::now();
-
-    while (!is_opened) {
-        if (ros::Duration(ros::Time::now() - time_start_open_gripper) > ros::Duration(DXL_GRIPPER_ACTION_TIMEOUT)) {
-            ROS_WARN("Gripper timeout");
-            return TOOL_STATE_TIMEOUT;
-        }
-
-        ros::Duration(0.02).sleep();
-        if (tool.getPositionState() >= open_position - 30) { //5
-            is_opened = true;
-        }
-    }
-
-    // if successfully opened, set hold torque
+    // calculate open duration
+    int dxl_speed = open_speed * DXL_STEPS_FOR_1_SPEED; // position . sec-1
+    int dxl_steps_to_do = abs(open_position - tool.getPositionState()); // position
+    double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
+   
+    ros::Duration(seconds_to_wait + 0.25).sleep();
+    
+    // set hold torque
     tool.setTorqueCommand(open_hold_torque);
     write_tool_enable = true;
 
@@ -594,6 +587,7 @@ int DxlCommunication::openGripper(uint8_t id, uint16_t open_position, uint16_t o
 }
 
 /*
+ * Close position must be lower than open position (from mechanical design)
  * This method should be called in a different thread than control loop
  */
 int DxlCommunication::closeGripper(uint8_t id, uint16_t close_position, uint16_t close_speed, uint16_t close_hold_torque, uint16_t close_max_torque)
@@ -602,34 +596,23 @@ int DxlCommunication::closeGripper(uint8_t id, uint16_t close_position, uint16_t
     if (id != tool.getId()) {
         return TOOL_STATE_WRONG_ID;  
     }
-    
+   
+    int position_command = (close_position < 50) ? 0 : close_position - 50;
+
     // set gripper pos, vel and torque
     tool.setVelocityCommand(close_speed);
-    tool.setPositionCommand(0);
+    tool.setPositionCommand(position_command);
     tool.setTorqueCommand(close_max_torque);
     write_tool_enable = true;
+
+    // calculate close duration
+    int dxl_speed = close_speed * DXL_STEPS_FOR_1_SPEED; // position . sec-1
+    int dxl_steps_to_do = abs(close_position - tool.getPositionState()); // position
+    double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
+
+    ros::Duration(seconds_to_wait + 0.25).sleep();
     
-    // wait until gripper is closed - or timeout
-    bool is_closed = false;
-    uint16_t current_load;
-    ros::Time time_start_close_gripper = ros::Time::now();
-
-    while (!is_closed) {
-        if (ros::Duration(ros::Time::now() - time_start_close_gripper) > ros::Duration(DXL_GRIPPER_ACTION_TIMEOUT)) {
-            ROS_WARN("Gripper timeout");
-            return TOOL_STATE_TIMEOUT;
-        }
-        
-        ros::Duration(0.02).sleep();
-        if (tool.getTorqueState() >= close_max_torque * 0.95) { 
-            is_closed = true;
-        }
-    }
-
-    // let some time to reach max load
-    ros::Duration(0.1).sleep();
-
-    // if successfully closed, set hold torque and position
+    // set hold torque and position
     tool.setTorqueCommand(close_hold_torque);
     tool.setPositionCommand(close_position);
     write_tool_enable = true;
@@ -639,8 +622,6 @@ int DxlCommunication::closeGripper(uint8_t id, uint16_t close_position, uint16_t
 
 /*
  * This method should be called in a different thread than control loop
- *
- * TODO : finish to implement
  */
 int DxlCommunication::pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, uint16_t pull_air_hold_torque)
 {
@@ -648,18 +629,23 @@ int DxlCommunication::pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, 
     if (id != tool.getId()) {
         return TOOL_STATE_WRONG_ID;  
     }
-    ROS_INFO("Start pull air vp");
-    
+   
+    int pull_air_velocity = 1023;
+
     // set vacuum pump pos, vel and torque
-    tool.setVelocityCommand(512);
+    tool.setVelocityCommand(pull_air_velocity);
     tool.setPositionCommand(pull_air_position);
     tool.setTorqueCommand(1023);
     write_tool_enable = true;
 
-    ros::Duration(2.0).sleep(); // TODO check load and keep
+    // calculate pull air duration
+    int dxl_speed = pull_air_velocity * DXL_STEPS_FOR_1_SPEED; // position . sec-1
+    int dxl_steps_to_do = abs(pull_air_position - tool.getPositionState()); // position
+    double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
     
-    // if successfully pulled (object grasped), set hold torque and position
-    tool.setPositionCommand(tool.getPositionState());
+    ros::Duration(seconds_to_wait + 0.25).sleep();
+    
+    // set hold torque
     tool.setTorqueCommand(pull_air_hold_torque);
     write_tool_enable = true;
 
@@ -668,8 +654,6 @@ int DxlCommunication::pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, 
 
 /*
  * This method should be called in a different thread than control loop
- *
- * TODO : finish to implement
  */
 int DxlCommunication::pushAirVacuumPump(uint8_t id, uint16_t push_air_position)
 {
@@ -677,17 +661,23 @@ int DxlCommunication::pushAirVacuumPump(uint8_t id, uint16_t push_air_position)
     if (id != tool.getId()) {
         return TOOL_STATE_WRONG_ID;  
     }
-    ROS_INFO("Start push air vp");
+
+    int push_air_velocity = 1023;
 
     // set vacuum pump pos, vel and torque
-    tool.setVelocityCommand(512);
+    tool.setVelocityCommand(push_air_velocity);
     tool.setPositionCommand(push_air_position);
     tool.setTorqueCommand(1023);
     write_tool_enable = true;
 
-    ros::Duration(2.0).sleep(); // TODO check position
+    // calculate push air duration
+    int dxl_speed = push_air_velocity * DXL_STEPS_FOR_1_SPEED; // position . sec-1
+    int dxl_steps_to_do = abs(push_air_position - tool.getPositionState()); // position
+    double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
+    
+    ros::Duration(seconds_to_wait + 0.25).sleep();
 
-    // if successfully pushed (object released), set torque to zero
+    // set torque to 0
     tool.setTorqueCommand(0);
     write_tool_enable = true;
 
