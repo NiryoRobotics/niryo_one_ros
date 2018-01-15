@@ -7,14 +7,14 @@
 #
 
 stepper_1_gear_ratio: 6.0625
-stepper_2_gear_ratio: 6.65
-stepper_3_gear_ratio: 6.3
+stepper_2_gear_ratio: 8.3125
+stepper_3_gear_ratio: 7.875
 stepper_4_gear_ratio: 5.0
 
 stepper_1_offset_position: 3.05433
 stepper_2_offset_position: 0.628319
 stepper_3_offset_position: -1.401
-stepper_4_offset_position: 2.791  #2.61799
+stepper_4_offset_position: 2.791
 
 stepper_1_home_position: 0.0
 stepper_2_home_position: 0.628319
