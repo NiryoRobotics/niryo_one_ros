@@ -21,33 +21,21 @@
 # All nodes related to Raspberry Pi are running here with only one node
 # ( lower RAM usage )
 #
-#
 
 import rospy
 import RPi.GPIO as GPIO
 
 from ros_log_manager import RosLogManager
 from led_manager import LEDManager
+from fans_manager import FansManager
 from niryo_one_button import NiryoButton
 from digital_io_panel import DigitalIOPanel
 from wifi_connection import WifiConnectionManager
 from niryo_one_ros_setup import *
 from niryo_one_modbus.modbus_server import ModbusServer
 
-FAN_1_GPIO = 23
-FAN_2_GPIO = 27
 
 class NiryoOneRpi:
-
-    def setup_fans(self):
-        GPIO.setwarnings(False) 
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(FAN_1_GPIO, GPIO.OUT)
-        GPIO.setup(FAN_2_GPIO, GPIO.OUT)
-        rospy.sleep(0.1)
-        GPIO.output(FAN_1_GPIO, GPIO.HIGH)
-        GPIO.output(FAN_2_GPIO, GPIO.HIGH)
-        rospy.loginfo("------ RPI FANS ON ------")
 
     def __init__(self):
         self.wifi_manager_enabled = rospy.get_param("~wifi_manager_enabled")
@@ -65,7 +53,7 @@ class NiryoOneRpi:
         if self.wifi_manager_enabled:
             self.wifi_manager = WifiConnectionManager()
       
-        self.setup_fans()
+        self.fans_manager = FansManager()
         self.ros_log_manager = RosLogManager()
         self.led_manager = LEDManager()
         self.niryo_one_button = NiryoButton()
