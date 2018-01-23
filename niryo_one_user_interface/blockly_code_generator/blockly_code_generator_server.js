@@ -46,9 +46,22 @@ const generateCode = (dirPath) => {
     }
 
     var workspace = new Blockly.Workspace();
-    Blockly.Xml.domToWorkspace(xml, workspace);
+    
+    try {
+        Blockly.Xml.domToWorkspace(xml, workspace);
+    }
+    catch (e) {
+        return { status: 400, message: 'Failed to parse given Xml' };
+    }
+    
     var code = '#!/usr/bin/env python\n\nfrom niryo_one_python_api.niryo_one_api import *\n\nn = NiryoOne()\n\n';
-    code += Blockly.Python.workspaceToCode(workspace);
+    
+    try {
+        code += Blockly.Python.workspaceToCode(workspace);
+    }
+    catch (e) {
+        return { status: 400, message: 'Could not generate code from given Xml' };
+    }
 
     try {
         fs.writeFileSync(filenameWrite, code, 'utf-8');
