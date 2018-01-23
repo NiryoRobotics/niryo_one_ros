@@ -17,12 +17,12 @@ add_message_files(
   RobotState.msg
   RobotMoveCommand.msg
   ToolCommand.msg
-  BlocklyCommand.msg
   ProcessState.msg
   HardwareStatus.msg
   LogStatus.msg
   DigitalIOState.msg
   SoftwareVersion.msg
+  Sequence.msg
 )
 
 add_service_files(
@@ -40,6 +40,8 @@ add_service_files(
   PushAirVacuumPump.srv
   SetDigitalIO.srv
   GetDigitalIO.srv
+  GetSequenceList.srv
+  ManageSequence.srv
 )
 
 add_action_files(
@@ -48,7 +50,7 @@ add_action_files(
   JoystickJoints.action
   RobotMove.action
   Tool.action
-  Blockly.action
+  Sequence.action
 )
 
 generate_messages(

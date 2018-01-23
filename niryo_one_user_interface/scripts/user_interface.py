@@ -20,7 +20,10 @@
 import rospy
 
 from joystick_interface import JoystickInterface
-from blockly_action_server import BlocklyActionServer
+
+from sequence_manager import SequenceManager
+from sequence_action_server import SequenceActionServer
+
 
 class UserInterface:
 
@@ -30,12 +33,16 @@ class UserInterface:
         self.joy = JoystickInterface()
         self.joy.disable_joy()
     
-        # Blockly Server
-        self.blockly_server = BlocklyActionServer()
-        self.blockly_server.start()
+        # Sequence Manager
+        sequences_dir = rospy.get_param("~sequences_dir")
+        self.sequence_manager = SequenceManager(sequences_dir)
+
+        # Sequence Action Server
+        self.sequence_action_server = SequenceActionServer(self.sequence_manager)
+        self.sequence_action_server.start()
 
     def shutdown(self):
-        self.blockly_server.shutdown()
+        self.sequence_manager.shutdown()
 
 if __name__ == '__main__':
     rospy.init_node('user_interface')

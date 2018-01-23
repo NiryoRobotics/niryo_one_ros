@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# command_status.py
+# sequence_command_type.py
 # Copyright (C) 2017 Niryo
 # All rights reserved.
 #
@@ -17,28 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-class CommandStatus:
+class SequenceCommandType:
     
-    # Success
-    SUCCESS = 1
-    STOPPED = 2
-    WAITING = 6
-
-    # Rejected
-    GOAL_STILL_ACTIVE  = 10
-    INVALID_PARAMETERS = 11
-    LEARNING_MODE_ON   = 12
-    JOYSTICK_ENABLED   = 13
-
-    # Aborted
-    NO_PLAN_AVAILABLE   = 20
-    PLAN_FAILED         = 21
-    CONTROLLER_PROBLEMS = 22
-    STILL_RUNNING       = 23
-    TOOL_FAILED         = 24
-    SEQUENCE_FAILED     = 25
-
-    # ROS error
-    ROS_ERROR           = 30
-
+    GET               = 1
+    CREATE            = 2
+    UPDATE            = 3
+    DELETE            = 4
+    GET_LAST_EXECUTED = 5

@@ -4,15 +4,29 @@ This packages handles high-level user interface commands.
 
 ### Joystick interface
 
-This interfaces uses the _joy_ ROS package to read data from a Xbox controller, and then sends commands to Niryo One joint trajectory controller. 
+This interface uses the _joy_ ROS package to read data from a Xbox controller, and then sends commands to Niryo One joint trajectory controller. 
 
 Each joint can be controlled separately with different buttons on the joystick.
 
-### Blockly server
+### Sequence manager
 
-This is an actionlib server that can receive Blockly commands.
+A sequence is a set of commands that can be executed on the robot. 
+For now, a sequence is created from a Blockly Xml. The Xml is then converted into some Python code which uses the Niryo One Python API.
 
-* Receives Blockly commands (Blockly XML)
+The sequence manager allows - through a service server - to : 
+
+* Create a sequence
+* Get a sequence from ID
+* Get list of sequences
+* Get last executed sequence
+* Update sequence
+* Delete sequence
+
+### Sequence action server
+
+This action server is used to execute a sequence.
+
+* Receives sequence command (from ID, from XML)
 * Handles concurrent requests
 * Generates Python code from XML (through a nodejs server)
 * Executes the generated Python code (corresponds to the Niryo One Python API functions)

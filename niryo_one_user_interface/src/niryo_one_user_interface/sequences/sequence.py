@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# command_status.py
+# sequence.py
 # Copyright (C) 2017 Niryo
 # All rights reserved.
 #
@@ -17,28 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import rospy
 
-class CommandStatus:
-    
-    # Success
-    SUCCESS = 1
-    STOPPED = 2
-    WAITING = 6
+class Sequence:
 
-    # Rejected
-    GOAL_STILL_ACTIVE  = 10
-    INVALID_PARAMETERS = 11
-    LEARNING_MODE_ON   = 12
-    JOYSTICK_ENABLED   = 13
-
-    # Aborted
-    NO_PLAN_AVAILABLE   = 20
-    PLAN_FAILED         = 21
-    CONTROLLER_PROBLEMS = 22
-    STILL_RUNNING       = 23
-    TOOL_FAILED         = 24
-    SEQUENCE_FAILED     = 25
-
-    # ROS error
-    ROS_ERROR           = 30
-
+    def __init__(self, id=0, name="", description="", blockly_xml="", python_code=""):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.created = rospy.Time.now().secs
+        self.updated = rospy.Time.now().secs
+        self.blockly_xml = blockly_xml
+        self.python_code = python_code
