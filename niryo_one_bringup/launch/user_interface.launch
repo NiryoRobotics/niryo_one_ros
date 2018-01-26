@@ -18,5 +18,10 @@
         
         <param name="sequences_dir" type="string"  value="/home/niryo/niryo_one_sequences" unless="$(arg simulation_mode)"/>
         <param name="sequences_dir" type="string"  value="~/niryo_one_sequences"           if="$(arg simulation_mode)"/>
+
+        <param name="sequence_autorun_status_file" type="string"
+            value="/home/niryo/niryo_one_saved_values/sequence_autorun_status.txt" unless="$(arg simulation_mode)"/>
+        <param name="sequence_autorun_status_file" type="string"
+            value="~/sequence_autorun_status.txt" if="$(arg simulation_mode)"/>
     </node>
 </launch>

@@ -23,6 +23,7 @@ from joystick_interface import JoystickInterface
 
 from sequence_manager import SequenceManager
 from sequence_action_server import SequenceActionServer
+from sequence_autorun import SequenceAutorun
 
 
 class UserInterface:
@@ -40,6 +41,9 @@ class UserInterface:
         # Sequence Action Server
         self.sequence_action_server = SequenceActionServer(self.sequence_manager)
         self.sequence_action_server.start()
+
+        # Sequence Autorun
+        self.sequence_autorun = SequenceAutorun()
 
     def shutdown(self):
         self.sequence_manager.shutdown()

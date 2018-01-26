@@ -23,6 +23,7 @@ add_message_files(
   DigitalIOState.msg
   SoftwareVersion.msg
   Sequence.msg
+  SequenceAutorunStatus.msg
 )
 
 add_service_files(
@@ -42,6 +43,7 @@ add_service_files(
   GetDigitalIO.srv
   GetSequenceList.srv
   ManageSequence.srv
+  SetSequenceAutorun.srv
 )
 
 add_action_files(

@@ -92,6 +92,15 @@ class NiryoButton:
         except rospy.ServiceException, e:
             rospy.logwarn("Could not call set_hotspot service")
 
+    def send_trigger_sequence_autorun(self):
+        rospy.loginfo("Trigger sequence autorun from button")
+        try:
+            rospy.wait_for_service('/niryo_one/sequences/trigger_sequence_autorun', 0.1)
+            trigger = rospy.ServiceProxy('/niryo_one/sequences/trigger_sequence_autorun', SetInt)
+            trigger(1) # value doesn't matter, it will switch state on the server
+        except (rospy.ServiceException, rospy.ROSException), e:
+            return
+
     def check_button(self, event):
         if not self.activated:
             return
@@ -119,6 +128,8 @@ class NiryoButton:
                 self.hotspot_action = True
             elif self.consecutive_pressed > self.timer_frequency * 3:
                 self.shutdown_action = True
+            elif self.consecutive_pressed >= 1:
+                self.send_trigger_sequence_autorun()
             self.consecutive_pressed = 0
             
         # Use LED to help user know which action to execute
