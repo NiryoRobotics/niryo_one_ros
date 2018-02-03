@@ -46,6 +46,9 @@ class FansManager:
     def __init__(self):
         self.setup_fans()
         self.learning_mode_on = True
+        # Activate fans for 5 seconds to give an audio signal to the user
+        self.set_fans(True)
+        rospy.sleep(5)
         self.set_fans(not self.learning_mode_on)
 
         self.learning_mode_subscriber = rospy.Subscriber(
