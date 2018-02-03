@@ -1,0 +1,3 @@
+RobotState trajectory_start
+string group_name
+RobotTrajectory trajectory

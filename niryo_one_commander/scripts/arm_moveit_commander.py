@@ -100,6 +100,10 @@ class ArmMoveitCommander:
             #rospy.loginfo("Sign change counter : " + str(sign_change_counter))
         return True
     
+    
+    def set_next_plan(selfself, plan):
+        self.next_plan = plan
+    
     def execute_plan(self, wait=False):
         if self.next_plan:
             

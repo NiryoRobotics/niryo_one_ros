@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   actionlib_msgs
   message_generation
+  moveit_msgs
 )
 
 add_message_files(
@@ -24,6 +25,7 @@ add_message_files(
   SoftwareVersion.msg
   Sequence.msg
   SequenceAutorunStatus.msg
+  MotionPlan.msg
 )
 
 add_service_files(
