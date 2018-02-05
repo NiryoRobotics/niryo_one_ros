@@ -61,7 +61,8 @@ class SequenceAutorun:
                             mode = int(line.replace('mode:', '').rstrip())
                         if line.startswith('sequence_ids:'):
                             sequence_ids_str = line.replace('sequence_ids:', '').rstrip()
-                            sequence_ids = [int(x) for x in sequence_ids_str.split(',')]
+                            if sequence_ids_str != '':
+                                sequence_ids = [int(x) for x in sequence_ids_str.split(',')]
         return enabled, mode, sequence_ids
 
     def write_sequence_autorun(self, enabled, mode, sequence_ids):
