@@ -124,6 +124,7 @@ class RobotActionServer:
       
         # validate parameters -> set_rejected (msg : validation or commander error)
         try:
+            rospy.loginfo("Robot Acton Sever - checking paramter Validity")
             self.validate_params(goal_handle.goal.goal.cmd)
         except RobotCommanderException as e:
             result = self.create_result(e.status, e.message)
@@ -208,6 +209,7 @@ class RobotActionServer:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Wrong command type")
 
     def validate_trajectory(self, plan):
+        rospy.loginfo("Checking trajectory valididty")
         #Do soemthing here to check if the trajectory is valid
         dummy = 0
     

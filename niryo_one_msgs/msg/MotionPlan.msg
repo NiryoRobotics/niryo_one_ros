@@ -1,3 +1,3 @@
-RobotState trajectory_start
+moveit_msgs/RobotState trajectory_start
 string group_name
-RobotTrajectory trajectory
+moveit_msgs/RobotTrajectory trajectory

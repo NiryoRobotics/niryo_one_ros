@@ -87,9 +87,6 @@ class RobotCommander:
 
         self.robot_command_server = rospy.Service('niryo_one/commander/execute_command',
                 RobotMove, self.callback_robot_command)
-        
-        self.set_pla_server = rospy.Service('niryo_one/commander/set_plan_and_execute',
-                                            SetPlanAndExecute, self.callback_set_plan_and_execute)
 
         self.reset_controller_pub = rospy.Publisher('/niryo_one/steppers_reset_controller', Empty, queue_size=1)
         
@@ -101,13 +98,6 @@ class RobotCommander:
         cmd = req.cmd
         try:
             return self.execute_command(cmd)
-        except RobotCommanderException as e:
-            return self.create_response(e.status, e.message)
-        
-    def callback_set_plan_and_execute(self, req):
-        plan = req.Trajectory
-        try: 
-            return self.set_plan_and_execute(plan)
         except RobotCommanderException as e:
             return self.create_response(e.status, e.message)
         
@@ -123,7 +113,7 @@ class RobotCommander:
             message = "Tool command has been successfully processed"
         else: # move command
             if cmd_type == CommandType.EXECUTE_TRAJ:
-                status, message = self.set_next_plan_and_execute(cmd.plan)
+                status, message = self.set_plan_and_execute(cmd.plan)
             else:
                 if cmd_type == CommandType.JOINTS:
                     self.arm_commander.set_joint_target(cmd.joints)
