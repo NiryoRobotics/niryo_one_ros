@@ -101,6 +101,13 @@ class RobotCommander:
         except RobotCommanderException as e:
             return self.create_response(e.status, e.message)
         
+    def callback_set_plan_and_execute(self, req):
+        plan = req.Trajectory
+        try: 
+            return self.set_plan_and_execute(plan)
+        except RobotCommanderException as e:
+            return self.create_response(e.status, e.message)
+        
 
     def execute_command(self, cmd):
         cmd_type = cmd.cmd_type
