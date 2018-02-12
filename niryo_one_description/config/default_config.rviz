@@ -132,7 +132,7 @@ Visualization Manager:
           Value: true
         wrist_link:
           Value: true
-      Marker Scale: 0.300000012
+      Marker Scale: 0.100000001
       Name: TF
       Show Arrows: true
       Show Axes: true
@@ -175,7 +175,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.01129115
+      Distance: 0.518430948
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -190,10 +190,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.745398104
+      Pitch: 0.885397971
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.870417595
+      Yaw: 6.17860126
     Saved: ~
 Window Geometry:
   Displays:
