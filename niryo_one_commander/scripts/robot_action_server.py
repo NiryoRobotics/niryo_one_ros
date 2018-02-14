@@ -124,6 +124,7 @@ class RobotActionServer:
       
         # validate parameters -> set_rejected (msg : validation or commander error)
         try:
+            rospy.loginfo("Robot Acton Sever - checking paramter Validity")
             self.validate_params(goal_handle.goal.goal.cmd)
         except RobotCommanderException as e:
             result = self.create_result(e.status, e.message)
@@ -200,11 +201,18 @@ class RobotActionServer:
             self.validate_orientation(cmd.rpy)
         elif cmd_type == CommandType.SHIFT_POSE:
             self.validate_shift_pose(cmd.shift)
+        elif cmd_type == CommandType.EXECUTE_TRAJ:
+            self.validate_trajectory(cmd.plan)
         elif cmd_type == CommandType.TOOL:
             self.validate_tool_command(cmd.tool_cmd)
         else:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Wrong command type")
 
+    def validate_trajectory(self, plan):
+        rospy.loginfo("Checking trajectory valididty")
+        #Do soemthing here to check if the trajectory is valid
+        dummy = 0
+    
     def validate_joints(self, joint_array):
         v = self.validation['joint_limits']
 

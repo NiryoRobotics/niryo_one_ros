@@ -25,3 +25,4 @@ class CommandType(object):
     RPY        = 4
     SHIFT_POSE = 5
     TOOL       = 6
+    EXECUTE_TRAJ = 7
