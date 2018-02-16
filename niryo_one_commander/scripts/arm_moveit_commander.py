@@ -102,23 +102,6 @@ class ArmMoveitCommander:
     
     
     def set_next_plan(self, plan):
-        rospy.loginfo("checking if current state is near trajectory start state")
-        group_variable_values = self.arm.get_current_joint_values()
-        rospy.loginfo("got current joint values:")
-        rospy.loginfo("".join(str(x) for x in group_variable_values))
-        #print group_variable_values.size()
-        #rospy.loginfo(group_variable_values)
-        rospy.loginfo("Trajectory start values:")
-        rospy.loginfo("".join(str(x) for x in plan.trajectory_start.joint_state.position))
-        
-        #for idx,val in group_variable_values:
-        #    if abs(val-plan.trajectory_start.joint_state.position[idx])>0.01:
-        #        rospy.logerr("Start state does not match current state")
-        #        return
-        #print plan.trajectory_start.type()
-        #print plan.trajectory_start.size()
-        #rospy.loginfo(plan.trajectory_start)
-        rospy.loginfo("Start staet valid, plan set")
         self.next_plan = plan.trajectory
     
     def execute_plan(self, wait=False):

@@ -25,7 +25,7 @@ include_directories(include)
 
 set(IKFAST_LIBRARY_NAME niryo_one_arm_moveit_ikfast_plugin)
 
-find_package(LAPACK REQUIRED)
+#find_package(LAPACK REQUIRED)
 
 add_library(${IKFAST_LIBRARY_NAME} src/niryo_one_arm_ikfast_moveit_plugin.cpp)
 target_link_libraries(${IKFAST_LIBRARY_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${LAPACK_LIBRARIES})
