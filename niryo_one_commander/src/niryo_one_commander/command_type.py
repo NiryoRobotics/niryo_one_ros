@@ -26,3 +26,4 @@ class CommandType(object):
     SHIFT_POSE = 5
     TOOL       = 6
     EXECUTE_TRAJ = 7
+    POSE_QUAT  = 8

@@ -20,6 +20,7 @@
 import rospy, sys
 import actionlib
 import threading
+from math import sqrt
 
 # Lib
 from niryo_one_commander.command_type import CommandType
@@ -205,6 +206,9 @@ class RobotActionServer:
             self.validate_trajectory(cmd.plan)
         elif cmd_type == CommandType.TOOL:
             self.validate_tool_command(cmd.tool_cmd)
+        elif cmd_type == CommandType.POSE_QUAT:
+            self.validate_position(cmd.pose_quat.position)
+            self.validate_orientation_quaternion(cmd.pose_quat.orientation)
         else:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Wrong command type")
 
@@ -262,6 +266,13 @@ class RobotActionServer:
         if (orientation.yaw < v['yaw']['min'] or orientation.yaw > v['yaw']['max']):
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS,
                     "rot.z (yaw) not in range ( " + str(v['yaw']['min']) + " , " + str(v['yaw']['max']) + " )")
+            
+    def validate_orientation_quaternion(self, quat):
+        norm = quat.x*quat.x +quat.y*quat.y + quat.z*quat.z + quat.w*quat.w
+        norm = sqrt(norm)
+        if (abs(norm-1.0) > 0.001):
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS,
+                    "Quaternian is not normalised.")
 
     def validate_shift_pose(self, shift):
         if (shift.axis_number not in [0,1,2,3,4,5]):

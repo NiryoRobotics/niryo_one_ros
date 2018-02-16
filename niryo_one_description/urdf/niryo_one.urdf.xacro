@@ -33,8 +33,7 @@
     <xacro:property name="distance_wrist_hand_x" value="0.018" />
     <xacro:property name="distance_wrist_hand_y" value="0" />
     <!-- not yet implemented, for now -->
-    <xacro:property name="distance_hand_gripper_z" value="0.1115" />
-    <xacro:property name="distance_hand_gripper_y" value="-0.014" />
+    <xacro:property name="distance_hand_gripper" value="0.00" />
 	
 	<xacro:property name="thickness_arm_axis" value="0.052" />
 	<xacro:property name="thickness_forearm_axis" value="0.048" />
@@ -249,7 +248,7 @@
 	<joint name="hand_gripper_joint" type="fixed">
         <parent link="hand_link" />
         <child link="gripper_link" />
-        <origin xyz="0 ${distance_hand_gripper_y} ${distance_hand_gripper_z}" rpy="0 ${PI} -${PI/2}" />
+        <origin xyz="0 0 ${distance_hand_gripper}" rpy="${-PI/2} ${-PI/2} 0" />
 	</joint>
 
 </robot>

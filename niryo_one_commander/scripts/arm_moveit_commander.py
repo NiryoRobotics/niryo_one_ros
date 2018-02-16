@@ -180,6 +180,9 @@ class ArmMoveitCommander:
  
     def set_pose_target(self, x, y, z, roll, pitch, yaw):
         self.arm.set_pose_target([x, y, z, roll, pitch, yaw], self.end_effector_link)
+        
+    def set_pose_quat_target(self,pose_msg):
+        self.arm.set_pose_target(pose_msg)
 
     def set_shift_pose_target(self, axis_number, value):
         self.arm.shift_pose_target(axis_number, value, self.end_effector_link)

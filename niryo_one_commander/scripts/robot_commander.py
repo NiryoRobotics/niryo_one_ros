@@ -133,6 +133,8 @@ class RobotCommander:
                     self.arm_commander.set_rpy_target(cmd.rpy.roll, cmd.rpy.pitch, cmd.rpy.yaw)
                 elif cmd_type == CommandType.SHIFT_POSE:
                     self.arm_commander.set_shift_pose_target(cmd.shift.axis_number, cmd.shift.value)
+                elif cmd_type == CommandType.POSE_QUAT:
+                    self.arm_commander.set_pose_quat_target(cmd.pose_quat)
             
                 status, message = self.compute_and_execute_plan()
 
