@@ -203,7 +203,7 @@ class RobotActionServer:
         elif cmd_type == CommandType.SHIFT_POSE:
             self.validate_shift_pose(cmd.shift)
         elif cmd_type == CommandType.EXECUTE_TRAJ:
-            self.validate_trajectory(cmd.plan)
+            self.validate_trajectory(cmd.Trajectory)
         elif cmd_type == CommandType.TOOL:
             self.validate_tool_command(cmd.tool_cmd)
         elif cmd_type == CommandType.POSE_QUAT:

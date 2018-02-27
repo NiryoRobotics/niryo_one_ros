@@ -5,7 +5,7 @@ float64[] joints
 geometry_msgs/Point position
 niryo_one_msgs/RPY rpy
 niryo_one_msgs/ShiftPose shift
-niryo_one_msgs/MotionPlan plan
+niryo_one_msgs/TrajectoryPlan Trajectory
 geometry_msgs/Pose pose_quat
 
 niryo_one_msgs/ToolCommand tool_cmd

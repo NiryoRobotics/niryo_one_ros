@@ -101,8 +101,8 @@ class ArmMoveitCommander:
         return True
     
     
-    def set_next_plan(self, plan):
-        self.next_plan = plan.trajectory
+    def set_next_plan(self, traj):
+        self.next_plan = traj.trajectory
     
     def execute_plan(self, wait=False):
         if self.next_plan:

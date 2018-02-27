@@ -58,8 +58,8 @@ class RobotCommander:
         rospy.loginfo("Send Moveit trajectory")
         return self.arm_commander.execute_plan()
     
-    def set_plan_and_execute(self, plan):
-        self.arm_commander.set_next_plan(plan)
+    def set_plan_and_execute(self, traj):
+        self.arm_commander.set_next_plan(traj)
         self.reset_controller()
         rospy.loginfo("Send newly set trajectory to execute")
         return self.arm_commander.execute_plan()
@@ -101,13 +101,6 @@ class RobotCommander:
         except RobotCommanderException as e:
             return self.create_response(e.status, e.message)
         
-    def callback_set_plan_and_execute(self, req):
-        plan = req.Trajectory
-        try: 
-            return self.set_plan_and_execute(plan)
-        except RobotCommanderException as e:
-            return self.create_response(e.status, e.message)
-        
 
     def execute_command(self, cmd):
         cmd_type = cmd.cmd_type
@@ -120,7 +113,7 @@ class RobotCommander:
             message = "Tool command has been successfully processed"
         else: # move command
             if cmd_type == CommandType.EXECUTE_TRAJ:
-                status, message = self.set_plan_and_execute(cmd.plan)
+                status, message = self.set_plan_and_execute(cmd.Trajectory)
             else:
                 if cmd_type == CommandType.JOINTS:
                     self.arm_commander.set_joint_target(cmd.joints)
