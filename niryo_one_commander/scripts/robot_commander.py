@@ -57,6 +57,12 @@ class RobotCommander:
         self.reset_controller()
         rospy.loginfo("Send Moveit trajectory")
         return self.arm_commander.execute_plan()
+    
+    def set_plan_and_execute(self, traj):
+        self.arm_commander.set_next_plan(traj)
+        self.reset_controller()
+        rospy.loginfo("Send newly set trajectory to execute")
+        return self.arm_commander.execute_plan()
 
     def reset_controller(self):
         msg = Empty() 
@@ -94,6 +100,7 @@ class RobotCommander:
             return self.execute_command(cmd)
         except RobotCommanderException as e:
             return self.create_response(e.status, e.message)
+        
 
     def execute_command(self, cmd):
         cmd_type = cmd.cmd_type
@@ -105,19 +112,24 @@ class RobotCommander:
             status = CommandStatus.SUCCESS # todo get status from send_tool_command
             message = "Tool command has been successfully processed"
         else: # move command
-            if cmd_type == CommandType.JOINTS:
-                self.arm_commander.set_joint_target(cmd.joints)
-            elif cmd_type == CommandType.POSE:
-                self.arm_commander.set_pose_target(cmd.position.x, cmd.position.y, cmd.position.z,
-                                                   cmd.rpy.roll, cmd.rpy.pitch, cmd.rpy.yaw)
-            elif cmd_type == CommandType.POSITION:
-                self.arm_commander.set_position_target(cmd.position.x, cmd.position.y, cmd.position.z)
-            elif cmd_type == CommandType.RPY:
-                self.arm_commander.set_rpy_target(cmd.rpy.roll, cmd.rpy.pitch, cmd.rpy.yaw)
-            elif cmd_type == CommandType.SHIFT_POSE:
-                self.arm_commander.set_shift_pose_target(cmd.shift.axis_number, cmd.shift.value)
-        
-            status, message = self.compute_and_execute_plan()
+            if cmd_type == CommandType.EXECUTE_TRAJ:
+                status, message = self.set_plan_and_execute(cmd.Trajectory)
+            else:
+                if cmd_type == CommandType.JOINTS:
+                    self.arm_commander.set_joint_target(cmd.joints)
+                elif cmd_type == CommandType.POSE:
+                    self.arm_commander.set_pose_target(cmd.position.x, cmd.position.y, cmd.position.z,
+                                                       cmd.rpy.roll, cmd.rpy.pitch, cmd.rpy.yaw)
+                elif cmd_type == CommandType.POSITION:
+                    self.arm_commander.set_position_target(cmd.position.x, cmd.position.y, cmd.position.z)
+                elif cmd_type == CommandType.RPY:
+                    self.arm_commander.set_rpy_target(cmd.rpy.roll, cmd.rpy.pitch, cmd.rpy.yaw)
+                elif cmd_type == CommandType.SHIFT_POSE:
+                    self.arm_commander.set_shift_pose_target(cmd.shift.axis_number, cmd.shift.value)
+                elif cmd_type == CommandType.POSE_QUAT:
+                    self.arm_commander.set_pose_quat_target(cmd.pose_quat)
+            
+                status, message = self.compute_and_execute_plan()
 
         result = self.create_response(status, message)
         return result

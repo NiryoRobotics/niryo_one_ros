@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   actionlib_msgs
   message_generation
+  moveit_msgs
 )
 
 add_message_files(
@@ -24,6 +25,7 @@ add_message_files(
   SoftwareVersion.msg
   Sequence.msg
   SequenceAutorunStatus.msg
+  TrajectoryPlan.msg
 )
 
 add_service_files(
@@ -60,10 +62,11 @@ generate_messages(
   std_msgs
   geometry_msgs
   actionlib_msgs
+  moveit_msgs
 )
 
 catkin_package(
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime actionlib_msgs geometry_msgs
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime actionlib_msgs geometry_msgs moveit_msgs
 )
 
 include_directories(
