@@ -25,7 +25,7 @@ add_message_files(
   SoftwareVersion.msg
   Sequence.msg
   SequenceAutorunStatus.msg
-  MotionPlan.msg
+  TrajectoryPlan.msg
 )
 
 add_service_files(
