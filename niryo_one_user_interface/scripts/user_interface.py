@@ -24,7 +24,7 @@ from joystick_interface import JoystickInterface
 from sequence_manager import SequenceManager
 from sequence_action_server import SequenceActionServer
 from sequence_autorun import SequenceAutorun
-
+from matlab_manager import MatlabManager 
 
 class UserInterface:
 
@@ -44,6 +44,9 @@ class UserInterface:
 
         # Sequence Autorun
         self.sequence_autorun = SequenceAutorun()
+
+        #Matlab node manager 
+        self.matlab_manager=MatlabManager()
 
     def shutdown(self):
         self.sequence_manager.shutdown()

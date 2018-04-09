@@ -26,6 +26,7 @@ add_message_files(
   Sequence.msg
   SequenceAutorunStatus.msg
   TrajectoryPlan.msg
+  MatlabMoveResult.msg
 )
 
 add_service_files(
