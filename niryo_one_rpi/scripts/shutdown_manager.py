@@ -22,7 +22,7 @@
 import rospy
 import threading 
 
-from niryo_one_rpi.shutdown import send_shutdown_command 
+from niryo_one_rpi.rpi_ros_utils import send_shutdown_command 
 
 from niryo_one_msgs.srv import SetInt
 

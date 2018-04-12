@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# shutdown.py
+# rpi_ros_utils.py
 # Copyright (C) 2018 Niryo
 # All rights reserved.
 #
@@ -20,11 +20,29 @@
 
 
 import rospy
-import RPi.GPIO as GPIO
 import subprocess
 
 from niryo_one_msgs.srv import SetInt
 
+def send_hotspot_command(self):
+    rospy.loginfo("HOTSPOT")
+    send_led_state(5)
+    rospy.wait_for_service('/niryo_one/wifi/set_hotspot')
+    try:
+        set_hotspot = rospy.ServiceProxy('/niryo_one/wifi/set_hotspot', SetInt)
+        set_hotspot()
+    except rospy.ServiceException, e:
+        rospy.logwarn("Could not call set_hotspot service")
+
+
+def send_trigger_sequence_autorun(self):
+    rospy.loginfo("Trigger sequence autorun from button")
+    try:
+        rospy.wait_for_service('/niryo_one/sequences/trigger_sequence_autorun', 0.1)
+        trigger = rospy.ServiceProxy('/niryo_one/sequences/trigger_sequence_autorun', SetInt)
+        trigger(1) # value doesn't matter, it will switch state on the server
+    except (rospy.ServiceException, rospy.ROSException), e:
+        return
 
 
 def send_shutdown_command():
