@@ -21,6 +21,8 @@ import rospy
 import RPi.GPIO as GPIO
 import subprocess
 
+from niryo_one_rpi.shutdown import * 
+
 from niryo_one_msgs.srv import SetInt
 
 # todo include led_state constant
@@ -55,36 +57,9 @@ class NiryoButton:
         rospy.loginfo("Shutdown button, cleanup GPIO")
         self.button_timer.shutdown()
 
-    def send_led_state(self, state):
-        rospy.wait_for_service('/niryo_one/rpi/set_led_state')
-        try:
-            set_led = rospy.ServiceProxy('/niryo_one/rpi/set_led_state', SetInt)
-            set_led(state)
-        except rospy.ServiceException, e:
-            rospy.logwarn("Could not call set_led_state service")
-
-    def send_shutdown_command(self):
-        rospy.loginfo("SHUTDOWN")
-        self.send_led_state(1)
-        rospy.loginfo("Activate learning mode")
-        try:
-            rospy.wait_for_service('/niryo_one/activate_learning_mode', 1)
-        except rospy.ROSException, e:
-            pass
-        try:
-            activate_learning_mode = rospy.ServiceProxy('/niryo_one/activate_learning_mode', SetInt)
-            activate_learning_mode(1)
-        except rospy.ServiceException, e:
-            pass
-        rospy.loginfo("Command 'sudo shutdown now'")
-        try:
-            output = subprocess.check_output(['sudo', 'shutdown', 'now'])
-        except subprocess.CalledProcessError:
-            rospy.loginfo("Can't exec shutdown cmd")
-
     def send_hotspot_command(self):
         rospy.loginfo("HOTSPOT")
-        self.send_led_state(5)
+        send_led_state(5)
         rospy.wait_for_service('/niryo_one/wifi/set_hotspot')
         try:
            set_hotspot = rospy.ServiceProxy('/niryo_one/wifi/set_hotspot', SetInt)
@@ -111,7 +86,7 @@ class NiryoButton:
             self.hotspot_action = False
             self.shutdown_action = False
         elif self.shutdown_action:
-            self.send_shutdown_command()
+            send_shutdown_command()
             self.hotspot_action = False
             self.shutdown_action = False
 
@@ -134,9 +109,9 @@ class NiryoButton:
             
         # Use LED to help user know which action to execute
         if self.consecutive_pressed > self.timer_frequency * 20:
-            self.send_led_state(1)
+            send_led_state(1)
         elif self.consecutive_pressed > self.timer_frequency * 6:
-            self.send_led_state(5)
+            send_led_state(5)
         elif self.consecutive_pressed > self.timer_frequency * 3:
-            self.send_led_state(1)
+            send_led_state(1)
 
