@@ -33,7 +33,7 @@ from digital_io_panel import DigitalIOPanel
 from wifi_connection import WifiConnectionManager
 from niryo_one_ros_setup import *
 from niryo_one_modbus.modbus_server import ModbusServer
-
+from shutdown_manager import ShutdownManager
 
 class NiryoOneRpi:
 
@@ -44,7 +44,7 @@ class NiryoOneRpi:
         self.modbus_server_address = rospy.get_param("~modbus_server_address")
         self.modbus_server_port = rospy.get_param("~modbus_server_port")
         self.niryo_one_ros_setup = None
-
+    
         if self.launch_ros_processes:
             self.niryo_one_ros_setup = NiryoOneRosSetup()
             rospy.sleep(10) # let some time for other processes to launch (does not affect total launch time)
@@ -55,6 +55,7 @@ class NiryoOneRpi:
       
         self.fans_manager = FansManager()
         self.ros_log_manager = RosLogManager()
+        self.shutdown_manager = ShutdownManager()
         self.led_manager = LEDManager()
         self.niryo_one_button = NiryoButton()
         self.digital_io_panel = DigitalIOPanel()
@@ -64,6 +65,9 @@ class NiryoOneRpi:
             self.modbus_server = ModbusServer(self.modbus_server_address, self.modbus_server_port)
             rospy.on_shutdown(self.modbus_server.stop)
             self.modbus_server.start()
+        
+         
+                        
 
 if __name__ == '__main__':
     rospy.init_node('niryo_one_rpi')
