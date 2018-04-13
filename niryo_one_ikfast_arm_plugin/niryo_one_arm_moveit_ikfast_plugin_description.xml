@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<library path="lib/libniryo_one_arm_moveit_ikfast_plugin">
-  <class name="niryo_one_arm_kinematics/IKFastKinematicsPlugin" type="ikfast_kinematics_plugin::IKFastKinematicsPlugin" base_class_type="kinematics::KinematicsBase">
-    <description>IKFast61 plugin for closed-form kinematics</description>
-  </class>
-</library>
