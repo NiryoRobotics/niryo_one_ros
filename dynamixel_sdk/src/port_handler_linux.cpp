@@ -178,8 +178,13 @@ int PortHandlerLinux::writePort(uint8_t *packet, int length)
   gpioHigh();
 
   int write_result = write(socket_fd_, packet, length);
-  
-  nanosleep((const struct timespec[]){{0, 250000L}}, NULL);
+
+  double time_to_wait_secs = (double)length / ((double)baudrate_ / 10.0);
+  struct timespec tim;
+  tim.tv_sec = 0;
+  tim.tv_nsec = (long) (time_to_wait_secs * 1000000000.0);
+  nanosleep(&tim, NULL);
+
   gpioLow();
 
   return write_result;
