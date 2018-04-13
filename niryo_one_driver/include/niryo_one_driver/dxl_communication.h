@@ -25,8 +25,15 @@
 #include <string>
 #include <thread>
 
+#include "dynamixel_sdk/dynamixel_sdk.h"
 #include "niryo_one_driver/dxl_motor_state.h"
 #include "niryo_one_driver/xl320_driver.h"
+
+#define DXL_BUS_PROTOCOL_VERSION 2.0
+
+#define DXL_FAIL_OPEN_PORT         -4500
+#define DXL_FAIL_PORT_SET_BAUDRATE -4501
+#define DXL_FAIL_SETUP_GPIO        -4502
 
 // we stop at 1022 instead of 1023, to get an odd number of positions (1023)
 // --> so we can get a middle point (511)
@@ -95,6 +102,9 @@ class DxlCommunication {
 
         std::string device_name;
         int uart_baudrate;
+        
+        dynamixel::PortHandler *dxlPortHandler;
+        dynamixel::PacketHandler *dxlPacketHandler;
        
         boost::shared_ptr<XL320Driver> xl320;
 

@@ -47,7 +47,10 @@ DxlCommunication::DxlCommunication()
 
     resetHardwareControlLoopRates();
 
-    xl320.reset(new XL320Driver(device_name.c_str(), uart_baudrate));
+    dxlPortHandler = dynamixel::PortHandler::getPortHandler(device_name.c_str());
+    dxlPacketHandler = dynamixel::PacketHandler::getPacketHandler(DXL_BUS_PROTOCOL_VERSION);
+
+    xl320.reset(new XL320Driver(dxlPortHandler, dxlPacketHandler));
 
     is_dxl_connection_ok = false;
     debug_error_message = "No connection with Dynamixel motors has been made yet";
@@ -108,23 +111,30 @@ void DxlCommunication::resetHardwareControlLoopRates()
     time_hw_status_last_read = now;
 }
 
-int DxlCommunication::init() 
+int DxlCommunication::init()
 {
     ROS_INFO("Dxl : set port name (%s), baudrate(%d)", device_name.c_str(), uart_baudrate);
-    int result = xl320->init();
-
-    if (result == DXL_FAIL_SETUP_GPIO) { 
+    // setup half-duplex direction GPIO
+    // see schema http://support.robotis.com/en/product/actuator/dynamixel_x/xl-series_main.htm
+    if (!dxlPortHandler->setupGpio()) {
         ROS_ERROR("Failed to setup direction GPIO pin for Dynamixel half-duplex serial");
+        return DXL_FAIL_SETUP_GPIO;
     }
-    else if (result == DXL_FAIL_OPEN_PORT) {
+
+    // Open port
+    if (!dxlPortHandler->openPort()) {
         ROS_ERROR("Failed to open Uart port for Dynamixel bus");
+        return DXL_FAIL_OPEN_PORT;
     }
-    else if (result == DXL_FAIL_PORT_SET_BAUDRATE) {
+
+    // Set baudrate
+    if (!dxlPortHandler->setBaudRate(uart_baudrate)) {
         ROS_ERROR("Failed to set baudrate for Dynamixel bus");
+        return DXL_FAIL_PORT_SET_BAUDRATE;
     }
 
     ros::Duration(0.1).sleep();
-    return result;
+    return COMM_SUCCESS;
 }
 
 void DxlCommunication::startHardwareControlLoop(bool limited_mode)
