@@ -170,7 +170,7 @@ void DxlCommunication::hardwareControlRead()
         
         // read position
         if (read_position_enable) {
-            std::vector<uint16_t> position_list;
+            std::vector<uint32_t> position_list;
             int read_position_result = xl320->syncReadPosition(id_list, position_list);
 
             if (read_position_result == COMM_SUCCESS && id_list.size() == position_list.size()) {
@@ -190,7 +190,7 @@ void DxlCommunication::hardwareControlRead()
 
         // read velocity
         if (read_velocity_enable) {
-            std::vector<uint16_t> velocity_list;
+            std::vector<uint32_t> velocity_list;
             int read_velocity_result = xl320->syncReadVelocity(id_list, velocity_list);
 
             if (read_velocity_result == COMM_SUCCESS && id_list.size() == velocity_list.size()) {
@@ -210,7 +210,7 @@ void DxlCommunication::hardwareControlRead()
 
         // read load
         if (read_torque_enable) {
-            std::vector<uint16_t> torque_list;
+            std::vector<uint32_t> torque_list;
             int read_torque_result = xl320->syncReadLoad(id_list, torque_list);
 
             if (read_torque_result == COMM_SUCCESS && id_list.size() == torque_list.size()) {
@@ -236,7 +236,7 @@ void DxlCommunication::hardwareControlRead()
             time_hw_status_last_read += 1.0/hw_status_read_frequency;
             
             // read temperature
-            std::vector<uint16_t> temperature_list;
+            std::vector<uint32_t> temperature_list;
             int read_temperature_result = xl320->syncReadTemperature(id_list, temperature_list);
 
             if (read_temperature_result == COMM_SUCCESS && id_list.size() == temperature_list.size()) {
@@ -254,7 +254,7 @@ void DxlCommunication::hardwareControlRead()
             }
 
             // read voltage
-            std::vector<uint16_t> voltage_list;
+            std::vector<uint32_t> voltage_list;
             int read_voltage_result = xl320->syncReadVoltage(id_list, voltage_list);
 
             if (read_voltage_result == COMM_SUCCESS && id_list.size() == voltage_list.size()) {
@@ -272,7 +272,7 @@ void DxlCommunication::hardwareControlRead()
             }
 
             // read hw_error
-            std::vector<uint16_t> hw_error_list;
+            std::vector<uint32_t> hw_error_list;
             int read_hw_error_result = xl320->syncReadHwErrorStatus(id_list, hw_error_list);
 
             if (read_hw_error_result == COMM_SUCCESS && id_list.size() == hw_error_list.size()) {
@@ -312,14 +312,14 @@ void DxlCommunication::hardwareControlWrite()
         {
             if (is_tool_connected) {
                 id_list.push_back(tool.getId());
-                std::vector<uint8_t> torque_enable_list = { torque_on, torque_on, torque_on, torque_on };
+                std::vector<uint32_t> torque_enable_list = { torque_on, torque_on, torque_on, torque_on };
                 int write_torque_enable_result = xl320->syncWriteTorqueEnable(id_list, torque_enable_list);
                 if (write_torque_enable_result != COMM_SUCCESS) { ROS_WARN("Fail to write torque enable"); }
                 else { write_torque_on_enable = false; } // disable writing torque ON/OFF after success
                 id_list.pop_back();
             }
             else {
-                std::vector<uint8_t> torque_enable_list = { torque_on, torque_on, torque_on };
+                std::vector<uint32_t> torque_enable_list = { torque_on, torque_on, torque_on };
                 int write_torque_enable_result = xl320->syncWriteTorqueEnable(id_list, torque_enable_list);
                 if (write_torque_enable_result != COMM_SUCCESS) { ROS_WARN("Fail to write torque enable"); }
                 else { write_torque_on_enable = false; } // disable writing torque ON/OFF after success
@@ -329,24 +329,24 @@ void DxlCommunication::hardwareControlWrite()
         if (torque_on) {
             // write position
             if (write_position_enable) {
-                std::vector<uint16_t> position_list = { (uint16_t) m5_1.getPositionCommand(),
-                    (uint16_t) m5_2.getPositionCommand(), (uint16_t) m6.getPositionCommand() };
+                std::vector<uint32_t> position_list = { m5_1.getPositionCommand(),
+                    m5_2.getPositionCommand(), m6.getPositionCommand() };
                 int write_position_result = xl320->syncWritePositionGoal(id_list, position_list);
                 if (write_position_result != COMM_SUCCESS) { ROS_WARN("Fail to write position"); }
             }
 
             // write velocity
             if (write_velocity_enable) {
-                std::vector<uint16_t> velocity_list = { (uint16_t) m5_1.getVelocityCommand(),
-                    (uint16_t) m5_2.getVelocityCommand(), (uint16_t) m6.getVelocityCommand() };
+                std::vector<uint32_t> velocity_list = { m5_1.getVelocityCommand(),
+                    m5_2.getVelocityCommand(), m6.getVelocityCommand() };
                 int write_velocity_result = xl320->syncWriteVelocityGoal(id_list, velocity_list);
                 if (write_velocity_result != COMM_SUCCESS) { ROS_WARN("Fail to write velocity"); }
             }
 
             // write torque
             if (write_torque_enable) {
-                std::vector<uint16_t> torque_list = { (uint16_t) m5_1.getTorqueCommand(),
-                    (uint16_t) m5_2.getTorqueCommand(), (uint16_t) m6.getTorqueCommand() };
+                std::vector<uint32_t> torque_list = { m5_1.getTorqueCommand(),
+                    m5_2.getTorqueCommand(), m6.getTorqueCommand() };
                 int write_torque_result = xl320->syncWriteTorqueGoal(id_list, torque_list);
                 if (write_torque_result != COMM_SUCCESS) { ROS_WARN("Fail to write torque"); }
             }
@@ -374,14 +374,14 @@ void DxlCommunication::hardwareControlWrite()
         if (write_led_enable) {
             if (is_tool_connected) {
                 id_list.push_back(tool.getId());
-                std::vector<uint8_t> led_list = { m5_1.getLedCommand(), m5_2.getLedCommand(), m6.getLedCommand(), tool.getLedCommand() };
+                std::vector<uint32_t> led_list = { m5_1.getLedCommand(), m5_2.getLedCommand(), m6.getLedCommand(), tool.getLedCommand() };
                 int write_led_result = xl320->syncWriteLed(id_list, led_list);
                 if (write_led_result != COMM_SUCCESS) { ROS_WARN("Fail to write led"); }
                 else { write_led_enable = false; } // disable writing LED after success
                 id_list.pop_back();
             }
             else {
-                std::vector<uint8_t> led_list = { m5_1.getLedCommand(), m5_2.getLedCommand(), m6.getLedCommand() };
+                std::vector<uint32_t> led_list = { m5_1.getLedCommand(), m5_2.getLedCommand(), m6.getLedCommand() };
                 int write_led_result = xl320->syncWriteLed(id_list, led_list);
                 if (write_led_result != COMM_SUCCESS) { ROS_WARN("Fail to write led"); }
                 else { write_led_enable = false; } // disable writing LED after success

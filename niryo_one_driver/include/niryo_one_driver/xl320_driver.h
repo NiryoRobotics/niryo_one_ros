@@ -105,12 +105,12 @@ class XL320Driver {
         std::string deviceName;
         int baudRate;
         
-        int syncWrite1Byte  (uint8_t address, std::vector<uint8_t> &id_list, std::vector<uint8_t> &data_list);
-        int syncWrite2Bytes (uint8_t address, std::vector<uint8_t> &id_list, std::vector<uint16_t> &data_list);
+        int syncWrite1Byte  (uint8_t address, std::vector<uint8_t> &id_list, std::vector<uint32_t> &data_list);
+        int syncWrite2Bytes (uint8_t address, std::vector<uint8_t> &id_list, std::vector<uint32_t> &data_list);
 
-        int read1Byte       (uint8_t address, uint8_t id, uint8_t *data);
-        int read2Bytes      (uint8_t address, uint8_t id, uint16_t *data);
-        int syncRead        (uint8_t address, uint8_t data_len, std::vector<uint8_t> &id_list, std::vector<uint16_t> &data_list);
+        int read1Byte       (uint8_t address, uint8_t id, uint32_t *data);
+        int read2Bytes      (uint8_t address, uint8_t id, uint32_t *data);
+        int syncRead        (uint8_t address, uint8_t data_len, std::vector<uint8_t> &id_list, std::vector<uint32_t> &data_list);
 
     public:
         XL320Driver(std::string deviceName, int baudrate);
@@ -123,47 +123,47 @@ class XL320Driver {
 
         // eeprom write
         int changeId            (uint8_t id, uint8_t new_id);
-        int changeBaudRate      (uint8_t id, uint8_t new_baudrate);
-        int setReturnDelayTime  (uint8_t id, uint8_t return_delay_time);
-        int setLimitTemperature (uint8_t id, uint8_t temperature);
-        int setMaxTorque        (uint8_t id, uint8_t torque);
-        int setReturnLevel      (uint8_t id, uint8_t return_level);
-        int setAlarmShutdown    (uint8_t id, uint8_t alarm_shutdown);
+        int changeBaudRate      (uint8_t id, uint32_t new_baudrate);
+        int setReturnDelayTime  (uint8_t id, uint32_t return_delay_time);
+        int setLimitTemperature (uint8_t id, uint32_t temperature);
+        int setMaxTorque        (uint8_t id, uint32_t torque);
+        int setReturnLevel      (uint8_t id, uint32_t return_level);
+        int setAlarmShutdown    (uint8_t id, uint32_t alarm_shutdown);
 
         // eeprom read
-        int readReturnDelayTime  (uint8_t id, uint8_t *return_delay_time);
-        int readLimitTemperature (uint8_t id, uint8_t *limit_temperature);
-        int readMaxTorque        (uint8_t id, uint16_t *max_torque);
-        int readReturnLevel      (uint8_t id, uint8_t *return_level);
-        int readAlarmShutdown    (uint8_t id, uint8_t *alarm_shutdown);
+        int readReturnDelayTime  (uint8_t id, uint32_t *return_delay_time);
+        int readLimitTemperature (uint8_t id, uint32_t *limit_temperature);
+        int readMaxTorque        (uint8_t id, uint32_t *max_torque);
+        int readReturnLevel      (uint8_t id, uint32_t *return_level);
+        int readAlarmShutdown    (uint8_t id, uint32_t *alarm_shutdown);
 
         // ram write --> return comm_result
-        int setTorqueEnable   (uint8_t id, bool torque_enable);
-        int setLed            (uint8_t id, uint8_t led_value);
-        int setGoalPosition   (uint8_t id, uint16_t position);
-        int setGoalVelocity   (uint8_t id, uint16_t velocity);
-        int setGoalTorque     (uint8_t id, uint16_t torque);
+        int setTorqueEnable   (uint8_t id, uint32_t torque_enable);
+        int setLed            (uint8_t id, uint32_t led_value);
+        int setGoalPosition   (uint8_t id, uint32_t position);
+        int setGoalVelocity   (uint8_t id, uint32_t velocity);
+        int setGoalTorque     (uint8_t id, uint32_t torque);
 
-        int syncWriteLed          (std::vector<uint8_t> &id_list, std::vector<uint8_t> &led_list);
-        int syncWriteTorqueEnable (std::vector<uint8_t> &id_list, std::vector<uint8_t> &torque_enable_list); 
-        int syncWritePositionGoal (std::vector<uint8_t> &id_list, std::vector<uint16_t> &position_list);
-        int syncWriteVelocityGoal (std::vector<uint8_t> &id_list, std::vector<uint16_t> &velocity_list);
-        int syncWriteTorqueGoal   (std::vector<uint8_t> &id_list, std::vector<uint16_t> &torque_list);
+        int syncWriteLed          (std::vector<uint8_t> &id_list, std::vector<uint32_t> &led_list);
+        int syncWriteTorqueEnable (std::vector<uint8_t> &id_list, std::vector<uint32_t> &torque_enable_list); 
+        int syncWritePositionGoal (std::vector<uint8_t> &id_list, std::vector<uint32_t> &position_list);
+        int syncWriteVelocityGoal (std::vector<uint8_t> &id_list, std::vector<uint32_t> &velocity_list);
+        int syncWriteTorqueGoal   (std::vector<uint8_t> &id_list, std::vector<uint32_t> &torque_list);
 
         // ram read
-        int readPosition       (uint8_t id, uint16_t *present_position);
-        int readVelocity       (uint8_t id, uint16_t *present_velocity);
-        int readLoad           (uint8_t id, uint16_t *present_load);
-        int readTemperature    (uint8_t id, uint8_t *temperature);
-        int readVoltage        (uint8_t id, uint8_t *voltage);
-        int readHardwareStatus (uint8_t id, uint8_t *hardware_status);
+        int readPosition       (uint8_t id, uint32_t *present_position);
+        int readVelocity       (uint8_t id, uint32_t *present_velocity);
+        int readLoad           (uint8_t id, uint32_t *present_load);
+        int readTemperature    (uint8_t id, uint32_t *temperature);
+        int readVoltage        (uint8_t id, uint32_t *voltage);
+        int readHardwareStatus (uint8_t id, uint32_t *hardware_status);
 
-        int syncReadPosition       (std::vector<uint8_t> &id_list, std::vector<uint16_t> &position_list);
-        int syncReadVelocity       (std::vector<uint8_t> &id_list, std::vector<uint16_t> &velocity_list);
-        int syncReadLoad           (std::vector<uint8_t> &id_list, std::vector<uint16_t> &load_list);
-        int syncReadTemperature    (std::vector<uint8_t> &id_list, std::vector<uint16_t> &temperature_list);
-        int syncReadVoltage        (std::vector<uint8_t> &id_list, std::vector<uint16_t> &voltage_list);
-        int syncReadHwErrorStatus  (std::vector<uint8_t> &id_list, std::vector<uint16_t> &hw_error_list);
+        int syncReadPosition       (std::vector<uint8_t> &id_list, std::vector<uint32_t> &position_list);
+        int syncReadVelocity       (std::vector<uint8_t> &id_list, std::vector<uint32_t> &velocity_list);
+        int syncReadLoad           (std::vector<uint8_t> &id_list, std::vector<uint32_t> &load_list);
+        int syncReadTemperature    (std::vector<uint8_t> &id_list, std::vector<uint32_t> &temperature_list);
+        int syncReadVoltage        (std::vector<uint8_t> &id_list, std::vector<uint32_t> &voltage_list);
+        int syncReadHwErrorStatus  (std::vector<uint8_t> &id_list, std::vector<uint32_t> &hw_error_list);
 };
 
 #endif
