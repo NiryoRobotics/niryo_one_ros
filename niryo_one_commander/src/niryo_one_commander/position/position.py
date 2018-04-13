@@ -18,7 +18,7 @@
 
 
 
-import rospy
+
 
 class Position:
     def __init__(self,position_name="", prefixe="", position_id=0, joints=[], pose=[]): 

@@ -58,9 +58,9 @@ class PositionFileHandler:
                 f.write("position ID: \n") 
                 f.write(str(position.position_id)+"\n") 
                 f.write("Joints: \n")
-                f.write(str(position.joints).strip('[]')+"\n")
+                f.write(str(position.joints).strip('()')+"\n")
                 f.write( "Pose:  \n") 
-                f.write( str(position.pose).strip('[]')+"\n") 
+                f.write( str(position.pose).strip('()')+"\n") 
 
     def does_file_exist(self, filename):
         filenames = self.get_all_filenames()
@@ -94,10 +94,10 @@ class PositionFileHandler:
                         pos.position_id=int(next(f).rstrip())
                     if line.startswith("Joints: "): 
                         pos.joints=list(str(next(f).rstrip()).split(','))
-                        pos.joints=map(int,pos.joints)
+                        pos.joints=map(float ,pos.joints)
                     if line.startswith("Pose:"):
                         pos.pose=list(str(next(f).rstrip()).split(','))
-                        pos.pose=map(int,pos.pose)
+                        pos.pose=map(float,pos.pose)
                 return pos 
 
 
@@ -112,18 +112,23 @@ class PositionFileHandler:
 
 
 if __name__ == '__main__': 
-    fh=PositionFileHandler("~/niryo_one_position")   # create a dir niryo_one_position
+    pass 
+    '''    fh=PositionFileHandler("~/niryo_one_position")   # create a dir niryo_one_position
     print(fh.base_dir)
-    p=Position("move", "pl1", 1, [1,2,3,4,5,6], [1,2,3,4,5,6]) 
+    
+    p=Position("ddd", "pl1", 1, [7.01,2.02,3.03,4,5,6], [1.12,2.1,3.2,4,5,6]) 
     fh.write_position(p)
-    pos=fh.read_position("move")
+    pos=fh.read_position("ddd")
     print(pos.joints)
     print(pos.pose)
     joint=pos.joints[1]
     print(joint)
-    fh.remove_position("move")
-    
+   # p=Position()
 
+    #print(p.position_id)
+
+   ''' 
+    
 
 
 
