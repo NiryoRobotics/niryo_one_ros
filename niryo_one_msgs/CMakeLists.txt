@@ -27,6 +27,7 @@ add_message_files(
   SequenceAutorunStatus.msg
   TrajectoryPlan.msg
   MatlabMoveResult.msg
+  Position.msg
 )
 
 add_service_files(
@@ -47,6 +48,7 @@ add_service_files(
   GetSequenceList.srv
   ManageSequence.srv
   SetSequenceAutorun.srv
+  ManagePosition.srv 
 )
 
 add_action_files(
@@ -73,4 +75,3 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
-
