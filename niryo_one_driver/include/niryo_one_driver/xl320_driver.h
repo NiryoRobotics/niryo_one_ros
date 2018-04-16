@@ -1,6 +1,6 @@
 /*
     xl320_driver.h
-    Copyright (C) 2017 Niryo
+    Copyright (C) 2018 Niryo
     All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -20,15 +20,11 @@
 #ifndef XL320_DRIVER_H
 #define XL320_DRIVER_H
 
-#include "dynamixel_sdk/dynamixel_sdk.h"
+#include "niryo_one_driver/dxl_driver.h"
 #include <vector>
-#include <string>
 
 #define XL320_PROTOCOL_VERSION 2.0
 #define XL320_MODEL_NUMBER 350
-
-#define DXL_LEN_ONE_BYTE  1
-#define DXL_LEN_TWO_BYTES 2
 
 // Table here : http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm
 #define XL320_ADDR_MODEL_NUMBER          0
@@ -64,53 +60,12 @@
 #define XL320_ADDR_HW_ERROR_STATUS       50                  
 #define XL320_ADDR_PUNCH                 51
 
-// Communication Result
-//#define COMM_SUCCESS        0       // tx or rx packet communication success
-//#define COMM_PORT_BUSY      -1000   // Port is busy (in use)                    
-//#define COMM_TX_FAIL        -1001   // Failed transmit instruction packet      
-//#define COMM_RX_FAIL        -1002   // Failed get status packet               
-//#define COMM_TX_ERROR       -2000   // Incorrect instruction packet               FROM dynamixel_sdk
-//#define COMM_RX_WAITING     -3000   // Now recieving status packet           
-//#define COMM_RX_TIMEOUT     -3001   // There is no status packet            
-//#define COMM_RX_CORRUPT     -3002   // Incorrect status packet             
-//#define COMM_NOT_AVAILABLE  -9000 //                                      
-//
-/////////////////// Protocol 2.0 Error bit /////////////////
-//#define ERRNUM_RESULT_FAIL      1       // Failed to process the instruction packet.  
-//#define ERRNUM_INSTRUCTION      2       // Instruction error                          
-//#define ERRNUM_CRC              3       // CRC check error                            
-//#define ERRNUM_DATA_RANGE       4       // Data range error                           
-//#define ERRNUM_DATA_LENGTH      5       // Data length error                          
-//#define ERRNUM_DATA_LIMIT       6       // Data limit error                           
-//#define ERRNUM_ACCESS 7 // Access error                                              
-
-//#define ERRBIT_ALERT 128 //When the device has a problem, this bit is set to 1. Check "Device Status Check" value.
-
-#define GROUP_SYNC_REDONDANT_ID     10
-#define GROUP_SYNC_READ_RX_FAIL     11
-#define LEN_ID_DATA_NOT_SAME        20
-
-#define PING_WRONG_MODEL_NUMBER     30
-
-class XL320Driver {
-
-    private:
-        dynamixel::PortHandler *portHandler;
-        dynamixel::PacketHandler *packetHandler;
-
-        int syncWrite1Byte  (uint8_t address, std::vector<uint8_t> &id_list, std::vector<uint32_t> &data_list);
-        int syncWrite2Bytes (uint8_t address, std::vector<uint8_t> &id_list, std::vector<uint32_t> &data_list);
-
-        int read1Byte       (uint8_t address, uint8_t id, uint32_t *data);
-        int read2Bytes      (uint8_t address, uint8_t id, uint32_t *data);
-        int syncRead        (uint8_t address, uint8_t data_len, std::vector<uint8_t> &id_list, std::vector<uint32_t> &data_list);
+class XL320Driver : public DxlDriver {
 
     public:
         XL320Driver(dynamixel::PortHandler* portHandler, dynamixel::PacketHandler* packetHandler);
 
-        int scan(std::vector<uint8_t> &id_list);
-        int ping(uint8_t id);
-        int reboot(uint8_t id);
+        int checkModelNumber(uint8_t id);
 
         // eeprom write
         int changeId            (uint8_t id, uint8_t new_id);
