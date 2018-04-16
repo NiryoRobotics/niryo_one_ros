@@ -1,5 +1,4 @@
 string position_name
-string prefixe
 
 int32 position_id
 

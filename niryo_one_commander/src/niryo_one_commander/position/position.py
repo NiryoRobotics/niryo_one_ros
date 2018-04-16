@@ -18,13 +18,10 @@
 
 
 
-
-
 class Position:
-    def __init__(self,position_name="", prefixe="", position_id=0, joints=[], pose=[]): 
+    def __init__(self,position_name="", position_id=0, joints=[0,0,0,0,0,0], pose=[0,0,0,0,0,0]): 
 
-        self.position_name=position_name
-        self.prefixe=prefixe 
+        self.position_name=position_name 
         self.position_id=position_id 
         self.joints=joints 
         self.pose=pose 

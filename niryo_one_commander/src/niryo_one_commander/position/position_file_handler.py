@@ -53,8 +53,6 @@ class PositionFileHandler:
             with open(self.base_dir + filename, 'w') as f:
                 f.write("position name: \n") 
                 f.write(str(position.position_name)+"\n") 
-                f.write("prefixe: \n") 
-                f.write( str(position.prefixe)+"\n") 
                 f.write("position ID: \n") 
                 f.write(str(position.position_id)+"\n") 
                 f.write("Joints: \n")
@@ -88,8 +86,6 @@ class PositionFileHandler:
                 for line in f:
                     if line.startswith('position name: '):
                         pos.position_name = str(next(f).rstrip())
-                    if line.startswith("prefixe:"): 
-                        pos.prefixe=str(next(f).rstrip())
                     if line.startswith("position ID:"):
                         pos.position_id=int(next(f).rstrip())
                     if line.startswith("Joints: "): 
@@ -113,20 +109,10 @@ class PositionFileHandler:
 
 if __name__ == '__main__': 
     pass 
-    '''    fh=PositionFileHandler("~/niryo_one_position")   # create a dir niryo_one_position
+    ''' 
+    fh=PositionFileHandler("~/niryo_one_position")   # create a dir niryo_one_position
     print(fh.base_dir)
     
-    p=Position("ddd", "pl1", 1, [7.01,2.02,3.03,4,5,6], [1.12,2.1,3.2,4,5,6]) 
-    fh.write_position(p)
-    pos=fh.read_position("ddd")
-    print(pos.joints)
-    print(pos.pose)
-    joint=pos.joints[1]
-    print(joint)
-   # p=Position()
-
-    #print(p.position_id)
-
    ''' 
     
 
