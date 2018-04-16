@@ -56,28 +56,44 @@ DxlCommunication::DxlCommunication()
     debug_error_message = "No connection with Dynamixel motors has been made yet";
 
     // get required and authorized motors ids
-    std::vector<int> required_dxl;
+    std::vector<int> required_dxl_ids;
     std::vector<int> allowed_dxl;
-    ros::param::get("/niryo_one/motors/dxl_required_motors", required_dxl);
+    ros::param::get("/niryo_one/motors/dxl_required_motors", required_dxl_ids);
     ros::param::get("/niryo_one/motors/dxl_authorized_motors", allowed_dxl);
     
-    niryo_one_motors_ids.insert(niryo_one_motors_ids.end(), required_dxl.begin(), required_dxl.end());
-    allowed_motors_ids.insert(allowed_motors_ids.end(), required_dxl.begin(), required_dxl.end());
+    niryo_one_motors_ids.insert(niryo_one_motors_ids.end(), required_dxl_ids.begin(), required_dxl_ids.end());
+    allowed_motors_ids.insert(allowed_motors_ids.end(), required_dxl_ids.begin(), required_dxl_ids.end());
     allowed_motors_ids.insert(allowed_motors_ids.end(), allowed_dxl.begin(), allowed_dxl.end());
 
-    if (niryo_one_motors_ids.size() != 3) {
-        debug_error_message = "Incorrect configuration : Ros Param /niryo_one_motors/dxl_required_motors " 
-            "should contain a list with 3 ids. You need to fix this !";
+    // Create motors
+    m5_1 = DxlMotorState("Servo Axis 5_1", DXL_MOTOR_5_1_ID, DXL_MIDDLE_POSITION);
+    m5_2 = DxlMotorState("Servo Axis 5_2", DXL_MOTOR_5_2_ID, DXL_MIDDLE_POSITION);
+    m6 = DxlMotorState("Servo Axis 6", DXL_MOTOR_6_ID, DXL_MIDDLE_POSITION);
+
+    for (uint8_t i = 0 ; i < required_dxl_ids.size() ; i++) {
+        if      (required_dxl_ids.at(i) == m5_1.getId()) { m5_1.enable(); }
+        else if (required_dxl_ids.at(i) == m5_2.getId()) { m5_2.enable(); }
+        else if (required_dxl_ids.at(i) == m6.getId()) { m6.enable(); }
+        else {
+            debug_error_message = "Incorrect configuration : Wrong ID )" + std::to_string(required_dxl_ids.at(i)) 
+                + ") given in Ros Param /niryo_one_motors/dxl_required_motors. You need to fix this !";
+            ROS_ERROR("%s", debug_error_message.c_str());
+            return;
+        }
+    }
+    if (required_dxl_ids.size() == 0) {
+        debug_error_message = "Incorrect configuration : Ros Param /niryo_one_motors/dxl_required_motors "
+        "should contain a list with at least one motor. You need to fix this !";
         ROS_ERROR("%s", debug_error_message.c_str());
         return;
     }
-    else {
-        m5_1 = DxlMotorState("Servo Axis 5_1", niryo_one_motors_ids.at(0));
-        m5_2 = DxlMotorState("Servo Axis 5_2", niryo_one_motors_ids.at(1));
-        m6 = DxlMotorState("Servo Axis 6", niryo_one_motors_ids.at(2));
-    }
 
-    tool = DxlMotorState("No tool connected", 0);
+    // Fill motors array 
+    motors.push_back(&m5_1);
+    motors.push_back(&m5_2);
+    motors.push_back(&m6);
+
+    tool = DxlMotorState("No tool connected", 0, DXL_MIDDLE_POSITION);
     is_tool_connected = false;
     
     torque_on = 0;
@@ -158,19 +174,28 @@ void DxlCommunication::startHardwareControlLoop(bool limited_mode)
 
 void DxlCommunication::stopHardwareControlLoop()
 {
-    m5_1.resetState();
-    m5_2.resetState();
-    m6.resetState();
+    for (int i = 0; i < motors.size(); i++) {
+        motors.at(i)->resetState();
+    }
     tool.resetState();
     hw_control_loop_keep_alive = false;
 }
 
 void DxlCommunication::hardwareControlRead()
 {
-    std::vector<uint8_t> id_list = { m5_1.getId(), m5_2.getId(), m6.getId() };
+    std::vector<uint8_t> id_list;
+    for (int i = 0; i < motors.size(); i++) {
+        if (motors.at(i)->isEnabled()) {
+            id_list.push_back(motors.at(i)->getId());
+        }
+    }
 
     if (is_tool_connected) {
         id_list.push_back(tool.getId());
+    }
+
+    if (id_list.size() == 0) {
+        return; // no motor, nothing to read
     }
     
     // read data
@@ -182,14 +207,17 @@ void DxlCommunication::hardwareControlRead()
         if (read_position_enable) {
             std::vector<uint32_t> position_list;
             int read_position_result = xl320->syncReadPosition(id_list, position_list);
-
             if (read_position_result == COMM_SUCCESS && id_list.size() == position_list.size()) {
                 hw_fail_counter_read = 0;
-                m5_1.setPositionState(position_list.at(0));
-                m5_2.setPositionState(position_list.at(1));
-                m6.setPositionState(position_list.at(2));
+                int index_counter = 0;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        motors.at(i)->setPositionState(position_list.at(index_counter));
+                        index_counter++;
+                    }
+                }
                 if (is_tool_connected) {
-                    tool.setPositionState(position_list.at(3));
+                    tool.setPositionState(position_list.at(index_counter));
                 }
             }
             else {
@@ -202,14 +230,17 @@ void DxlCommunication::hardwareControlRead()
         if (read_velocity_enable) {
             std::vector<uint32_t> velocity_list;
             int read_velocity_result = xl320->syncReadVelocity(id_list, velocity_list);
-
             if (read_velocity_result == COMM_SUCCESS && id_list.size() == velocity_list.size()) {
                 hw_fail_counter_read = 0;
-                m5_1.setVelocityState(velocity_list.at(0));
-                m5_2.setVelocityState(velocity_list.at(1));
-                m6.setVelocityState(velocity_list.at(2));
+                int index_counter = 0;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        motors.at(i)->setVelocityState(velocity_list.at(index_counter));
+                        index_counter++;
+                    }
+                }
                 if (is_tool_connected) {
-                    tool.setVelocityState(velocity_list.at(3));
+                    tool.setVelocityState(velocity_list.at(index_counter));
                 }
             }
             else {
@@ -222,14 +253,17 @@ void DxlCommunication::hardwareControlRead()
         if (read_torque_enable) {
             std::vector<uint32_t> torque_list;
             int read_torque_result = xl320->syncReadLoad(id_list, torque_list);
-
             if (read_torque_result == COMM_SUCCESS && id_list.size() == torque_list.size()) {
                 hw_fail_counter_read = 0;
-                m5_1.setTorqueState(torque_list.at(0));
-                m5_2.setTorqueState(torque_list.at(1));
-                m6.setTorqueState(torque_list.at(2));
+                int index_counter = 0;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        motors.at(i)->setTorqueState(torque_list.at(index_counter));
+                        index_counter++;
+                    }
+                }
                 if (is_tool_connected) {
-                    tool.setTorqueState(torque_list.at(3));
+                    tool.setTorqueState(torque_list.at(index_counter));
                 }
             }
             else {
@@ -251,11 +285,15 @@ void DxlCommunication::hardwareControlRead()
 
             if (read_temperature_result == COMM_SUCCESS && id_list.size() == temperature_list.size()) {
                 hw_fail_counter_read = 0;
-                m5_1.setTemperatureState(temperature_list.at(0));
-                m5_2.setTemperatureState(temperature_list.at(1));
-                m6.setTemperatureState(temperature_list.at(2));
+                int index_counter = 0;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        motors.at(i)->setTemperatureState(temperature_list.at(index_counter));
+                        index_counter++;
+                    }
+                }
                 if (is_tool_connected) {
-                    tool.setTemperatureState(temperature_list.at(3));
+                    tool.setTemperatureState(temperature_list.at(index_counter));
                 }
             }
             else {
@@ -269,11 +307,15 @@ void DxlCommunication::hardwareControlRead()
 
             if (read_voltage_result == COMM_SUCCESS && id_list.size() == voltage_list.size()) {
                 hw_fail_counter_read = 0;
-                m5_1.setVoltageState(voltage_list.at(0));
-                m5_2.setVoltageState(voltage_list.at(1));
-                m6.setVoltageState(voltage_list.at(2));
+                int index_counter = 0;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        motors.at(i)->setVoltageState(voltage_list.at(index_counter));
+                        index_counter++;
+                    }
+                }
                 if (is_tool_connected) {
-                    tool.setVoltageState(voltage_list.at(3));
+                    tool.setVoltageState(voltage_list.at(index_counter));
                 }
             }
             else {
@@ -287,11 +329,15 @@ void DxlCommunication::hardwareControlRead()
 
             if (read_hw_error_result == COMM_SUCCESS && id_list.size() == hw_error_list.size()) {
                 hw_fail_counter_read = 0;
-                m5_1.setHardwareError(hw_error_list.at(0));
-                m5_2.setHardwareError(hw_error_list.at(1));
-                m6.setHardwareError(hw_error_list.at(2));
+                int index_counter = 0;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        motors.at(i)->setHardwareError(hw_error_list.at(index_counter));
+                        index_counter++;
+                    }
+                }
                 if (is_tool_connected) {
-                    tool.setHardwareError(hw_error_list.at(3));
+                    tool.setHardwareError(hw_error_list.at(index_counter));
                 }
             }
             else {
@@ -311,7 +357,12 @@ void DxlCommunication::hardwareControlRead()
 
 void DxlCommunication::hardwareControlWrite()
 {
-    std::vector<uint8_t> id_list = { m5_1.getId(), m5_2.getId(), m6.getId() };
+    std::vector<uint8_t> id_list;
+    for (int i = 0; i < motors.size(); i++) {
+        if (motors.at(i)->isEnabled()) {
+            id_list.push_back(motors.at(i)->getId());
+        }
+    }
 
     if (ros::Time::now().toSec() - time_hw_data_last_write > 1.0/hw_data_write_frequency) {
     
@@ -320,48 +371,66 @@ void DxlCommunication::hardwareControlWrite()
         // write torque enable
         if (write_torque_on_enable)
         {
+            std::vector<uint32_t> torque_enable_list;
+            for (int i = 0; i < motors.size(); i++) {
+                if (motors.at(i)->isEnabled()) {
+                    torque_enable_list.push_back(torque_on);
+                }
+            }
+           
             if (is_tool_connected) {
                 id_list.push_back(tool.getId());
-                std::vector<uint32_t> torque_enable_list = { torque_on, torque_on, torque_on, torque_on };
-                int write_torque_enable_result = xl320->syncWriteTorqueEnable(id_list, torque_enable_list);
-                if (write_torque_enable_result != COMM_SUCCESS) { ROS_WARN("Fail to write torque enable"); }
-                else { write_torque_on_enable = false; } // disable writing torque ON/OFF after success
-                id_list.pop_back();
+                torque_enable_list.push_back(torque_on);
             }
-            else {
-                std::vector<uint32_t> torque_enable_list = { torque_on, torque_on, torque_on };
-                int write_torque_enable_result = xl320->syncWriteTorqueEnable(id_list, torque_enable_list);
-                if (write_torque_enable_result != COMM_SUCCESS) { ROS_WARN("Fail to write torque enable"); }
-                else { write_torque_on_enable = false; } // disable writing torque ON/OFF after success
+
+            int write_torque_enable_result = xl320->syncWriteTorqueEnable(id_list, torque_enable_list);
+            if (write_torque_enable_result != COMM_SUCCESS) { ROS_WARN("Fail to write torque enable"); }
+            else { write_torque_on_enable = false; } // disable writing torque ON/OFF after success
+
+            if (is_tool_connected) {
+                id_list.pop_back();
             }
         }
 
         if (torque_on) {
             // write position
             if (write_position_enable) {
-                std::vector<uint32_t> position_list = { m5_1.getPositionCommand(),
-                    m5_2.getPositionCommand(), m6.getPositionCommand() };
+                std::vector<uint32_t> position_list;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        position_list.push_back(motors.at(i)->getPositionCommand());
+                    }
+                }
+
                 int write_position_result = xl320->syncWritePositionGoal(id_list, position_list);
                 if (write_position_result != COMM_SUCCESS) { ROS_WARN("Fail to write position"); }
             }
 
             // write velocity
             if (write_velocity_enable) {
-                std::vector<uint32_t> velocity_list = { m5_1.getVelocityCommand(),
-                    m5_2.getVelocityCommand(), m6.getVelocityCommand() };
+                std::vector<uint32_t> velocity_list;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        velocity_list.push_back(motors.at(i)->getVelocityCommand());
+                    }
+                }
                 int write_velocity_result = xl320->syncWriteVelocityGoal(id_list, velocity_list);
                 if (write_velocity_result != COMM_SUCCESS) { ROS_WARN("Fail to write velocity"); }
             }
 
             // write torque
             if (write_torque_enable) {
-                std::vector<uint32_t> torque_list = { m5_1.getTorqueCommand(),
-                    m5_2.getTorqueCommand(), m6.getTorqueCommand() };
+                std::vector<uint32_t> torque_list;
+                for (int i = 0; i < motors.size(); i++) {
+                    if (motors.at(i)->isEnabled()) {
+                        torque_list.push_back(motors.at(i)->getTorqueCommand());
+                    }
+                }
                 int write_torque_result = xl320->syncWriteTorqueGoal(id_list, torque_list);
                 if (write_torque_result != COMM_SUCCESS) { ROS_WARN("Fail to write torque"); }
             }
 
-            // write_tool
+            // write_tool separately - send position, velocity and torque together
             if (write_tool_enable && is_tool_connected) {
                 ros::Duration(0.005).sleep();
                 int write_tool_velocity_result = xl320->setGoalVelocity(tool.getId(), tool.getVelocityCommand());
@@ -382,19 +451,24 @@ void DxlCommunication::hardwareControlWrite()
         }
 
         if (write_led_enable) {
+            std::vector<uint32_t> led_list;
+            for (int i = 0; i < motors.size(); i++) {
+                if (motors.at(i)->isEnabled()) {
+                    led_list.push_back(motors.at(i)->getLedCommand());
+                }
+            }
+
             if (is_tool_connected) {
                 id_list.push_back(tool.getId());
-                std::vector<uint32_t> led_list = { m5_1.getLedCommand(), m5_2.getLedCommand(), m6.getLedCommand(), tool.getLedCommand() };
-                int write_led_result = xl320->syncWriteLed(id_list, led_list);
-                if (write_led_result != COMM_SUCCESS) { ROS_WARN("Fail to write led"); }
-                else { write_led_enable = false; } // disable writing LED after success
-                id_list.pop_back();
+                led_list.push_back(tool.getLedCommand());
             }
-            else {
-                std::vector<uint32_t> led_list = { m5_1.getLedCommand(), m5_2.getLedCommand(), m6.getLedCommand() };
-                int write_led_result = xl320->syncWriteLed(id_list, led_list);
-                if (write_led_result != COMM_SUCCESS) { ROS_WARN("Fail to write led"); }
-                else { write_led_enable = false; } // disable writing LED after success
+
+            int write_led_result = xl320->syncWriteLed(id_list, led_list);
+            if (write_led_result != COMM_SUCCESS) { ROS_WARN("Fail to write led"); }
+            else { write_led_enable = false; } // disable writing LED after success
+
+            if (is_tool_connected) {
+                id_list.pop_back();
             }
         }
     }
@@ -435,11 +509,23 @@ void DxlCommunication::setGoalPosition(double axis_5_pos, double axis_6_pos)
     m5_1.setPositionCommand(rad_pos_to_dxl_pos(axis_5_pos));
     m5_2.setPositionCommand(DXL_MIDDLE_POSITION * 2 - m5_1.getPositionCommand());
     m6.setPositionCommand(rad_pos_to_dxl_pos(axis_6_pos));
+    
+    // if motor disabled, pos_state = pos_cmd (echo position)
+    for (int i = 0 ; i < motors.size(); i++) {
+        if (!motors.at(i)->isEnabled()) {
+            motors.at(i)->setPositionState(motors.at(i)->getPositionCommand());
+        }
+    }
 }
 
 void DxlCommunication::getCurrentPosition(double *axis_5_pos, double *axis_6_pos)
 {
-    *axis_5_pos = dxl_pos_to_rad_pos(m5_1.getPositionState());
+    if (m5_1.isEnabled()) {
+        *axis_5_pos = dxl_pos_to_rad_pos(m5_1.getPositionState());
+    }
+    else { // in case motor 5_1 is disabled, take motor 5_2 (symetric) position for axis 5
+        *axis_5_pos = dxl_pos_to_rad_pos(DXL_MIDDLE_POSITION * 2 - m5_2.getPositionState());
+    }
     *axis_6_pos = dxl_pos_to_rad_pos(m6.getPositionState());
 }
 
@@ -460,28 +546,18 @@ void DxlCommunication::getHardwareStatus(bool *is_connection_ok, std::string &er
     voltages.clear();
     hw_errors.clear();
 
-    motor_names.push_back(m5_1.getName());
-    motor_names.push_back(m5_2.getName());
-    motor_names.push_back(m6.getName());
-    motor_names.push_back(tool.getName());
-
-    for (int i = 0 ; i < 4 ; i++) {
+    for (int i = 0; i < motors.size(); i++) {
+        motor_names.push_back(motors.at(i)->getName());
         motor_types.push_back("dxl_xl_320");
+        temperatures.push_back(motors.at(i)->getTemperatureState());
+        voltages.push_back((double)motors.at(i)->getVoltageState() / 10.0);
+        hw_errors.push_back(motors.at(i)->getHardwareErrorState());
     }
-
-    temperatures.push_back(m5_1.getTemperatureState());
-    temperatures.push_back(m5_2.getTemperatureState());
-    temperatures.push_back(m6.getTemperatureState());
+    
+    motor_names.push_back(tool.getName());
+    motor_types.push_back("dxl_xl_320");
     temperatures.push_back(tool.getTemperatureState());
-
-    voltages.push_back((double)m5_1.getVoltageState() / 10.0);
-    voltages.push_back((double)m5_2.getVoltageState() / 10.0);
-    voltages.push_back((double)m6.getVoltageState() / 10.0);
     voltages.push_back((double)tool.getVoltageState() / 10.0);
-
-    hw_errors.push_back(m5_1.getHardwareErrorState());
-    hw_errors.push_back(m5_2.getHardwareErrorState());
-    hw_errors.push_back(m6.getHardwareErrorState());
     hw_errors.push_back(tool.getHardwareErrorState());
 }
 
@@ -504,16 +580,26 @@ void DxlCommunication::setTorqueOn(bool on)
 
 void DxlCommunication::setLeds(std::vector<int> &leds)
 {
-    if (leds.size() != 4) {
-        ROS_WARN("Led array must have 4 values");
+    if (leds.size() < motors.size() + 1) {
+        ROS_WARN("Led array must contain %d values", motors.size() + 1);
         return;
     }
 
-    if (leds.at(0) >= 0 && leds.at(0) <= 7) { m5_1.setLedCommand(leds.at(0)); }
-    if (leds.at(1) >= 0 && leds.at(1) <= 7) { m5_2.setLedCommand(leds.at(1)); }
-    if (leds.at(2) >= 0 && leds.at(2) <= 7) { m6.setLedCommand(leds.at(2)); }
-    if (leds.at(3) >= 0 && leds.at(3) <= 7) { tool.setLedCommand(leds.at(3)); }
-   
+    int index_counter = 0;
+
+    for (int i = 0; i < motors.size(); i++) {
+        if (motors.at(i)->isEnabled()) {
+            if (leds.at(index_counter) >= 0 && leds.at(index_counter) <= 7) {
+                motors.at(i)->setLedCommand(leds.at(index_counter));
+            }
+            index_counter++;
+        }
+    }
+
+    if (leds.at(index_counter) >= 0 && leds.at(index_counter) <= 7) {
+        tool.setLedCommand(leds.at(index_counter));
+    }
+
     write_led_enable = true;
 }
 

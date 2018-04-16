@@ -37,16 +37,19 @@ class DxlMotorState {
 
     public:
         DxlMotorState() {}
-        DxlMotorState(const std::string name, uint8_t motor_id) {
+        DxlMotorState(const std::string name, uint8_t motor_id, uint32_t init_position) {
             this->name = name;
             id = motor_id;
+
+            this->init_position = init_position;
+            is_enabled = false;
 
             resetState();
             resetCommand();
         }
 
         void resetState() {
-            state_pos = 0;
+            state_pos = init_position;
             state_vel = 0;
             state_torque = 0;
             state_temperature = 0;
@@ -54,7 +57,7 @@ class DxlMotorState {
             state_hw_error = 0;
         }
         void resetCommand() {
-            cmd_pos = 0;
+            cmd_pos = init_position;
             cmd_vel = 0;
             cmd_torque = 0;
             cmd_led = 0;
@@ -64,6 +67,9 @@ class DxlMotorState {
         void setName(std::string n)  { name = n; } 
         uint8_t getId()              { return id; }
         void setId(uint8_t motor_id) { id = motor_id; } // allows to change tool motor easily
+        void enable()                { is_enabled = true; }
+        void disable()               { is_enabled = false; }
+        bool isEnabled()             { return is_enabled; }
         
         // getters - state
         uint32_t getPositionState()      { return state_pos; }
@@ -97,6 +103,8 @@ class DxlMotorState {
 
         std::string name;
         uint8_t id;
+        bool is_enabled;
+        uint32_t init_position;
 
         // read variables
         

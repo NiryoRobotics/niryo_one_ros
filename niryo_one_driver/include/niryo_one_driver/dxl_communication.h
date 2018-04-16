@@ -29,6 +29,10 @@
 #include "niryo_one_driver/dxl_motor_state.h"
 #include "niryo_one_driver/xl320_driver.h"
 
+#define DXL_MOTOR_5_1_ID 4
+#define DXL_MOTOR_5_2_ID 5
+#define DXL_MOTOR_6_ID   6
+
 #define DXL_BUS_PROTOCOL_VERSION 2.0
 
 #define DXL_FAIL_OPEN_PORT         -4500
@@ -127,6 +131,7 @@ class DxlCommunication {
         DxlMotorState m5_2;
         DxlMotorState m6;
         DxlMotorState tool;
+        std::vector<DxlMotorState*> motors;
 
         // for hardware control
         
