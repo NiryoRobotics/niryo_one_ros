@@ -28,9 +28,12 @@
 #include "dynamixel_sdk/dynamixel_sdk.h"
 #include "niryo_one_driver/dxl_motor_state.h"
 #include "niryo_one_driver/xl320_driver.h"
+#include "niryo_one_driver/xl430_driver.h"
 
-#define DXL_MOTOR_5_1_ID 4
-#define DXL_MOTOR_5_2_ID 5
+#define DXL_MOTOR_4_ID   2 // V2 - axis 4
+#define DXL_MOTOR_5_ID   3 // V2 - axis 5
+#define DXL_MOTOR_5_1_ID 4 // V1 - axis 5 (1)
+#define DXL_MOTOR_5_2_ID 5 // V1 - axis 5 (2)
 #define DXL_MOTOR_6_ID   6
 
 #define DXL_BUS_PROTOCOL_VERSION 2.0
@@ -41,12 +44,20 @@
 
 // we stop at 1022 instead of 1023, to get an odd number of positions (1023)
 // --> so we can get a middle point (511)
-#define DXL_TOTAL_ANGLE          296.67
-#define DXL_MAX_POSITION         1022
-#define DXL_MIN_POSITION         0
-#define DXL_MIDDLE_POSITION      511
-#define DXL_TOTAL_RANGE_POSITION 1023
-    
+#define XL320_TOTAL_ANGLE          296.67
+#define XL320_MAX_POSITION         1022
+#define XL320_MIN_POSITION         0
+#define XL320_MIDDLE_POSITION      511
+#define XL320_TOTAL_RANGE_POSITION 1023
+
+// we stop at 4094 instead of 4095, to get an odd number of positions (4095)
+// --> so we can get a middle point (2047)
+#define XL430_TOTAL_ANGLE          360.36
+#define XL430_MAX_POSITION         4094
+#define XL430_MIN_POSITION         0
+#define XL430_MIDDLE_POSITION      2047
+#define XL430_TOTAL_RANGE_POSITION 4095
+
 #define RADIAN_TO_DEGREE 57.295779513082320876798154814105
 
 #define TIME_TO_WAIT_IF_BUSY 0.0005
@@ -62,19 +73,20 @@
 #define DXL_CONTROL_MODE_TORQUE   3
 
 // according to xl-320 datasheet : 1 speed ~ 0.111 rpm ~ 1.8944 dxl position per second
-#define DXL_STEPS_FOR_1_SPEED 1.8944 // 0.111 * 1024 / 60
+#define XL320_STEPS_FOR_1_SPEED 1.8944 // 0.111 * 1024 / 60
 
 class DxlCommunication {
 
     public:
         
-        DxlCommunication();
+        DxlCommunication(int hardware_version);
         int init();
 
         void startHardwareControlLoop(bool limited_mode);
         void stopHardwareControlLoop();
 
-        void getCurrentPosition(double *axis_5_pos, double *axis_6_pos); 
+        void getCurrentPositionV1(double *axis_5_pos, double *axis_6_pos); 
+        void getCurrentPositionV2(double *axis_4_pos, double *axis_5_pos, double *axis_6_pos); 
         
         void getHardwareStatus(bool *is_connection_ok, std::string &error_message,
                 int *calibration_needed, bool *calibration_in_progress,
@@ -85,7 +97,8 @@ class DxlCommunication {
         bool isOnLimitedMode();
 
         void setControlMode(int control_mode); // position, velocity, or torque
-        void setGoalPosition(double axis_5_pos, double axis_6_pos);
+        void setGoalPositionV1(double axis_5_pos, double axis_6_pos);
+        void setGoalPositionV2(double axis_4_pos, double axis_5_pos, double axis_6_pos);
         void setTorqueOn(bool on);
         void setLeds(std::vector<int> &leds);
 
@@ -104,6 +117,9 @@ class DxlCommunication {
 
     private:
 
+        // Niryo One hardware version
+        int hardware_version;
+
         std::string device_name;
         int uart_baudrate;
         
@@ -111,12 +127,16 @@ class DxlCommunication {
         dynamixel::PacketHandler *dxlPacketHandler;
        
         boost::shared_ptr<XL320Driver> xl320;
+        boost::shared_ptr<XL430Driver> xl430;
 
-        std::vector<uint8_t> niryo_one_motors_ids;
+        std::vector<uint8_t> required_motors_ids;
         std::vector<uint8_t> allowed_motors_ids;
 
-        uint16_t rad_pos_to_dxl_pos(double position_rad);
-        double   dxl_pos_to_rad_pos(uint16_t position_dxl);
+        uint32_t rad_pos_to_xl320_pos(double position_rad);
+        double   xl320_pos_to_rad_pos(uint32_t position_dxl);
+
+        uint32_t rad_pos_to_xl430_pos(double position_rad);
+        double   xl430_pos_to_rad_pos(uint32_t position_dxl);
 
         void hardwareControlLoop();
         void hardwareControlRead();
@@ -127,10 +147,12 @@ class DxlCommunication {
         boost::shared_ptr<std::thread> hardware_control_loop_thread;
 
         // motors 
-        DxlMotorState m5_1;
-        DxlMotorState m5_2;
-        DxlMotorState m6;
-        DxlMotorState tool;
+        DxlMotorState m4; // V2 only
+        DxlMotorState m5; // V2 only
+        DxlMotorState m5_1; // V1 only
+        DxlMotorState m5_2; // V1 only
+        DxlMotorState m6; // V1 + V2
+        DxlMotorState tool; // V1 + V2
         std::vector<DxlMotorState*> motors;
 
         // for hardware control
@@ -148,7 +170,8 @@ class DxlCommunication {
 
         double hw_control_loop_frequency;
 
-        int hw_fail_counter_read;
+        int xl320_hw_fail_counter_read;
+        int xl430_hw_fail_counter_read;
 
         double time_hw_data_last_write;
         double time_hw_data_last_read;

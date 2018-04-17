@@ -5,6 +5,10 @@
 #
 #  Stepper caracteristics
 #
+#  Note : stepper_4_* params are only used for Niryo One V1
+#  On Niryo One V2 (current version), Stepper 4 has been
+#  replaced by a Dynamixel XL430 motor
+#
 
 stepper_1_gear_ratio: 6.0625
 stepper_2_gear_ratio: 8.3125

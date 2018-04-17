@@ -21,6 +21,9 @@
 
 NiryoOneCommunication::NiryoOneCommunication() 
 {
+    // TODO get from params
+    hardware_version = 1;
+    
     ros::param::get("~can_enabled", can_enabled);
     ros::param::get("~dxl_enabled", dxl_enabled);
     ros::param::get("~niryo_one_hw_check_connection_frequency", niryo_one_hw_check_connection_frequency);
@@ -33,11 +36,11 @@ NiryoOneCommunication::NiryoOneCommunication()
     }
 
     if (can_enabled) {
-        canComm.reset(new CanCommunication());
+        canComm.reset(new CanCommunication(hardware_version));
     }
 
     if (dxl_enabled) {
-        dxlComm.reset(new DxlCommunication());
+        dxlComm.reset(new DxlCommunication(hardware_version));
     }
 
     new_calibration_requested = false;
@@ -360,39 +363,77 @@ void NiryoOneCommunication::getFirmwareVersions(std::vector<std::string> &motor_
 
 void NiryoOneCommunication::getCurrentPosition(double pos[6])
 {
-    if (can_enabled) { canComm->getCurrentPosition(&pos[0], &pos[1], &pos[2], &pos[3]); }
-    if (dxl_enabled) { dxlComm->getCurrentPosition(&pos[4], &pos[5]); }
+    if (hardware_version == 1) {
+        if (can_enabled) { canComm->getCurrentPositionV1(&pos[0], &pos[1], &pos[2], &pos[3]); }
+        if (dxl_enabled) { dxlComm->getCurrentPositionV1(&pos[4], &pos[5]); }
 
-    // if disabled (debug purposes)
-    if (!can_enabled) {
-        pos[0] = pos_can_disabled[0];
-        pos[1] = pos_can_disabled[1];
-        pos[2] = pos_can_disabled[2];
-        pos[3] = pos_can_disabled[3];
+        // if disabled (debug purposes)
+        if (!can_enabled) {
+            pos[0] = pos_can_disabled_v1[0];
+            pos[1] = pos_can_disabled_v1[1];
+            pos[2] = pos_can_disabled_v1[2];
+            pos[3] = pos_can_disabled_v1[3];
+        }
+
+        if (!dxl_enabled) {
+            pos[4] = pos_dxl_disabled_v1[0];
+            pos[5] = pos_dxl_disabled_v1[1];
+        }
     }
+    else if (hardware_version == 2) {
+        if (can_enabled) { canComm->getCurrentPositionV2(&pos[0], &pos[1], &pos[2]); }
+        if (dxl_enabled) { dxlComm->getCurrentPositionV2(&pos[3], &pos[4], &pos[5]); }
+        
+        // if disabled (debug purposes)
+        if (!can_enabled) {
+            pos[0] = pos_can_disabled_v2[0];
+            pos[1] = pos_can_disabled_v2[1];
+            pos[2] = pos_can_disabled_v2[2];
+        }
 
-    if (!dxl_enabled) {
-        pos[4] = pos_dxl_disabled[0];
-        pos[5] = pos_dxl_disabled[1];
+        if (!dxl_enabled) {
+            pos[3] = pos_dxl_disabled_v2[0];
+            pos[4] = pos_dxl_disabled_v2[1];
+            pos[5] = pos_dxl_disabled_v2[2];
+        }
     }
 }
 
 void NiryoOneCommunication::sendPositionToRobot(const double cmd[6])
 {
-    if (can_enabled) { canComm->setGoalPosition(cmd[0], cmd[1], cmd[2], cmd[3]); }
-    if (dxl_enabled) { dxlComm->setGoalPosition(cmd[4], cmd[5]); }
+    if (hardware_version == 1) {
+        if (can_enabled) { canComm->setGoalPositionV1(cmd[0], cmd[1], cmd[2], cmd[3]); }
+        if (dxl_enabled) { dxlComm->setGoalPositionV1(cmd[4], cmd[5]); }
 
-    // if disabled (debug purposes)
-    if (!can_enabled) {
-        pos_can_disabled[0] = cmd[0];
-        pos_can_disabled[1] = cmd[1];
-        pos_can_disabled[2] = cmd[2];
-        pos_can_disabled[3] = cmd[3];
+        // if disabled (debug purposes)
+        if (!can_enabled) {
+            pos_can_disabled_v1[0] = cmd[0];
+            pos_can_disabled_v1[1] = cmd[1];
+            pos_can_disabled_v1[2] = cmd[2];
+            pos_can_disabled_v1[3] = cmd[3];
+        }
+
+        if (!dxl_enabled) {
+            pos_dxl_disabled_v1[0] = cmd[4];
+            pos_dxl_disabled_v1[1] = cmd[5];
+        }
     }
+    else if (hardware_version == 2) {
+        if (can_enabled) { canComm->setGoalPositionV2(cmd[0], cmd[1], cmd[2]); }
+        if (dxl_enabled) { dxlComm->setGoalPositionV2(cmd[3], cmd[4], cmd[5]); }
+        
+        // if disabled (debug purposes)
+        if (!can_enabled) {
+            pos_can_disabled_v2[0] = cmd[0];
+            pos_can_disabled_v2[1] = cmd[1];
+            pos_can_disabled_v2[2] = cmd[2];
+        }
 
-    if (!dxl_enabled) {
-        pos_dxl_disabled[0] = cmd[4];
-        pos_dxl_disabled[1] = cmd[5];
+        if (!dxl_enabled) {
+            pos_dxl_disabled_v2[0] = cmd[3];
+            pos_dxl_disabled_v2[1] = cmd[4];
+            pos_dxl_disabled_v2[2] = cmd[5];
+        }
     }
 }
 
@@ -419,7 +460,6 @@ bool NiryoOneCommunication::setLeds(std::vector<int> &leds, std::string &message
 
 bool NiryoOneCommunication::activateDcMotor(bool activate)
 {
-    // TODO
     return true;
 }
 
