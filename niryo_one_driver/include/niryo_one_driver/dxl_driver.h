@@ -85,6 +85,8 @@ class DxlDriver {
 
         /*
          * Virtual functions below - to override
+         *
+         * --> All functions return communication result
          */
 
         virtual int checkModelNumber(uint8_t id) = 0;
@@ -105,7 +107,7 @@ class DxlDriver {
         virtual int readReturnLevel      (uint8_t id, uint32_t *return_level) = 0;
         virtual int readAlarmShutdown    (uint8_t id, uint32_t *alarm_shutdown) = 0;
 
-        // ram write --> return comm_result
+        // ram write
         virtual int setTorqueEnable   (uint8_t id, uint32_t torque_enable) = 0;
         virtual int setLed            (uint8_t id, uint32_t led_value) = 0;
         virtual int setGoalPosition   (uint8_t id, uint32_t position) = 0;

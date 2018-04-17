@@ -1,5 +1,5 @@
 /*
-    xl320_driver.h
+    xl430_driver.h
     Copyright (C) 2018 Niryo
     All rights reserved.
 
@@ -17,53 +17,50 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef XL320_DRIVER_H
-#define XL320_DRIVER_H
+#ifndef XL430_DRIVER_H
+#define XL430_DRIVER_H
 
 #include "niryo_one_driver/dxl_driver.h"
 #include <vector>
 
-#define XL320_PROTOCOL_VERSION 2.0
-#define XL320_MODEL_NUMBER 350
+#define XL430_PROTOCOL_VERSION 2.0
+#define XL430_MODEL_NUMBER 1060
 
-// Table here : http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm
-#define XL320_ADDR_MODEL_NUMBER          0
-#define XL320_ADDR_FIRMWARE_VERSION      2
-#define XL320_ADDR_ID                    3
-#define XL320_ADDR_BAUDRATE              4
-#define XL320_ADDR_RETURN_DELAY_TIME     5
-#define XL320_ADDR_CW_ANGLE_LIMIT        6  
-#define XL320_ADDR_CCW_ANGLE_LIMIT       8                  // EEPROM
-#define XL320_ADDR_CONTROL_MODE          11
-#define XL320_ADDR_LIMIT_TEMPERATURE     12
-#define XL320_ADDR_LOWER_LIMIT_VOLTAGE   13
-#define XL320_ADDR_UPPER_LIMIT_VOLTAGE   14
-#define XL320_ADDR_MAX_TORQUE            15
-#define XL320_ADDR_RETURN_LEVEL          17
-#define XL320_ADDR_ALARM_SHUTDOWN        18
+// Table here : http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl430-w250.htm
+#define XL430_ADDR_MODEL_NUMBER        0
+#define XL430_ADDR_FIRMWARE_VERSION    6
+#define XL430_ADDR_ID                  7 
+#define XL430_ADDR_BAUDRATE            8
+#define XL430_ADDR_RETURN_DELAY_TIME   9
+#define XL430_ADDR_DRIVE_MODE          10
+#define XL430_ADDR_OPERATING_MODE      11
+#define XL430_ADDR_HOMING_OFFSET       20           // EEPROM (not all addresses)
+#define XL430_ADDR_TEMPERATURE_LIMIT   31
+#define XL430_ADDR_MAX_VOLTAGE_LIMIT   32
+#define XL430_ADDR_MIN_VOLTAGE_LIMIT   34
+#define XL430_ADDR_MAX_POSITION_LIMIT  48
+#define XL430_ADDR_MIN_POSITION_LIMIT  52
+#define XL430_ADDR_ALARM_SHUTDOWN      63
 
-#define XL320_ADDR_TORQUE_ENABLE         24
-#define XL320_ADDR_LED                   25
-#define XL320_ADDR_D_GAIN                27
-#define XL320_ADDR_I_GAIN                28
-#define XL320_ADDR_P_GAIN                29
-#define XL320_ADDR_GOAL_POSITION         30
-#define XL320_ADDR_GOAL_SPEED            32
-#define XL320_ADDR_GOAL_TORQUE           35
-#define XL320_ADDR_PRESENT_POSITION      37                  // RAM
-#define XL320_ADDR_PRESENT_SPEED         39
-#define XL320_ADDR_PRESENT_LOAD          41
-#define XL320_ADDR_PRESENT_VOLTAGE       45
-#define XL320_ADDR_PRESENT_TEMPERATURE   46
-#define XL320_ADDR_REGISTERED            47
-#define XL320_ADDR_MOVING                49
-#define XL320_ADDR_HW_ERROR_STATUS       50                  
-#define XL320_ADDR_PUNCH                 51
+#define XL430_ADDR_TORQUE_ENABLE       64
+#define XL430_ADDR_LED                 65
+#define XL430_ADDR_STATUS_RETURN_LEVEL 68
+#define XL430_ADDR_HW_ERROR_STATUS     70
+#define XL430_ADDR_GOAL_PWM            100
+#define XL430_ADDR_GOAL_VELOCITY       104
+#define XL430_ADDR_GOAL_POSITION       116          // RAM (not all addresses)
+#define XL430_ADDR_MOVING              122
+#define XL430_ADDR_PRESENT_PWM         124
+#define XL430_ADDR_PRESENT_LOAD        126
+#define XL430_ADDR_PRESENT_VELOCITY    128
+#define XL430_ADDR_PRESENT_POSITION    132
+#define XL430_ADDR_PRESENT_VOLTAGE     144
+#define XL430_ADDR_PRESENT_TEMPERATURE 146
 
-class XL320Driver : public DxlDriver {
+class XL430Driver : public DxlDriver {
 
     public:
-        XL320Driver(dynamixel::PortHandler* portHandler, dynamixel::PacketHandler* packetHandler);
+        XL430Driver(dynamixel::PortHandler* portHandler, dynamixel::PacketHandler* packetHandler);
 
         int checkModelNumber(uint8_t id);
 

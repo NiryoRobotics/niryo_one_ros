@@ -41,6 +41,7 @@ add_executable(niryo_one_driver
     src/hw_driver/niryo_one_can_driver.cpp
     src/hw_driver/dxl_driver.cpp
     src/hw_driver/xl320_driver.cpp
+    src/hw_driver/xl430_driver.cpp
     src/hw_comm/dxl_communication.cpp
     src/hw_comm/can_communication.cpp
     src/hw_comm/niryo_one_communication.cpp
