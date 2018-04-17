@@ -66,9 +66,9 @@ DxlCommunication::DxlCommunication()
     allowed_motors_ids.insert(allowed_motors_ids.end(), allowed_dxl.begin(), allowed_dxl.end());
 
     // Create motors
-    m5_1 = DxlMotorState("Servo Axis 5_1", DXL_MOTOR_5_1_ID, DXL_MIDDLE_POSITION);
-    m5_2 = DxlMotorState("Servo Axis 5_2", DXL_MOTOR_5_2_ID, DXL_MIDDLE_POSITION);
-    m6 = DxlMotorState("Servo Axis 6", DXL_MOTOR_6_ID, DXL_MIDDLE_POSITION);
+    m5_1 = DxlMotorState("Servo Axis 5_1", DXL_MOTOR_5_1_ID, DXL_MIDDLE_POSITION, MOTOR_TYPE_XL320);
+    m5_2 = DxlMotorState("Servo Axis 5_2", DXL_MOTOR_5_2_ID, DXL_MIDDLE_POSITION, MOTOR_TYPE_XL320);
+    m6 = DxlMotorState("Servo Axis 6", DXL_MOTOR_6_ID, DXL_MIDDLE_POSITION, MOTOR_TYPE_XL320);
 
     for (uint8_t i = 0 ; i < required_dxl_ids.size() ; i++) {
         if      (required_dxl_ids.at(i) == m5_1.getId()) { m5_1.enable(); }
@@ -93,7 +93,7 @@ DxlCommunication::DxlCommunication()
     motors.push_back(&m5_2);
     motors.push_back(&m6);
 
-    tool = DxlMotorState("No tool connected", 0, DXL_MIDDLE_POSITION);
+    tool = DxlMotorState("No tool connected", 0, DXL_MIDDLE_POSITION, MOTOR_TYPE_XL320);
     is_tool_connected = false;
     
     torque_on = 0;

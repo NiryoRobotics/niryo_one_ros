@@ -33,14 +33,17 @@
 #define VACUUM_PUMP_STATE_PULLED 0x20
 #define VACUUM_PUMP_STATE_PUSHED 0x21
 
+#define MOTOR_TYPE_XL320 1
+#define MOTOR_TYPE_XL430 2
+
 class DxlMotorState {
 
     public:
         DxlMotorState() {}
-        DxlMotorState(const std::string name, uint8_t motor_id, uint32_t init_position) {
+        DxlMotorState(const std::string name, uint8_t id, int type, uint32_t init_position) {
             this->name = name;
-            id = motor_id;
-
+            this->id = id;
+            this->type = type;
             this->init_position = init_position;
             is_enabled = false;
 
@@ -67,6 +70,7 @@ class DxlMotorState {
         void setName(std::string n)  { name = n; } 
         uint8_t getId()              { return id; }
         void setId(uint8_t motor_id) { id = motor_id; } // allows to change tool motor easily
+        int getType()                { return type; }
         void enable()                { is_enabled = true; }
         void disable()               { is_enabled = false; }
         bool isEnabled()             { return is_enabled; }
@@ -103,6 +107,7 @@ class DxlMotorState {
 
         std::string name;
         uint8_t id;
+        int type;
         bool is_enabled;
         uint32_t init_position;
 
