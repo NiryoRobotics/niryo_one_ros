@@ -1,4 +1,6 @@
 <launch>
+    <arg name="simulation_mode" default="false" />
+
     <!-- Moveit move_group -->
     <include file="$(find niryo_one_moveit_config)/launch/move_group.launch" />
     
@@ -14,13 +16,16 @@
     <param name="/move_group/start_state_max_bounds_error" value="0.3" />
   
     <!-- Robot commander -->
-    <node name="robot_commander" pkg="niryo_one_commander" type="robot_commander.py" output="screen" respawn="false">
+    <node name="niryo_one_commander_node" pkg="niryo_one_commander" type="niryo_one_commander_node.py" output="screen" respawn="false">
         <param name="reference_frame"            type="string" value="ground_link" />
         <param name="move_group_commander_name"  type="string" value="arm" />
         <param name="allow_replanning"           type="bool"   value="true" />
         <param name="goal_joint_tolerance"       type="double" value="0.0001" />
         <param name="goal_position_tolerance"    type="double" value="0.0001" />
         <param name="goal_orientation_tolerance" type="double" value="0.001" />
+        <param name="positions_dir" type="string"  value="/home/niryo/niryo_one_positions" unless="$(arg simulation_mode)"/>
+        <param name="positions_dir" type="string"  value="~/niryo_one_postions"           if="$(arg simulation_mode)"/>
+
     </node>
 </launch>
 
