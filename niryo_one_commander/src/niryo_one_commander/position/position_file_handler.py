@@ -51,25 +51,25 @@ class PositionFileHandler:
         filename = self.filename_from_position_name(position.position_name)
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
-                f.write("position name: \n") 
+                f.write("Position_Name:\n") 
                 f.write(str(position.position_name)+"\n") 
-                f.write("position ID: \n") 
+                f.write("Position_Id:\n") 
                 f.write(str(position.position_id)+"\n") 
-                f.write("Joints: \n")
+                f.write("Joints:\n")
                 f.write(str(position.joints).strip('()')+"\n")
-                f.write( "Pose:  \n") 
+                f.write( "Pose:\n") 
                 f.write( str(position.pose).strip('()')+"\n") 
 
     def does_file_exist(self, filename):
         filenames = self.get_all_filenames()
-        return filename in filename
+        return filename in filenames
     def get_all_filenames(self):
         filenames = []
         try:
             filenames = os.listdir(self.base_dir)
         except OSError:
             pass
-        r = re.compile("^position_\d+$")
+        r = re.compile("^position_.+$")
         # Keep only correct filenames
         return filter(r.match, filenames)
 
@@ -84,11 +84,11 @@ class PositionFileHandler:
             with open(self.base_dir + filename, 'r') as f:
                 pos = Position()
                 for line in f:
-                    if line.startswith('position name: '):
+                    if line.startswith('Position_Name:'):
                         pos.position_name = str(next(f).rstrip())
-                    if line.startswith("position ID:"):
+                    if line.startswith("Position_Id:"):
                         pos.position_id=int(next(f).rstrip())
-                    if line.startswith("Joints: "): 
+                    if line.startswith("Joints:"): 
                         pos.joints=list(str(next(f).rstrip()).split(','))
                         pos.joints=map(float ,pos.joints)
                     if line.startswith("Pose:"):
@@ -104,7 +104,7 @@ class PositionFileHandler:
             try:
                 os.remove(self.base_dir + filename)
             except OSError as e:
-                raise NiryoOneFileException("Could not remove sequence with id "+position_name + " : " + str(e))
+                raise NiryoOneFileException("Could not remove sequence with id " + position_name + " : " + str(e))
 
 
 if __name__ == '__main__': 

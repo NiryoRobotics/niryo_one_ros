@@ -35,21 +35,22 @@ class PositionManager:
         self.fh = PositionFileHandler(position_dir)
         self.manage_position_server = rospy.Service('/niryo_one/position/manage_position', ManagePosition, self.callback_manage_position)
         rospy.loginfo("service manage position created") 
+        
    
     def create_position_response(self, status, message, position=None):
         position_msg = PositionMessage()
         if position != None:
             position_msg.position_name = position.position_name
-            position_msg.position_id=position.position_id 
+            position_msg.position_id = position.position_id 
             position_msg.joints=position.joints 
-            position_msg.pose= position.pose
+            position_msg.pose = position.pose
         return { 'status': status, 'message': message, 'position': position_msg }
     
     def callback_manage_position(self, req):
         cmd_type = req.cmd_type
         position_name = req.position_name 
         position_msg = req.position 
-        position_data = Position(position_name=position_msg.position_name, position_id=position_msg.position_id, joints=position_msg.joints , pose=position_msg.pose )
+        position_data = Position(position_name = position_msg.position_name, position_id = position_msg.position_id, joints= position_msg.joints, pose = position_msg.pose)
 
       # GET an existing position 
         if cmd_type == PositionCommandType.GET:
@@ -60,7 +61,7 @@ class PositionManager:
     
     # CREATE new position    
         elif cmd_type == PositionCommandType.CREATE:
-            new_position_name= self.create_new_position(position_data)
+            new_position_name = self.create_new_position(position_data)
             new_position = self.get_position(new_position_name)
             if new_position == None:
                 return self.create_position_response(400, "Failed to create position")
@@ -82,13 +83,6 @@ class PositionManager:
             if not success:
                 return self.create_position_response(400, "Could not delete position with name : " + position_name)
             return self.create_position_response(200, "Position  has been deleted")
-
-       # GET last executed
-        elif cmd_type == PositionCommandType.GET_LAST_EXECUTED:
-            pos = self.get_last_executed_position()
-            if pos == None:
-                return self.create_position_response(400, "No last executed position has been found")
-            return self.create_position_response(200, " position has been found",pos)
     
     def delete_position(self, position_name):
         try:
@@ -96,25 +90,12 @@ class PositionManager:
         except NiryoOneFileException as e:
             return False
         return True
-     
-    def get_last_executed_position(self):
-        return self.get_position("last_executed_position")
-
-
-    def save_last_executed_sequence(self, position):
-        position.position_name="last_executed_postion"
-        try:
-            self.fh.write_position(position)
-        except NiryoOneFileException as e:
-            return -1
-        return 0
-
-
+    
     def update_position(self, position, position_data):
-        position.position_name=position_data.position_name
-        position.position_id=position_data.position_id
-        position.joints=position_data.joints
-        position.pose=position_data.pose 
+        position.position_name = position_data.position_name
+        position.position_id = position_data.position_id
+        position.joints = position_data.joints
+        position.pose = position_data.pose 
 
         try:
             self.fh.write_position(position)
@@ -129,20 +110,21 @@ class PositionManager:
         except NiryoOneFileException as e:
             return None
 
-    def create_new_position(self,position) : 
+    def create_new_position(self, position) : 
         try: 
             self.fh.write_position(position)
             return(position.position_name)
         except  NiryoOneFileException as e:
             return None
+    
 
+        
 
 if __name__ == '__main__':
-
-
-    rospy.init_node('niryo_one_position_manager') 
-    pm=PositionManager("~/niryo_one_position") 
-    rospy.spin()
+    pass
+ #   rospy.init_node('niryo_one_position_manager') 
+  #  pm=PositionManager("~/niryo_one_position") 
+  #  rospy.spin()
 
 
 
