@@ -465,7 +465,7 @@ void CanCommunication::hardwareControlCheckConnection()
                     if (motors.at(i)->getHwFailCounter() >= max_fail_counter) {
                         is_can_connection_ok = false;
                         debug_error_message = "Connection problem with CAN bus. Motor ";
-                        debug_error_message += motors.at(i)->getId();
+                        debug_error_message += std::to_string(motors.at(i)->getId());
                         debug_error_message += " is not connected";
                         return;
                     }

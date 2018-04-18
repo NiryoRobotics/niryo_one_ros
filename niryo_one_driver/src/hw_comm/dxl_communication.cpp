@@ -1022,40 +1022,59 @@ int DxlCommunication::scanAndCheck()
     hw_is_busy = false;
     
     if (result != COMM_SUCCESS) {
-        debug_error_message = "Failed to scan Dynamixel motors. Make sure that motors are correctly connected.";
+        debug_error_message = "Failed to scan Dynamixel motors. Make sure that motors are correctly connected and powered on.";
         ROS_WARN("Broadcast ping failed , result : %d", result);
         return result;
     }
 
     // 2. Check that ids correspond to niryo_one motors id list
-    std::vector<uint8_t>::iterator it;
-
-    for (it = required_motors_ids.begin() ; it < required_motors_ids.end() ; it++) {
-        if (std::find(id_list.begin(), id_list.end(), *it) == id_list.end()) {
-            debug_error_message = "Missing Dynamixel motor(s) on the robot. Make sure that all motors are correctly connected.";
-            ROS_ERROR("Missing Dynamixel : %d", *it);
-            return DXL_SCAN_MISSING_MOTOR;
+    std::vector<uint8_t> missing_motor_ids;
+    
+    for (int i = 0; i < required_motors_ids.size(); i++) {
+        if (std::find(id_list.begin(), id_list.end(), required_motors_ids.at(i)) == id_list.end()) {
+            missing_motor_ids.push_back(required_motors_ids.at(i));
         }
     }
-
+    
     if (is_tool_connected) {
         if (std::find(id_list.begin(), id_list.end(), tool.getId()) == id_list.end()) {
-            debug_error_message = "Missing tool. Make sure that all motors are correctly connected.";
-            ROS_ERROR("Missing Dynamixel : %d", tool.getId());
-            return DXL_SCAN_MISSING_MOTOR;
+            missing_motor_ids.push_back(tool.getId());
         }
+    }
+    
+    if (missing_motor_ids.size() > 0) {
+        debug_error_message = "Missing Dynamixel motor(s) on the robot : ";
+        for (int i = 0; i < missing_motor_ids.size(); i++) {
+            debug_error_message += std::to_string(missing_motor_ids.at(i));
+            if (i != missing_motor_ids.size() - 1) {
+                debug_error_message += ", ";
+            }
+        }
+        ROS_ERROR("%s", debug_error_message.c_str());
+        return DXL_SCAN_MISSING_MOTOR;
     }
 
     // 3. Check that there is no unwanted motor
-    for (it = id_list.begin() ; it < id_list.end() ; it++) {
-        if (std::find(allowed_motors_ids.begin(), allowed_motors_ids.end(), *it) == allowed_motors_ids.end()) {
-            debug_error_message = "Unallowed Dynamixel motor(s) on the robot. Make sure that all motors id are correct. "
-                "You may need to reconfigure some Dynamixel motors.";
-            ROS_ERROR("Unallowed Dynamixel : %d", *it);
-            return DXL_SCAN_UNALLOWED_MOTOR;
+    std::vector<uint8_t> unallowed_motor_ids;
+
+    for (int i = 0; i < id_list.size(); i++) {
+        if (std::find(allowed_motors_ids.begin(), allowed_motors_ids.end(), id_list.at(i)) == allowed_motors_ids.end()) {
+            unallowed_motor_ids.push_back(id_list.at(i));
         }
     }
-   
+
+    if (unallowed_motor_ids.size() > 0) {
+        debug_error_message = "Unallowed Dynamixel motor(s) on the robot : ";
+        for (int i = 0; i < unallowed_motor_ids.size(); i++) {
+            debug_error_message += std::to_string(unallowed_motor_ids.at(i));
+            if (i != unallowed_motor_ids.size() - 1) {
+                debug_error_message += ", ";
+            }
+        }
+        ROS_ERROR("%s", debug_error_message.c_str());
+        return DXL_SCAN_UNALLOWED_MOTOR;
+    }
+
     is_dxl_connection_ok = true;
     debug_error_message = "";
     return DXL_SCAN_OK;
