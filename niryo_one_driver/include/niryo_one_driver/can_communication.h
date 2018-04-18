@@ -60,8 +60,9 @@ class CanCommunication {
 
     public:
 
-        CanCommunication(int hardware_version);
-        int init();
+        CanCommunication();
+        int init(int hardware_version);
+        int setupCommunication();
         
         void startHardwareControlLoop(bool limited_mode);
         void stopHardwareControlLoop();

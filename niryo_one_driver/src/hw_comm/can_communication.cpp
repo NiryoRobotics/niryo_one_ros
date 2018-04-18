@@ -29,14 +29,19 @@ double CanCommunication::steps_to_rad_pos(int32_t steps, double gear_ratio, doub
     return (double) ((double)steps * 360.0 / (200.0 * 8.0 * gear_ratio * RADIAN_TO_DEGREE)) * direction ;
 }
 
-CanCommunication::CanCommunication(int hardware_version)
+CanCommunication::CanCommunication()
+{
+
+}
+
+int CanCommunication::init(int hardware_version)
 {
     this->hardware_version = hardware_version;
     
     if (hardware_version != 1 && hardware_version != 2) {
         debug_error_message = "Incorrect hardware version, should be 1 or 2";
         ROS_ERROR("%s", debug_error_message.c_str());
-        return;
+        return -1;
     }
 
     ros::param::get("~spi_channel", spi_channel);
@@ -123,17 +128,17 @@ CanCommunication::CanCommunication(int hardware_version)
         else if (required_steppers_ids.at(i) == m3.getId()) { m3.enable(); }
         else if (hardware_version == 1 && required_steppers_ids.at(i) == m4.getId()) { m4.enable(); }
         else {
-            debug_error_message = "Incorrect configuration : Wrong ID given in Ros Param /niryo_one_motors/can_required_motors. " 
-            "You need to fix this !";
+            debug_error_message = "Incorrect configuration : Wrong ID (" + std::to_string(required_steppers_ids.at(i))
+                + ") given in Ros Param /niryo_one_motors/can_required_motors. You need to fix this !";
             ROS_ERROR("%s", debug_error_message.c_str());
-            return;
+            return -1;
         }
     }
     if (required_steppers_ids.size() == 0) {
         debug_error_message = "Incorrect configuration : Ros Param /niryo_one_motors/can_required_motors "
         "should contain a list with at least one motor. You need to fix this !";
         ROS_ERROR("%s", debug_error_message.c_str());
-        return;
+        return -1;
     }
 
     ROS_INFO("%d motors should be connected to CAN bus", (int) required_steppers_ids.size());
@@ -164,9 +169,11 @@ CanCommunication::CanCommunication(int hardware_version)
     steppers_calibration_mode = CAN_STEPPERS_CALIBRATION_MODE_AUTO; // default
     write_synchronize_begin_traj = true;
     calibration_in_progress = false;
+
+    return setupCommunication();
 }
 
-int CanCommunication::init()
+int CanCommunication::setupCommunication()
 {
     int gpio_result = can->setupInterruptGpio();
     if (gpio_result != CAN_OK) {
@@ -179,7 +186,8 @@ int CanCommunication::init()
         ROS_ERROR("Failed to start spi communication for CAN bus"); 
         return spi_result;
     }
-
+    
+    // will return 0 on success
     return can->init();
 }
 

@@ -79,8 +79,9 @@ class DxlCommunication {
 
     public:
         
-        DxlCommunication(int hardware_version);
-        int init();
+        DxlCommunication();
+        int init(int hardware_version);
+        int setupCommunication();
 
         void startHardwareControlLoop(bool limited_mode);
         void stopHardwareControlLoop();

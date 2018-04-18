@@ -36,11 +36,11 @@ NiryoOneCommunication::NiryoOneCommunication()
     }
 
     if (can_enabled) {
-        canComm.reset(new CanCommunication(hardware_version));
+        canComm.reset(new CanCommunication());
     }
 
     if (dxl_enabled) {
-        dxlComm.reset(new DxlCommunication(hardware_version));
+        dxlComm.reset(new DxlCommunication());
     }
 
     new_calibration_requested = false;
@@ -53,13 +53,13 @@ int NiryoOneCommunication::init()
 {
     int result = 0;
     if (can_enabled) {
-        result = canComm->init();
+        result = canComm->init(hardware_version);
         if (result != 0) {
             return result;
         }
     }
     if (dxl_enabled) {
-        result =  dxlComm->init();
+        result =  dxlComm->init(hardware_version);
         if (result != 0) {
             return result;
         }

@@ -39,14 +39,19 @@ double DxlCommunication::xl430_pos_to_rad_pos(uint32_t position_dxl)
     return (double) ((((double)position_dxl - XL430_MIDDLE_POSITION) * (double)XL430_TOTAL_ANGLE) / (RADIAN_TO_DEGREE * (double)XL430_TOTAL_RANGE_POSITION));
 }
 
-DxlCommunication::DxlCommunication(int hardware_version)
+DxlCommunication::DxlCommunication()
+{
+
+}
+
+int DxlCommunication::init(int hardware_version)
 {
     this->hardware_version = hardware_version;
     
     if (hardware_version != 1 && hardware_version != 2) {
         debug_error_message = "Incorrect hardware version, should be 1 or 2";
         ROS_ERROR("%s", debug_error_message.c_str());
-        return;
+        return -1;
     }
 
     // get params from rosparams
@@ -108,7 +113,7 @@ DxlCommunication::DxlCommunication(int hardware_version)
                 debug_error_message = "Incorrect configuration : Wrong ID (" + std::to_string(required_dxl_ids.at(i)) 
                     + ") given in Ros Param /niryo_one_motors/dxl_required_motors. You need to fix this !";
                 ROS_ERROR("%s", debug_error_message.c_str());
-                return;
+                return -1;
             }
         }
     }
@@ -121,7 +126,7 @@ DxlCommunication::DxlCommunication(int hardware_version)
                 debug_error_message = "Incorrect configuration : Wrong ID (" + std::to_string(required_dxl_ids.at(i)) 
                     + ") given in Ros Param /niryo_one_motors/dxl_required_motors. You need to fix this !";
                 ROS_ERROR("%s", debug_error_message.c_str());
-                return;
+                return -1;
             }
         }
     }
@@ -130,7 +135,7 @@ DxlCommunication::DxlCommunication(int hardware_version)
         debug_error_message = "Incorrect configuration : Ros Param /niryo_one_motors/dxl_required_motors "
         "should contain a list with at least one motor. You need to fix this !";
         ROS_ERROR("%s", debug_error_message.c_str());
-        return;
+        return -1;
     }
 
     // Fill motors array 
@@ -163,22 +168,11 @@ DxlCommunication::DxlCommunication(int hardware_version)
     write_led_enable = true;
     write_torque_on_enable = true;
     write_tool_enable = false;
+
+    return setupCommunication();
 }
 
-bool DxlCommunication::isOnLimitedMode()
-{
-    return hw_limited_mode;
-}
-
-void DxlCommunication::resetHardwareControlLoopRates()
-{
-    double now = ros::Time::now().toSec();
-    time_hw_data_last_write = now;
-    time_hw_data_last_read = now;
-    time_hw_status_last_read = now;
-}
-
-int DxlCommunication::init()
+int DxlCommunication::setupCommunication()
 {
     ROS_INFO("Dxl : set port name (%s), baudrate(%d)", device_name.c_str(), uart_baudrate);
     // setup half-duplex direction GPIO
@@ -202,6 +196,19 @@ int DxlCommunication::init()
 
     ros::Duration(0.1).sleep();
     return COMM_SUCCESS;
+}
+
+bool DxlCommunication::isOnLimitedMode()
+{
+    return hw_limited_mode;
+}
+
+void DxlCommunication::resetHardwareControlLoopRates()
+{
+    double now = ros::Time::now().toSec();
+    time_hw_data_last_write = now;
+    time_hw_data_last_read = now;
+    time_hw_status_last_read = now;
 }
 
 void DxlCommunication::startHardwareControlLoop(bool limited_mode)
