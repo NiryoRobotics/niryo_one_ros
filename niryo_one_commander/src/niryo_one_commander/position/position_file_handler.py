@@ -132,23 +132,32 @@ class PositionFileHandler:
                 os.remove(self.base_dir + filename)
             except OSError as e:
                 raise NiryoOneFileException("Could not remove sequence with id " + position_name + " : " + str(e))
+    
+    
+
+        # choose a non used, incremental id
+    def pick_new_id(self):
+        filenames = self.get_all_filenames()
+        max_id = 0
+        for filename in filenames:
+            current_id = self.position_id_from_filename(filename)
+            if current_id > max_id:
+                max_id = current_id
+        return max_id + 1
+
+    def position_id_from_filename(self, filename):
+        with open(self.base_dir + filename, 'r') as f:
+            for line in f:
+                if line.startswith("Position_Id:"):
+                    position_id = int(next(f).rstrip())
+        return position_id
+
+
+
 
 
 if __name__ == '__main__': 
     pass 
-'''    rospy.init_node('position_file_handler') 
-    fh=PositionFileHandler("~/niryo_one_position")   # create a dir niryo_one_position
-    print(fh.base_dir)
-    rpy=Position.RPY(1,2,3)
-    points=Position.Points(1,2,3) 
-    quaternion=Position.Quaternion(1,2,3,4)
-    p=Position("mmmm",1,[0,0,0,0,0,0]) 
-    print(p.quaternion.x)
-    fh.write_position(p)
-    po=fh.read_position("mmmm")
-    print(po.rpy.pitch)
-    rospy.spin()
-   '''  
 
 
 

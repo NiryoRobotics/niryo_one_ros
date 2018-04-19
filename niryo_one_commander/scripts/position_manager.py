@@ -43,7 +43,7 @@ class PositionManager:
         position_msg = PositionMessage()
         if position != None:
             position_msg.position_name = position.position_name
-            position_msg.position_id = position.position_id 
+            position_msg.position_id = position.position_id
             position_msg.joints = position.joints 
             position_msg.rpy = Position.RPY(position.rpy.roll, position.rpy.pitch, position.rpy.yaw)
             position_msg.point = Position.Point( position.point.x, position.point.y, position.point.z) 
@@ -58,8 +58,9 @@ class PositionManager:
         rpy = Position.RPY(position_msg.rpy.roll, position_msg.rpy.pitch,  position_msg.rpy.yaw)
         point = Position.Point(position_msg.point.x, position_msg.point.y, position_msg.point.z)
         quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,  position_msg.quaternion.w )
-        
-        position_data = Position(position_name = position_msg.position_name, position_id = position_msg.position_id, joints= position_msg.joints  , rpy=rpy, point = point, quaternion =  quaternion)     
+        position_id=self.fh.pick_new_id() 
+        print(position_id)
+        position_data = Position(position_name = position_msg.position_name, position_id = position_id, joints= position_msg.joints  , rpy=rpy, point = point, quaternion =  quaternion)     
         # GET an existing position 
         if cmd_type == PositionCommandType.GET:
             pos = self.get_position(position_name)
@@ -101,7 +102,7 @@ class PositionManager:
     
     def update_position(self, position, position_data):
         position.position_name = position_data.position_name
-        position.position_id = position_data.position_id
+        position.position_id = self.fh.pick_new_id()
         position.joints = position_data.joints
         position_msg.rpy = Position.RPY(position.rpy.roll, position.rpy.pitch, position.rpy.yaw)
         position_msg.point = Position.Point( position.point.x, position.point.y, position.point.z)
