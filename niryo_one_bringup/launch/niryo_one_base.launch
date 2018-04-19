@@ -1,11 +1,16 @@
 <launch>
     <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
 
+    <arg name="hardware_version" default="1" /> 
     <arg name="urdf_without_meshes" default="true" />
     <arg name="niryo_one_sim_mode" default="false" />
     <arg name="execute_on_niryo_one_raspberry_pi_image" default="true" /> 
 
     <!-- PARAMS -->
+    <group ns="niryo_one">
+        <param name="hardware_version" type="int" value="$(arg hardware_version)" /> 
+    </group>
+
     <group ns="niryo_one/robot_command_validation">
         <rosparam file="$(find niryo_one_bringup)/config/robot_command_validation.yaml" />
     </group>

@@ -102,10 +102,10 @@ class NiryoOneDriver {
         trajectory_result_subscriber = nh_.subscribe("/niryo_one_follow_joint_trajectory_controller/follow_joint_trajectory/result",
                 10, &NiryoOneDriver::callbackTrajectoryResult, this);
 
-        hardware_version = 1;
+        ros::param::get("/niryo_one/hardware_version", hardware_version);
         
         if (hardware_version != 1 && hardware_version != 2) {
-            ROS_ERROR("%s", debug_error_message.c_str());
+            ROS_ERROR("Incorrect hardware version, should be 1 or 2");
             return;
         }
 
