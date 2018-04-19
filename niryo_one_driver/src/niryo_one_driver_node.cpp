@@ -42,6 +42,9 @@
 class NiryoOneDriver {
 
     private:
+    
+    int hardware_version;
+
     boost::shared_ptr<CommunicationBase> comm;
 
     boost::shared_ptr<NiryoOneHardwareInterface> robot;
@@ -99,6 +102,13 @@ class NiryoOneDriver {
         trajectory_result_subscriber = nh_.subscribe("/niryo_one_follow_joint_trajectory_controller/follow_joint_trajectory/result",
                 10, &NiryoOneDriver::callbackTrajectoryResult, this);
 
+        hardware_version = 1;
+        
+        if (hardware_version != 1 && hardware_version != 2) {
+            ROS_ERROR("%s", debug_error_message.c_str());
+            return;
+        }
+
         double ros_control_frequency;
         ros::param::get("~ros_control_loop_frequency", ros_control_frequency); 
 
@@ -111,7 +121,7 @@ class NiryoOneDriver {
             comm.reset(new FakeCommunication());
         }
         else {
-            comm.reset(new NiryoOneCommunication());
+            comm.reset(new NiryoOneCommunication(hardware_version));
         }
         
         int init_result = comm->init();
@@ -145,7 +155,7 @@ class NiryoOneDriver {
         ROS_INFO("Starting ROS interface...");
         bool learning_mode_activated_on_startup = true;
         ros_interface.reset(new RosInterface(comm.get(), rpi_diagnostics.get(), 
-                    &flag_reset_controllers, learning_mode_activated_on_startup));
+                    &flag_reset_controllers, learning_mode_activated_on_startup, hardware_version));
 
         // activate learning mode 
         comm->activateLearningMode(learning_mode_activated_on_startup);

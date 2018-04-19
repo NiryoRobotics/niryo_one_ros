@@ -34,7 +34,7 @@ class NiryoOneCommunication : public CommunicationBase {
 
     public:
    
-        NiryoOneCommunication();
+        NiryoOneCommunication(int hardware_version);
         int init();
 
         void manageHardwareConnection();

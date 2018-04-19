@@ -19,10 +19,9 @@
 
 #include "niryo_one_driver/niryo_one_communication.h"
 
-NiryoOneCommunication::NiryoOneCommunication() 
+NiryoOneCommunication::NiryoOneCommunication(int hardware_version)
 {
-    // TODO get from params
-    hardware_version = 1;
+    this->hardware_version = hardware_version;
     
     ros::param::get("~can_enabled", can_enabled);
     ros::param::get("~dxl_enabled", dxl_enabled);

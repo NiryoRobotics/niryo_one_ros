@@ -20,12 +20,13 @@
 #include "niryo_one_driver/ros_interface.h"
 
 RosInterface::RosInterface(CommunicationBase* niryo_one_comm, RpiDiagnostics* rpi_diagnostics,
-        bool *flag_reset_controllers, bool learning_mode_on)
+        bool *flag_reset_controllers, bool learning_mode_on, int hardware_version)
 {
     comm = niryo_one_comm;
     this->rpi_diagnostics = rpi_diagnostics;
     this->learning_mode_on = learning_mode_on;
     this->flag_reset_controllers = flag_reset_controllers;
+    this->hardware_version = hardware_version;
     
     ros::param::get("/niryo_one/info/image_version", rpi_image_version);
     ros::param::get("/niryo_one/info/ros_version", ros_niryo_one_version);
@@ -212,6 +213,7 @@ void RosInterface::publishHardwareStatus()
         niryo_one_msgs::HardwareStatus msg;
         msg.header.stamp = ros::Time::now();
         msg.rpi_temperature = rpi_diagnostics->getRpiCpuTemperature();
+        msg.hardware_version = hardware_version;
         msg.connection_up = connection_up;
         msg.error_message = error_message;
         msg.calibration_needed = calibration_needed;

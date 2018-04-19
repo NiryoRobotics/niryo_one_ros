@@ -47,7 +47,7 @@ class RosInterface {
     public:
 
         RosInterface(CommunicationBase* niryo_one_comm, RpiDiagnostics* rpi_diagnostics,
-                bool *flag_reset_controllers, bool learning_mode_on);
+                bool *flag_reset_controllers, bool learning_mode_on, int hardware_version);
 
         void startServiceServers();
         void startPublishers();
@@ -60,6 +60,7 @@ class RosInterface {
         ros::NodeHandle nh_;
 
         bool* flag_reset_controllers;
+        int hardware_version;
         bool learning_mode_on;
         int calibration_needed;
 
