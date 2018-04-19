@@ -20,16 +20,16 @@
 
 
 import rospy
+from niryo_one_commander.position.position  import Position 
+from niryo_one_commander.position.niryo_one_file_exception import NiryoOneFileException
+from niryo_one_commander.position.position_file_handler import PositionFileHandler
+from niryo_one_commander.position.position_command_type import PositionCommandType
 
 from niryo_one_msgs.msg import Position  as PositionMessage 
 from niryo_one_msgs.srv import ManagePosition 
 from niryo_one_msgs.msg import RPY
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
-from niryo_one_commander.position.position  import Position 
-from niryo_one_user_interface.sequences.niryo_one_file_exception import NiryoOneFileException
-from niryo_one_commander.position.position_file_handler import PositionFileHandler
-from niryo_one_commander.position.position_command_type import PositionCommandType
 
 class PositionManager:
    
@@ -38,7 +38,6 @@ class PositionManager:
         self.manage_position_server = rospy.Service('/niryo_one/position/manage_position', ManagePosition, self.callback_manage_position)
         rospy.loginfo("service manage position created") 
         
-   
     def create_position_response(self, status, message, position=None):
         position_msg = PositionMessage()
         if position != None:
@@ -108,13 +107,11 @@ class PositionManager:
         position_msg.point = Position.Point( position.point.x, position.point.y, position.point.z)
         position_msg.quaternion = Position.Quaternion(position.quaternion.x, position.quaternion.y, position.quaternion.z, position.quaternion.w)
                                 
-
         try:
             self.fh.write_position(position)
         except NiryoOneFileException as e:
             return False
         return True
-
 
     def get_position(self, position_name):
         try: 
@@ -128,8 +125,6 @@ class PositionManager:
             return(position.position_name)
         except  NiryoOneFileException as e:
             return None
-    
-          
 
 if __name__ == '__main__':
     pass 

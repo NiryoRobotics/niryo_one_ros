@@ -49,7 +49,6 @@ def get_forward_kinematic(joints):
     point = Position.Point(round(response.pose_stamped[1].pose.position.x,3), round(response.pose_stamped[1].pose.position.y,3), round(response.pose_stamped[1].pose.position.z,3))
     rpy=Position.RPY(round(rpy[0],3),round(rpy[1],3),round(rpy[2],3))
     rospy.loginfo("kinematic forward has been calculated ") 
-
     return(point, rpy, quaternion)
 
 def get_rpy_from_quaternion(rot): 

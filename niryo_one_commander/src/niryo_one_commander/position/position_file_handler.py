@@ -87,8 +87,6 @@ class PositionFileHandler:
         # Keep only correct filenames
         return filter(r.match, filenames)
 
-
-
     def read_position(self,position_name):
         filename = self.filename_from_position_name(position_name)
         # Check if exists
@@ -113,17 +111,13 @@ class PositionFileHandler:
                         pos.point.x = float(str(next(f).rstrip()))
                         pos.point.y = float(str(next(f).rstrip()))
                         pos.point.z = float(str(next(f).rstrip())) 
-                    
                     if line.startswith("Quaternion:"):
                         pos.quaternion.x = float(str(next(f).rstrip()))
                         pos.quaternion.y = float(str(next(f).rstrip()))
                         pos.quaternion.z = float(str(next(f).rstrip())) 
                         pos.quaternion.w = float(str(next(f).rstrip())) 
 
-
                 return pos 
-
-
 
     def remove_position(self, position_name):
         filename = self.filename_from_position_name(position_name)
@@ -132,7 +126,6 @@ class PositionFileHandler:
                 os.remove(self.base_dir + filename)
             except OSError as e:
                 raise NiryoOneFileException("Could not remove sequence with id " + position_name + " : " + str(e))
-    
     
 
         # choose a non used, incremental id
@@ -151,10 +144,6 @@ class PositionFileHandler:
                 if line.startswith("Position_Id:"):
                     position_id = int(next(f).rstrip())
         return position_id
-
-
-
-
 
 if __name__ == '__main__': 
     pass 
