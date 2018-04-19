@@ -38,20 +38,36 @@ Don't forget to use those commands before you try to launch anything (you can ad
 source /opt/ros/kinetic/setup.bash
 source ~/catkin_ws/devel/setup.bash
 ```
-You can now launch Rviz with Niryo One :
+You can now launch Rviz with Niryo One (only display mode with some cursors to move the joints):
 ```
 roslaunch niryo_one_description display.launch
 ```
 
-Niryo One ROS packages have been developed with **ROS kinetic, on Ubuntu 16.04**. Other ROS versions and OS distributions are not supported.
+You can also launch the complete Niryo One ROS Stack instead, which you can control from Niryo One Studio.
+```
+roslaunch niryo_one_bringup desktop_rviz_simulation.launch
+```
 
-## Niryo One ROS Stack documentation
+The main differences between this launch file and the launch file executed on Raspberry Pi 3 (rpi\_setup.launch) is that the hardware functionalities are disabled, and you get a 3D simulation view with Rviz.
+
+Note that Niryo One ROS packages have been developed with **ROS kinetic, on Ubuntu 16.04**. Other ROS versions and OS distributions are not supported.
+
+## Niryo One ROS Stack overview
 
 Here's a global overview of the Niryo One ROS Stack :
 
 ![niryo one ros stack - global overview](https://niryo.com/wp-content/uploads/2017/12/niryo_one_ros.png)
 
 **You can find more specific and detailed info in each package's README.**
+
+## Developer Documentation
+
+_The documentation is not complete yet and will be updated over time._
+
+* [C++ example to move the robot](https://github.com/smaassen/niryo_one_tester) by Steve Maassen
+* [Python API](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_python_api)
+
+## Any question ?
 
 If you have a question and you don't find the answer here or on our [FAQ](https://niryo.com/niryo-one-faq/?utm_source=github) page, please send us an email at support@niryo.com.
 
