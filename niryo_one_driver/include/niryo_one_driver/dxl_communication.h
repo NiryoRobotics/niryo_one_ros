@@ -104,7 +104,7 @@ class DxlCommunication {
         void setLeds(std::vector<int> &leds);
 
         int scanAndCheck();
-        
+        int detectVersion();
 
         // Dxl Tools
         void setTool(uint8_t id, std::string name);

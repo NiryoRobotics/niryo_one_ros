@@ -1079,3 +1079,72 @@ int DxlCommunication::scanAndCheck()
     debug_error_message = "";
     return DXL_SCAN_OK;
 }
+
+int DxlCommunication::detectVersion()
+{
+    int counter = 0;
+
+    while (hw_is_busy && counter < 100) { 
+        ros::Duration(TIME_TO_WAIT_IF_BUSY).sleep();    
+        counter++;
+    }
+    
+    if (counter == 100) {
+        debug_error_message = "Failed to scan motors, Dynamixel bus is too busy. Will retry...";
+        ROS_WARN("Failed to scan motors, dxl bus is too busy (counter max : %d)", counter);
+        return -1;
+    }
+   
+    hw_is_busy = true;
+
+    // 1. Get all ids from dxl bus
+    std::vector<uint8_t> id_list;
+    int result = xl320->scan(id_list);
+    hw_is_busy = false;
+    
+    if (result != COMM_SUCCESS) {
+        debug_error_message = "Failed to scan Dynamixel motors. Make sure that motors are correctly connected and powered on.";
+        ROS_WARN("Broadcast ping failed , result : %d", result);
+        return -1;
+    }
+
+    // Check if motor (MOTOR_4, Model : XL-430) is connected --> V2
+    if (std::find(id_list.begin(), id_list.end(), DXL_MOTOR_4_ID) != id_list.end()) {
+        // found the motor in the list, now check if model number matches XL-430 motors
+        if (xl430->checkModelNumber(DXL_MOTOR_4_ID) == 0) {
+            // we are know sure MOTOR_4 is connected and it is a XL-430 motor
+            return 2; // --> version 2
+        }
+    }
+    
+    // Check if motor (MOTOR_5, Model : XL-430) is connected --> V2
+    if (std::find(id_list.begin(), id_list.end(), DXL_MOTOR_5_ID) != id_list.end()) {
+        // found the motor in the list, now check if model number matches XL-430 motors
+        if (xl430->checkModelNumber(DXL_MOTOR_5_ID) == 0) {
+            // we are know sure MOTOR_5 is connected and it is a XL-430 motor
+            return 2; // --> version 2
+        }
+    }
+
+    // Check if motor (MOTOR_5_1, Model : XL-320) is connected --> V1
+    if (std::find(id_list.begin(), id_list.end(), DXL_MOTOR_5_1_ID) != id_list.end()) {
+        // found the motor in the list, now check if model number matches XL-320 motors
+        if (xl320->checkModelNumber(DXL_MOTOR_5_1_ID) == 0) {
+            // we are know sure MOTOR_5_1 is connected and it is a XL-320 motor
+            return 1; // --> version 1
+        }
+    }
+    
+    // Check if motor (MOTOR_5_2, Model : XL-320) is connected --> V1
+    if (std::find(id_list.begin(), id_list.end(), DXL_MOTOR_5_2_ID) != id_list.end()) {
+        // found the motor in the list, now check if model number matches XL-320 motors
+        if (xl320->checkModelNumber(DXL_MOTOR_5_2_ID) == 0) {
+            // we are know sure MOTOR_5_2 is connected and it is a XL-320 motor
+            return 1; // --> version 1
+        }
+    }
+
+    // if no motor from V1 or V2 has been found, it means some motors have been disabled
+    // for debug purposes, and we can't know (from hardware) which version we have.
+    return 0;
+}
