@@ -19,6 +19,7 @@
 
 import rospy
 import tf
+from niryo_one_commander.position.moveit_utils import get_rpy_from_quaternion
 
 from std_msgs.msg import Float64
 from niryo_one_msgs.msg import RobotState
@@ -38,20 +39,8 @@ class NiryoRobotStatePublisher:
 
     def get_robot_pose(self, event):
         try:
-            (pos, rot) = self.tf_listener.lookupTransform('base_link', 'hand_link', rospy.Time(0))
-            euler = tf.transformations.euler_from_quaternion(rot)
-            self.position = pos
-            self.rpy[0] = euler[1] * (-1.0)
-            self.rpy[1] = euler[0] - PI/2.0
-            self.rpy[2] = euler[2] - PI/2.0
-           
-            # force angle between -PI/PI
-            for i, angle in enumerate(self.rpy):
-                if angle > PI:
-                    self.rpy[i] = angle % PI
-                elif angle < -PI:
-                    self.rpy[i] = angle % -PI 
-
+            (pos, rot) = self.tf_listener.lookupTransform('base_link', 'hand_link', rospy.Time(0))  
+            self.rpy = get_rpy_from_quaternion(rot)
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             rospy.loginfo("TF fail")
 
