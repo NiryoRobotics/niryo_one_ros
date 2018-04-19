@@ -26,6 +26,7 @@ import os
 import re
 from threading import Lock
 
+from niryo_one_commander.position.moveit_utils import get_forward_kinematic
 from niryo_one_commander.position.position import Position 
 from niryo_one_user_interface.sequences.niryo_one_file_exception import NiryoOneFileException
 
@@ -49,6 +50,7 @@ class PositionFileHandler:
     
     def write_position(self, position ): 
         filename = self.filename_from_position_name(position.position_name)
+        (position.point, position.rpy, position.quaternion) =  get_forward_kinematic(position.joints)
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
                 f.write("Position_Name:\n") 
@@ -56,9 +58,21 @@ class PositionFileHandler:
                 f.write("Position_Id:\n") 
                 f.write(str(position.position_id)+"\n") 
                 f.write("Joints:\n")
-                f.write(str(position.joints).strip('()')+"\n")
-                f.write( "Pose:\n") 
-                f.write( str(position.pose).strip('()')+"\n") 
+                f.write(str(position.joints).strip('()')+"\n") 
+                f.write( "RPY:\n") 
+                f.write( str(position.rpy.roll)+ "\n") 
+                f.write( str(position.rpy.pitch)+ "\n") 
+                f.write( str(position.rpy.yaw)+ "\n") 
+                f.write( "Point:\n") 
+                f.write( str(position.point.x)+ "\n") 
+                f.write( str(position.point.y)+ "\n") 
+                f.write( str(position.point.z)+ "\n")
+                f.write( "Quaternion:\n") 
+                f.write( str(position.quaternion.x)+ "\n") 
+                f.write( str(position.quaternion.y)+ "\n") 
+                f.write( str(position.quaternion.z)+ "\n") 
+                f.write( str(position.quaternion.w)+ "\n")
+
 
     def does_file_exist(self, filename):
         filenames = self.get_all_filenames()
@@ -87,13 +101,26 @@ class PositionFileHandler:
                     if line.startswith('Position_Name:'):
                         pos.position_name = str(next(f).rstrip())
                     if line.startswith("Position_Id:"):
-                        pos.position_id=int(next(f).rstrip())
+                        pos.position_id = int(next(f).rstrip())
                     if line.startswith("Joints:"): 
-                        pos.joints=list(str(next(f).rstrip()).split(','))
-                        pos.joints=map(float ,pos.joints)
-                    if line.startswith("Pose:"):
-                        pos.pose=list(str(next(f).rstrip()).split(','))
-                        pos.pose=map(float,pos.pose)
+                        pos.joints = list(str(next(f).rstrip()).split(','))
+                        pos.joints = map(float ,pos.joints)
+                    if line.startswith("RPY:"):
+                        pos.rpy.roll = float(str(next(f).rstrip()))
+                        pos.rpy.pitch = float(str(next(f).rstrip()))
+                        pos.rpy.yaw = float(str(next(f).rstrip()))
+                    if line.startswith("Point:"):
+                        pos.point.x = float(str(next(f).rstrip()))
+                        pos.point.y = float(str(next(f).rstrip()))
+                        pos.point.z = float(str(next(f).rstrip())) 
+                    
+                    if line.startswith("Quaternion:"):
+                        pos.quaternion.x = float(str(next(f).rstrip()))
+                        pos.quaternion.y = float(str(next(f).rstrip()))
+                        pos.quaternion.z = float(str(next(f).rstrip())) 
+                        pos.quaternion.w = float(str(next(f).rstrip())) 
+
+
                 return pos 
 
 
@@ -109,13 +136,19 @@ class PositionFileHandler:
 
 if __name__ == '__main__': 
     pass 
-    ''' 
+'''    rospy.init_node('position_file_handler') 
     fh=PositionFileHandler("~/niryo_one_position")   # create a dir niryo_one_position
     print(fh.base_dir)
-    
-   ''' 
-    
-
+    rpy=Position.RPY(1,2,3)
+    points=Position.Points(1,2,3) 
+    quaternion=Position.Quaternion(1,2,3,4)
+    p=Position("mmmm",1,[0,0,0,0,0,0]) 
+    print(p.quaternion.x)
+    fh.write_position(p)
+    po=fh.read_position("mmmm")
+    print(po.rpy.pitch)
+    rospy.spin()
+   '''  
 
 
 
