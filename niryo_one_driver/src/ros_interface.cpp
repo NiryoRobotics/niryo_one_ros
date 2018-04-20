@@ -161,15 +161,32 @@ bool RosInterface::callbackCloseGripper(niryo_one_msgs::CloseGripper::Request &r
 
 bool RosInterface::callbackPullAirVacuumPump(niryo_one_msgs::PullAirVacuumPump::Request &req, niryo_one_msgs::PullAirVacuumPump::Response &res)
 {
-    ROS_INFO("CALLBACK pull air vp");
     res.state = comm->pullAirVacuumPump(req.id, req.pull_air_position, req.pull_air_hold_torque);
     return true;
 }
 
 bool RosInterface::callbackPushAirVacuumPump(niryo_one_msgs::PushAirVacuumPump::Request &req, niryo_one_msgs::PushAirVacuumPump::Response &res)
 {
-    ROS_INFO("CALLBACK push air vp");
     res.state = comm->pushAirVacuumPump(req.id, req.push_air_position);
+    return true;
+}
+
+bool RosInterface::callbackChangeHardwareVersion(niryo_one_msgs::ChangeHardwareVersion::Request &req,
+        niryo_one_msgs::ChangeHardwareVersion::Response &res)
+{
+    int result = change_hardware_version_and_reboot(req.old_version, req.new_version);
+    if (result == CHANGE_HW_VERSION_OK) {
+        res.status = 200;
+        res.message = "Successfully changed hardware version.";
+    }
+    else if (result == CHANGE_HW_VERSION_FAIL) {
+        res.status = 400;
+        res.message = "Failed to change hardware version, please check the ROS logs";
+    }
+    else if (result == CHANGE_HW_VERSION_NOT_ARM) {
+        res.status = 400;
+        res.message = "Not allowed to change hardware version on non-ARM system";
+    }
     return true;
 }
 
@@ -187,6 +204,8 @@ void RosInterface::startServiceServers()
     close_gripper_server = nh_.advertiseService("niryo_one/tools/close_gripper", &RosInterface::callbackCloseGripper, this);
     pull_air_vacuum_pump_server = nh_.advertiseService("niryo_one/tools/pull_air_vacuum_pump", &RosInterface::callbackPullAirVacuumPump, this);
     push_air_vacuum_pump_server = nh_.advertiseService("niryo_one/tools/push_air_vacuum_pump", &RosInterface::callbackPushAirVacuumPump, this);
+
+    change_hardware_version_server = nh_.advertiseService("niryo_one/change_hardware_version", &RosInterface::callbackChangeHardwareVersion, this);
 }
 
 void RosInterface::publishHardwareStatus()

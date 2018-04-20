@@ -28,6 +28,7 @@
 
 #include "niryo_one_driver/communication_base.h"
 #include "niryo_one_driver/rpi_diagnostics.h"
+#include "niryo_one_driver/change_hardware_version.h"
 
 #include "niryo_one_msgs/SetInt.h"
 #include "niryo_one_msgs/SetLeds.h"
@@ -37,6 +38,8 @@
 #include "niryo_one_msgs/CloseGripper.h"
 #include "niryo_one_msgs/PullAirVacuumPump.h"
 #include "niryo_one_msgs/PushAirVacuumPump.h"
+
+#include "niryo_one_msgs/ChangeHardwareVersion.h"
 
 #include "niryo_one_msgs/HardwareStatus.h"
 #include "niryo_one_msgs/SoftwareVersion.h"
@@ -99,6 +102,8 @@ class RosInterface {
         ros::ServiceServer pull_air_vacuum_pump_server;
         ros::ServiceServer push_air_vacuum_pump_server;
 
+        ros::ServiceServer change_hardware_version_server;
+
         // callbacks
         
         bool callbackCalibrateMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
@@ -115,6 +120,9 @@ class RosInterface {
 
         bool callbackPullAirVacuumPump(niryo_one_msgs::PullAirVacuumPump::Request &req, niryo_one_msgs::PullAirVacuumPump::Response &res);
         bool callbackPushAirVacuumPump(niryo_one_msgs::PushAirVacuumPump::Request &req, niryo_one_msgs::PushAirVacuumPump::Response &res);
+
+        bool callbackChangeHardwareVersion(niryo_one_msgs::ChangeHardwareVersion::Request &req,
+                niryo_one_msgs::ChangeHardwareVersion::Response &res);
 
 };
 
