@@ -38,6 +38,7 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(niryo_one_driver
+    src/utils/change_hardware_version.cpp
     src/hw_driver/niryo_one_can_driver.cpp
     src/hw_driver/dxl_driver.cpp
     src/hw_driver/xl320_driver.cpp
