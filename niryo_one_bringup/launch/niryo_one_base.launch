@@ -9,6 +9,7 @@
     <!-- PARAMS -->
     <group ns="niryo_one">
         <param name="hardware_version" type="int" value="$(arg hardware_version)" /> 
+        <param name="reboot_when_auto_change_version" type="bool" value="true" />
     </group>
 
     <group ns="niryo_one/robot_command_validation">
