@@ -176,11 +176,43 @@ void NiryoOneCommunication::manageCanConnectionLoop()
     }
 }
 
+void NiryoOneCommunication::checkHardwareVersionFromDxlMotors()
+{
+    // Check if hardware_version is compatible
+    // The purpose here is retro-compatibility with version 1.
+    // Version 2 is the default
+    // If the robot is still V1 (old version) we can detect it from
+    // Dynamixel motors setup, and automatically change the version 
+    // used, without any user input
+    int detected_version = -1;
+    detected_version = dxlComm->detectVersion();
+    while (detected_version < 0) {
+        ROS_WARN("Scan to find Dxl motors + Check hardware version");
+        detected_version = dxlComm->detectVersion();
+        ros::Duration(0.25).sleep();
+    }
+
+    ROS_INFO("Detected version from hardware : %d", detected_version);
+    
+    if (detected_version == 0) {
+        // version could not be detected from current hardware setup
+        // it seems that some motors have been disabled for debug purposes
+        // --> continue like nothing happened
+    }
+    else if (  (detected_version == 1 && hardware_version == 2)
+            || (detected_version == 2 && hardware_version == 1)) {
+        // change version (V1->V2 or V2->V1) and reboot
+        change_hardware_version_and_reboot(hardware_version, detected_version);
+    }
+}
+
 void NiryoOneCommunication::manageDxlConnectionLoop()
 {
     if (!dxl_enabled) {
         return;
     }
+
+    checkHardwareVersionFromDxlMotors();
 
     ros::Rate check_connection_rate = ros::Rate(niryo_one_hw_check_connection_frequency);
 

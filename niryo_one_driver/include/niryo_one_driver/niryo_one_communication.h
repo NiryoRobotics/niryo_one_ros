@@ -30,6 +30,8 @@
 
 #include "niryo_one_driver/communication_base.h"
 
+#include "niryo_one_driver/change_hardware_version.h"
+
 class NiryoOneCommunication : public CommunicationBase {
 
     public:
@@ -76,6 +78,9 @@ class NiryoOneCommunication : public CommunicationBase {
         
         // steppers
         void synchronizeMotors(bool begin_traj);
+
+        // check hardware version (V1/V2)
+        void checkHardwareVersionFromDxlMotors();
 
     private:
 
