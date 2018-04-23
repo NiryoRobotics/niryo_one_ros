@@ -31,7 +31,11 @@ from std_msgs.msg import Header
 def get_forward_kinematic(joints): 
 
     arm = moveit_commander.MoveGroupCommander('arm')
-    rospy.wait_for_service('compute_fk',2)
+    try:
+	  rospy.wait_for_service('compute_fk',2)
+    except (rospy.ServiceException, rospy.ROSException), e:
+          rospy.logerr("Service call failed:",e)
+          return None 
     try:
 	  moveit_fk = rospy.ServiceProxy('compute_fk', GetPositionFK)
 	  fk_link= ['base_link','hand_link']

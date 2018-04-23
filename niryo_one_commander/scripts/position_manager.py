@@ -24,7 +24,7 @@ from niryo_one_commander.position.position  import Position
 from niryo_one_commander.position.niryo_one_file_exception import NiryoOneFileException
 from niryo_one_commander.position.position_file_handler import PositionFileHandler
 from niryo_one_commander.position.position_command_type import PositionCommandType
-from niryo_one_commander.position.moveit_utils import get_forward_kinematic
+from niryo_one_commander.moveit_utils import get_forward_kinematic
 
 from niryo_one_msgs.msg import Position  as PositionMessage 
 from niryo_one_msgs.srv import ManagePosition 
@@ -103,7 +103,7 @@ class PositionManager:
     def update_position(self, position, position_data):
         position.position_name = position_data.position_name
         position.joints = position_data.joints
-        position.position_id = position.position_id
+	position.position_id = position.position_id
         (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)
 	
                                 

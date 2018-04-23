@@ -19,7 +19,7 @@
 
 import rospy
 import tf
-from niryo_one_commander.position.moveit_utils import get_rpy_from_quaternion
+from niryo_one_commander.moveit_utils import get_rpy_from_quaternion
 
 from std_msgs.msg import Float64
 from niryo_one_msgs.msg import RobotState
