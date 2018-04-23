@@ -43,10 +43,10 @@ class PositionFileHandler:
         self.lock = Lock()
     
     def position_name_from_filename(self, filename):
-	index=filename.find('_',9)
-	position_name=''
+	index = filename.find('_',9)
+	position_name = ''
 	for i in range((index+1), len(filename)) : 
-            position_name=position_name+filename[i]
+            position_name = position_name + filename[i]
 	return position_name
 	
 
@@ -66,24 +66,24 @@ class PositionFileHandler:
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
                 f.write("Position_Name:\n") 
-                f.write(str(position.position_name)+"\n") 
+                f.write(str(position.position_name) + "\n") 
                 f.write("Position_Id:\n") 
-                f.write(str(position.position_id)+"\n") 
+                f.write(str(position.position_id) + "\n") 
                 f.write("Joints:\n")
-                f.write(str(position.joints).strip('()')+"\n") 
+                f.write(str(position.joints).strip('()') + "\n") 
                 f.write( "RPY:\n") 
-                f.write( str(position.rpy.roll)+ "\n") 
-                f.write( str(position.rpy.pitch)+ "\n") 
-                f.write( str(position.rpy.yaw)+ "\n") 
+                f.write( str(position.rpy.roll) + "\n") 
+                f.write( str(position.rpy.pitch) + "\n") 
+                f.write( str(position.rpy.yaw) + "\n") 
                 f.write( "Point:\n") 
-                f.write( str(position.point.x)+ "\n") 
-                f.write( str(position.point.y)+ "\n") 
-                f.write( str(position.point.z)+ "\n")
+                f.write( str(position.point.x) + "\n") 
+                f.write( str(position.point.y) + "\n") 
+                f.write( str(position.point.z) + "\n")
                 f.write( "Quaternion:\n") 
-                f.write( str(position.quaternion.x)+ "\n") 
-                f.write( str(position.quaternion.y)+ "\n") 
-                f.write( str(position.quaternion.z)+ "\n") 
-                f.write( str(position.quaternion.w)+ "\n")
+                f.write( str(position.quaternion.x) + "\n") 
+                f.write( str(position.quaternion.y) + "\n") 
+                f.write( str(position.quaternion.z) + "\n") 
+                f.write( str(position.quaternion.w) + "\n")
 
 
     def does_file_exist(self, filename):
@@ -138,7 +138,7 @@ class PositionFileHandler:
             try:
                 os.remove(self.base_dir + filename)
             except OSError as e:
-                raise NiryoOneFileException("Could not remove sequence with id " + position_name + " : " + str(e))
+                raise NiryoOneFileException("Could not remove position with id " + position_name + " : " + str(e))
     
 
         # choose a non used, incremental id

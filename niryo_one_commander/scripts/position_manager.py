@@ -60,7 +60,7 @@ class PositionManager:
         quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,
 		  position_msg.quaternion.w )
         position_data = Position(position_name = position_msg.position_name, position_id = position_msg.position_id, 
-		joints= position_msg.joints  , rpy=rpy, point = point, quaternion =  quaternion)     
+		joints = position_msg.joints  , rpy=rpy, point = point, quaternion =  quaternion)     
         # GET an existing position 
         if cmd_type == PositionCommandType.GET:
             pos = self.get_position(position_name)
@@ -103,7 +103,7 @@ class PositionManager:
     def update_position(self, position, position_data):
         position.position_name = position_data.position_name
         position.joints = position_data.joints
-        position.position_id =position.position_id
+        position.position_id = position.position_id
         (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)
 	
                                 
