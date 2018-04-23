@@ -77,6 +77,7 @@ class RobotCommander:
     
     def __init__(self, position_manager):
 
+        self.pos_manager=position_manager
         moveit_commander.roscpp_initialize(sys.argv)
 
         # Load all the sub-commanders
@@ -90,8 +91,6 @@ class RobotCommander:
                 RobotMove, self.callback_robot_command)
 
         self.reset_controller_pub = rospy.Publisher('/niryo_one/steppers_reset_controller', Empty, queue_size=1)
-
-        self.pos_manager=position_manager
 
    
     def callback_robot_command(self, req):

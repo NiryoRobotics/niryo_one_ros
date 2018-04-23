@@ -24,7 +24,7 @@
         <param name="goal_position_tolerance"    type="double" value="0.0001" />
         <param name="goal_orientation_tolerance" type="double" value="0.001" />
         <param name="positions_dir" type="string"  value="/home/niryo/niryo_one_positions" unless="$(arg simulation_mode)"/>
-        <param name="positions_dir" type="string"  value="~/niryo_one_postions"           if="$(arg simulation_mode)"/>
+        <param name="positions_dir" type="string"  value="~/niryo_one_positions"           if="$(arg simulation_mode)"/>
 
     </node>
 </launch>

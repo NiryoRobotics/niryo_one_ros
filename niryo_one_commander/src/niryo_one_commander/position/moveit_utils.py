@@ -31,22 +31,27 @@ from std_msgs.msg import Header
 def get_forward_kinematic(joints): 
 
     arm = moveit_commander.MoveGroupCommander('arm')
-    rospy.wait_for_service('compute_fk')
+    rospy.wait_for_service('compute_fk',2)
     try:
-          moveit_fk = rospy.ServiceProxy('compute_fk', GetPositionFK)
+	  moveit_fk = rospy.ServiceProxy('compute_fk', GetPositionFK)
+	  fk_link= ['base_link','hand_link']
+    	  joint_names = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
+    	  header = Header(0,rospy.Time.now(),"/ground_link")
+    	  rs = RobotState()
+          rs.joint_state.name = joint_names
+          rs.joint_state.position = joints
+          response = moveit_fk(header, fk_link, rs)
     except rospy.ServiceException,e:
-        rospy.logerr("Service call failed:",e)
-    fk_link= ['base_link','hand_link']
-    joint_names = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
-    header = Header(0,rospy.Time.now(),"/ground_link")
-    rs = RobotState()
-    rs.joint_state.name = joint_names
-    rs.joint_state.position = joints
-    response = moveit_fk(header, fk_link, rs) 
-    quaternion=[response.pose_stamped[1].pose.orientation.x, response.pose_stamped[1].pose.orientation.y, response.pose_stamped[1].pose.orientation.z, response.pose_stamped[1].pose.orientation.w]
+          rospy.logerr("Service call failed:",e)
+	  return(None)
+
+    quaternion=[response.pose_stamped[1].pose.orientation.x, response.pose_stamped[1].pose.orientation.y, 
+	response.pose_stamped[1].pose.orientation.z, response.pose_stamped[1].pose.orientation.w]
     rpy = get_rpy_from_quaternion(quaternion)
-    quaternion = Position.Quaternion(round(quaternion[0],3), round(quaternion[1],3), round(quaternion[2],3),round(quaternion[3],3))
-    point = Position.Point(round(response.pose_stamped[1].pose.position.x,3), round(response.pose_stamped[1].pose.position.y,3), round(response.pose_stamped[1].pose.position.z,3))
+    quaternion = Position.Quaternion(round(quaternion[0],3), round(quaternion[1],3), round(quaternion[2],3),
+	round(quaternion[3],3))
+    point = Position.Point(round(response.pose_stamped[1].pose.position.x,3), round(response.pose_stamped[1].pose.position.y,3),
+	 round(response.pose_stamped[1].pose.position.z,3))
     rpy=Position.RPY(round(rpy[0],3),round(rpy[1],3),round(rpy[2],3))
     rospy.loginfo("kinematic forward has been calculated ") 
     return(point, rpy, quaternion)

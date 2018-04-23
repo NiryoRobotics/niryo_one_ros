@@ -55,7 +55,8 @@ class RobotActionServer:
     def __init__(self, position_manager):
         
         self.pos_manager = position_manager
-        self.server = actionlib.ActionServer('niryo_one/commander/robot_action', RobotMoveAction, self.on_goal, self.on_cancel, auto_start=False)
+        self.server = actionlib.ActionServer('niryo_one/commander/robot_action',
+		 RobotMoveAction, self.on_goal, self.on_cancel, auto_start=False)
     
         self.current_goal_handle = None
 
@@ -218,7 +219,7 @@ class RobotActionServer:
         rospy.loginfo("Checking joints validity")
         saved_position = self.pos_manager.get_position(position_name)
         if saved_position == None :
-            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "command is empty") 
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Saved position not found") 
         self.validate_joints(saved_position.joints)
           
     def validate_trajectory(self, plan):

@@ -3,7 +3,7 @@
     <!-- set true if you want to launch ROS on your computer 
         - controller will just echo position command
         - all hardware relative stuff is deactivated            -->
-    <arg name="simulation_mode" default="true" />
+    <arg name="simulation_mode" default="false" />
     <!-- set false to disable hardware communication for spi or dxl (DEBUG PURPOSES) -->
     <arg name="disable_can_for_debug" default="false" />
     <arg name="disable_dxl_for_debug" default="false" />

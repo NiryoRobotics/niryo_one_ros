@@ -24,6 +24,7 @@ from niryo_one_commander.position.position  import Position
 from niryo_one_commander.position.niryo_one_file_exception import NiryoOneFileException
 from niryo_one_commander.position.position_file_handler import PositionFileHandler
 from niryo_one_commander.position.position_command_type import PositionCommandType
+from niryo_one_commander.position.moveit_utils import get_forward_kinematic
 
 from niryo_one_msgs.msg import Position  as PositionMessage 
 from niryo_one_msgs.srv import ManagePosition 
@@ -46,20 +47,20 @@ class PositionManager:
             position_msg.joints = position.joints 
             position_msg.rpy = Position.RPY(position.rpy.roll, position.rpy.pitch, position.rpy.yaw)
             position_msg.point = Position.Point( position.point.x, position.point.y, position.point.z) 
-            position_msg.quaternion = Position.Quaternion(position.quaternion.x, position.quaternion.y, position.quaternion.z, position.quaternion.w)
+            position_msg.quaternion = Position.Quaternion(position.quaternion.x, position.quaternion.y,
+		 position.quaternion.z, position.quaternion.w)
         return { 'status': status, 'message': message, 'position': position_msg }
     
     def callback_manage_position(self, req):
         cmd_type = req.cmd_type
         position_name = req.position_name 
         position_msg = req.position 
-
-        rpy = Position.RPY(position_msg.rpy.roll, position_msg.rpy.pitch,  position_msg.rpy.yaw)
+	rpy = Position.RPY(position_msg.rpy.roll, position_msg.rpy.pitch,  position_msg.rpy.yaw)
         point = Position.Point(position_msg.point.x, position_msg.point.y, position_msg.point.z)
-        quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,  position_msg.quaternion.w )
-        position_id=self.fh.pick_new_id() 
-        print(position_id)
-        position_data = Position(position_name = position_msg.position_name, position_id = position_id, joints= position_msg.joints  , rpy=rpy, point = point, quaternion =  quaternion)     
+        quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,
+		  position_msg.quaternion.w )
+        position_data = Position(position_name = position_msg.position_name, position_id = position_msg.position_id, 
+		joints= position_msg.joints  , rpy=rpy, point = point, quaternion =  quaternion)     
         # GET an existing position 
         if cmd_type == PositionCommandType.GET:
             pos = self.get_position(position_name)
@@ -101,11 +102,10 @@ class PositionManager:
     
     def update_position(self, position, position_data):
         position.position_name = position_data.position_name
-        position.position_id = self.fh.pick_new_id()
         position.joints = position_data.joints
-        position_msg.rpy = Position.RPY(position.rpy.roll, position.rpy.pitch, position.rpy.yaw)
-        position_msg.point = Position.Point( position.point.x, position.point.y, position.point.z)
-        position_msg.quaternion = Position.Quaternion(position.quaternion.x, position.quaternion.y, position.quaternion.z, position.quaternion.w)
+        position.position_id =position.position_id
+        (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)
+	
                                 
         try:
             self.fh.write_position(position)
@@ -114,13 +114,15 @@ class PositionManager:
         return True
 
     def get_position(self, position_name):
-        try: 
+        try:	
             return self.fh.read_position(position_name)
         except NiryoOneFileException as e:
             return None
 
     def create_new_position(self, position) : 
-        try: 
+        try:
+	    position.position_id =  self.fh.pick_new_id()
+	    (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)    
             self.fh.write_position(position)
             return(position.position_name)
         except  NiryoOneFileException as e:
@@ -128,10 +130,6 @@ class PositionManager:
 
 if __name__ == '__main__':
     pass 
-    '''    rospy.init_node('niryo_one_position_manager') 
-    pm=PositionManager("~/niryo_one_position") 
-    pm.client()
-    rospy.spin()
-'''
+    
 
 
