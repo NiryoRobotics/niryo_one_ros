@@ -24,7 +24,9 @@ import moveit_commander
 from niryo_one_commander.command_type import CommandType
 from niryo_one_commander.command_status import CommandStatus
 from niryo_one_commander.robot_commander_exception import RobotCommanderException
-
+from niryo_one_commander.position.position import Position 
+from niryo_one_commander.position.position_command_type import PositionCommandType
+from position_manager import PositionManager
 # Messages
 from std_msgs.msg import Empty
 from niryo_one_msgs.msg import RobotMoveCommand
@@ -32,6 +34,7 @@ from niryo_one_msgs.msg import RobotMoveCommand
 # Services
 from std_srvs.srv import SetBool
 from niryo_one_msgs.srv import RobotMove
+from niryo_one_msgs.srv import ManagePosition 
 
 # Commanders
 from arm_moveit_commander import ArmMoveitCommander
@@ -42,6 +45,7 @@ from robot_action_server import RobotActionServer
 
 # State publisher
 from niryo_one_robot_state_publisher import NiryoRobotStatePublisher
+
 
 """
 This class handles the arm and tools through a service interface 
@@ -71,16 +75,14 @@ class RobotCommander:
     def create_response(self, status, message):
         return {'status': status, 'message': message}
     
-    def __init__(self):
+    def __init__(self, position_manager):
 
+        self.pos_manager=position_manager
         moveit_commander.roscpp_initialize(sys.argv)
 
         # Load all the sub-commanders
         self.arm_commander = ArmMoveitCommander()
         self.tool_commander = ToolCommander()
-
-        # Publish robot state (position, orientation, gripper)
-        self.niryo_one_robot_state_publisher = NiryoRobotStatePublisher()
 
         self.stop_trajectory_server = rospy.Service(
                 'niryo_one/commander/stop_command', SetBool, self.callback_stop_command)
@@ -89,18 +91,20 @@ class RobotCommander:
                 RobotMove, self.callback_robot_command)
 
         self.reset_controller_pub = rospy.Publisher('/niryo_one/steppers_reset_controller', Empty, queue_size=1)
-        
-        # Load ROS action interface
-        robot_action_server = RobotActionServer()
-        robot_action_server.start()
 
+   
     def callback_robot_command(self, req):
         cmd = req.cmd
         try:
             return self.execute_command(cmd)
         except RobotCommanderException as e:
             return self.create_response(e.status, e.message)
-        
+
+    def set_saved_position(self, cmd):
+        rospy.loginfo("set saved position")
+        pos = self.pos_manager.get_position(cmd.saved_position_name)
+        rospy.loginfo(pos)
+        self.arm_commander.set_joint_target(pos.joints) 
 
     def execute_command(self, cmd):
         cmd_type = cmd.cmd_type
@@ -128,11 +132,14 @@ class RobotCommander:
                     self.arm_commander.set_shift_pose_target(cmd.shift.axis_number, cmd.shift.value)
                 elif cmd_type == CommandType.POSE_QUAT:
                     self.arm_commander.set_pose_quat_target(cmd.pose_quat)
-            
+                elif cmd_type == CommandType.SAVED_POSITION: 
+                    self.set_saved_position(cmd)
+
                 status, message = self.compute_and_execute_plan()
 
         result = self.create_response(status, message)
         return result
+
 
     def cancel_command(self):
         self.arm_commander.stop_current_plan()
@@ -144,10 +151,8 @@ class RobotCommander:
 
 
 if __name__ == '__main__':
-    rospy.init_node('robot_commander')
-    rc = RobotCommander()
-    rospy.spin()
-
+    
+    pass
 
 
 

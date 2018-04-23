@@ -26,6 +26,7 @@ from math import sqrt
 from niryo_one_commander.command_type import CommandType
 from niryo_one_commander.command_status import CommandStatus
 from niryo_one_commander.robot_commander_exception import RobotCommanderException
+from position_manager import PositionManager
 
 # Messages
 from std_msgs.msg import Bool
@@ -40,7 +41,6 @@ from niryo_one_msgs.srv import RobotMove
 from niryo_one_msgs.msg import RobotMoveAction
 from niryo_one_msgs.msg import RobotMoveGoal
 from niryo_one_msgs.msg import RobotMoveResult
-
 #
 # This class is the main interface to use niryo_one_commander
 # It implements an action server that will :
@@ -52,10 +52,12 @@ from niryo_one_msgs.msg import RobotMoveResult
 
 class RobotActionServer:
 
-    def __init__(self):
+    def __init__(self, position_manager):
+        
+        self.pos_manager = position_manager
         self.server = actionlib.ActionServer('niryo_one/commander/robot_action',
-                RobotMoveAction, self.on_goal, self.on_cancel, auto_start=False)
-
+		 RobotMoveAction, self.on_goal, self.on_cancel, auto_start=False)
+    
         self.current_goal_handle = None
 
         self.learning_mode_on = False 
@@ -190,7 +192,6 @@ class RobotActionServer:
     
     def validate_params(self, cmd):
         cmd_type = cmd.cmd_type
-
         if cmd_type == CommandType.JOINTS:
             self.validate_joints(cmd.joints)
         elif cmd_type == CommandType.POSE:
@@ -209,11 +210,20 @@ class RobotActionServer:
         elif cmd_type == CommandType.POSE_QUAT:
             self.validate_position(cmd.pose_quat.position)
             self.validate_orientation_quaternion(cmd.pose_quat.orientation)
+        elif cmd_type == CommandType.SAVED_POSITION: 
+            self.validate_saved_position(cmd.saved_position_name)
         else:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Wrong command type")
 
+    def validate_saved_position(self, position_name):
+        rospy.loginfo("Checking joints validity")
+        saved_position = self.pos_manager.get_position(position_name)
+        if saved_position == None :
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Saved position not found") 
+        self.validate_joints(saved_position.joints)
+          
     def validate_trajectory(self, plan):
-        rospy.loginfo("Checking trajectory valididty")
+        rospy.loginfo("Checking trajectory validity")
         #Do soemthing here to check if the trajectory is valid
         dummy = 0
     
