@@ -26,11 +26,11 @@ import os
 import re
 from threading import Lock
 
-from niryo_one_commander.position.moveit_utils import get_forward_kinematic
 from niryo_one_commander.position.position import Position 
 from niryo_one_user_interface.sequences.niryo_one_file_exception import NiryoOneFileException
 
 class PositionFileHandler:
+   
     def __init__(self, position_dir):
         self.base_dir = position_dir
         if self.base_dir.startswith('~'):
@@ -43,14 +43,26 @@ class PositionFileHandler:
         self.lock = Lock()
     
     def position_name_from_filename(self, filename):
-        return int(filename.replace('position_', ''))
+	index=filename.find('_',9)
+	position_name=''
+	for i in range((index+1), len(filename)) : 
+            position_name=position_name+filename[i]
+	return position_name
+	
 
     def filename_from_position_name(self, position_name):
-        return 'position_' + position_name
+        filenames=self.get_all_filenames()
+	for filename in filenames: 
+	    r=filename.find(position_name, 9)
+	    if r>0 : 
+ 		return(filename)
+	return None
+
+    def filename_from_position_name_id(self, position_name, position_id): 
+	return 'position_' + str(position_id) + '_' + position_name    
     
     def write_position(self, position ): 
-        filename = self.filename_from_position_name(position.position_name)
-        (position.point, position.rpy, position.quaternion) =  get_forward_kinematic(position.joints)
+        filename = self.filename_from_position_name_id(position.position_name,position.position_id)
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
                 f.write("Position_Name:\n") 
@@ -77,13 +89,14 @@ class PositionFileHandler:
     def does_file_exist(self, filename):
         filenames = self.get_all_filenames()
         return filename in filenames
+   
     def get_all_filenames(self):
         filenames = []
         try:
             filenames = os.listdir(self.base_dir)
         except OSError:
             pass
-        r = re.compile("^position_.+$")
+        r = re.compile("^position_\d+_.+$")
         # Keep only correct filenames
         return filter(r.match, filenames)
 
@@ -139,16 +152,8 @@ class PositionFileHandler:
         return max_id + 1
 
     def position_id_from_filename(self, filename):
-        with open(self.base_dir + filename, 'r') as f:
-            for line in f:
-                if line.startswith("Position_Id:"):
-                    position_id = int(next(f).rstrip())
-        return position_id
+	position_id = filename.replace('position_', '')
+        return int(position_id.replace('_' + self.position_name_from_filename(filename), ''))
 
 if __name__ == '__main__': 
-    pass 
-
-
-
-
-
+    pass
