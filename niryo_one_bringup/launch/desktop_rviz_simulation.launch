@@ -12,7 +12,9 @@
         <arg name="simulation_mode" value="true" />
     </include>
 
-    <include file="$(find niryo_one_bringup)/launch/robot_commander.launch" />
+    <include file="$(find niryo_one_bringup)/launch/robot_commander.launch">
+        <arg name="simulation_mode" value="true" />
+    </include>
 
     <include file="$(find niryo_one_bringup)/launch/user_interface.launch">
         <arg name="simulation_mode" value="true" />
