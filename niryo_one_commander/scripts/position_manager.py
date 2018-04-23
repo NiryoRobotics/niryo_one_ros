@@ -103,7 +103,6 @@ class PositionManager:
     def update_position(self, position, position_data):
         position.position_name = position_data.position_name
         position.joints = position_data.joints
-	position.position_id = position.position_id
         (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)
 	
                                 
