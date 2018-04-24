@@ -37,9 +37,9 @@ from niryo_one_msgs.srv import RobotMove
 from niryo_one_msgs.srv import ManagePosition 
 
 # Commanders
-from arm_moveit_commander import ArmMoveitCommander
+from arm_commander import ArmCommander
 from tool_commander import ToolCommander
-
+from niryo_one_commander.move_group_arm import MoveGroupArm
 # ROS action interface
 from robot_action_server import RobotActionServer
 
@@ -57,16 +57,16 @@ This class handles the arm and tools through a service interface
 class RobotCommander:
 
     def compute_and_execute_plan(self):
-        self.arm_commander.compute_plan()
+        next_plan = self.move_group_arm.compute_plan()
         self.reset_controller()
         rospy.loginfo("Send Moveit trajectory")
-        return self.arm_commander.execute_plan()
+        return self.arm_commander.execute_plan(next_plan)
     
     def set_plan_and_execute(self, traj):
-        self.arm_commander.set_next_plan(traj)
+        next_plan = self.arm_commander.set_next_plan(traj)
         self.reset_controller()
         rospy.loginfo("Send newly set trajectory to execute")
-        return self.arm_commander.execute_plan()
+        return self.arm_commander.execute_plan(next_plan)
 
     def reset_controller(self):
         msg = Empty() 
@@ -81,7 +81,8 @@ class RobotCommander:
         moveit_commander.roscpp_initialize(sys.argv)
 
         # Load all the sub-commanders
-        self.arm_commander = ArmMoveitCommander()
+        self.move_group_arm = MoveGroupArm()
+        self.arm_commander = ArmCommander(self.move_group_arm)
         self.tool_commander = ToolCommander()
 
         self.stop_trajectory_server = rospy.Service(
