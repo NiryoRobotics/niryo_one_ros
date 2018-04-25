@@ -33,8 +33,8 @@ class ShutdownManager:
         if req.value==1:  
             send_shutdown_command_thread = threading.Timer(1.0,send_shutdown_command)
             send_shutdown_command_thread.start()
-            return {'status': 1, 'message': 'Robot is shutting down'}
-        return {'status': 0, 'message': 'Robot is not shutting down : try request value :1 to shutdown rpi'}
+            return {'status': 200, 'message': 'Robot is shutting down'}
+        return {'status': 400, 'message': 'Robot is not shutting down : try request value :1 to shutdown rpi'}
 
     def __init__(self):
         self.shutdown_rpi_sever=rospy.Service('/niryo_one/rpi/shutdown_rpi', SetInt, self.callback_shutdown_rpi) 
