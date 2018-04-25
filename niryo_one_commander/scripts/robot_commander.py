@@ -57,16 +57,19 @@ This class handles the arm and tools through a service interface
 class RobotCommander:
 
     def compute_and_execute_plan(self):
-        next_plan = self.move_group_arm.compute_plan()
-        self.reset_controller()
+        plan = self.move_group_arm.compute_plan()
+        if not plan : 
+            raise RobotCommanderException(
+                CommandStatus.PLAN_FAILED, "Moveit failed to compute the plan.")
+
+	self.reset_controller()
         rospy.loginfo("Send Moveit trajectory")
-        return self.arm_commander.execute_plan(next_plan)
+        return self.arm_commander.execute_plan(plan)
     
     def set_plan_and_execute(self, traj):
-        next_plan = self.arm_commander.set_next_plan(traj)
         self.reset_controller()
         rospy.loginfo("Send newly set trajectory to execute")
-        return self.arm_commander.execute_plan(next_plan)
+        return self.arm_commander.execute_plan(traj.trajectory)
 
     def reset_controller(self):
         msg = Empty() 

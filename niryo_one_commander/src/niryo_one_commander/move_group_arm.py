@@ -19,8 +19,6 @@
 
 import rospy
 import moveit_commander
-from niryo_one_commander.robot_commander_exception import RobotCommanderException
-from niryo_one_commander.command_status import CommandStatus
 
 
 class MoveGroupArm: 
@@ -83,8 +81,7 @@ class MoveGroupArm:
             plan_counter += 1
 
             if not plan.joint_trajectory.points:
-                raise RobotCommanderException(
-                        CommandStatus.PLAN_FAILED, "Moveit failed to compute the plan.")
+                return None 
             else:
                 if self.check_trajectory(plan):
                     trajectory_found_but_not_correct = False

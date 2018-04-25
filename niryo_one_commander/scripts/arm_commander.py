@@ -43,22 +43,19 @@ TRAJECTORY_TIMEOUT = 15
 
 class ArmCommander:
 
-    def set_next_plan(self, traj):
-        next_plan = traj.trajectory
-        return(next_plan)
-    
-    def execute_plan(self, next_plan , wait=False):
-        if next_plan:
+
+    def execute_plan(self, plan , wait=False):
+        if plan:
             # reset event
             self.traj_finished_event.clear()
             self.current_goal_id = None
             self.current_goal_result = GoalStatus.LOST
 
             # send traj and wait 
-            self.move_group_arm.arm.execute(next_plan, wait=False)
+            self.move_group_arm.arm.execute(plan, wait=False)
             if self.traj_finished_event.wait(TRAJECTORY_TIMEOUT):
-                previous_plan = next_plan
-                next_plan = None
+                #previous_plan = plan
+                plan = None
 
                 if self.current_goal_result == GoalStatus.SUCCEEDED:
                     return CommandStatus.SUCCESS, "Command has been successfully processed"
@@ -73,8 +70,8 @@ class ArmCommander:
                     return CommandStatus.ROS_ERROR, "Unknown error, try to restart, or contact the support to know more"
             else:
                 # todo cancel goal
-                previous_plan = next_plan
-                next_plan = None
+                #previous_plan = plan
+                plan = None
                 raise RobotCommanderException(CommandStatus.CONTROLLER_PROBLEMS,
                         "Trajectory timeout - Try to restart the robot")
         else:
@@ -112,9 +109,9 @@ class ArmCommander:
     def set_shift_pose_target(self, axis_number, value):
         self.move_group_arm.arm.shift_pose_target(axis_number, value, self.move_group_arm.end_effector_link)
 
-    def get_plan_time(self, next_plan):
-        if next_plan:
-            return next_plan.joint_trajectory.points[-1].time_from_start.to_sec()
+    def get_plan_time(self, plan):
+        if plan:
+            return plan.joint_trajectory.points[-1].time_from_start.to_sec()
         else:
             raise RobotCommanderException(CommandStatus.NO_PLAN_AVAILABLE,
                         "No current plan found")
