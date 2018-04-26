@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#position_command_type.py
+#trajectory.py
 # Copyright (C) 2018 Niryo
 # All rights reserved.
 #
@@ -16,9 +16,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from niryo_one_msgs.msg import TrajectoryPlan 
+from std_msgs.msg import Header
+from trajectory_msgs.msg import JointTrajectory
 
-class PositionCommandType:
-    GET = 1
-    CREATE = 2
-    UPDATE = 3
-    DELETE = 4
+class Trajectory: 
+
+    def __init__(self, trajectory_id = '', trajectory_name = "", description = "", group_name = "", 
+            joint_trajectory= JointTrajectory() ):
+        self.trajectory_id = trajectory_id
+        self.trajectory_name = trajectory_name
+        self.description = description
+        self.group_name = group_name
+        self.joint_trajectory = joint_trajectory
+
+
+
+

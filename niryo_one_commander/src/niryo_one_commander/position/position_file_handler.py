@@ -155,5 +155,5 @@ class PositionFileHandler:
 	position_id = filename.replace('position_', '')
         return int(position_id.replace('_' + self.position_name_from_filename(filename), ''))
 
-if __name__ == '__main__': 
-    pass
+if __name__ == '__main__':
+    pass 
