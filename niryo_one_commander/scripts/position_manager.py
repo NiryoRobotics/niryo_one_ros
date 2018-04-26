@@ -42,7 +42,7 @@ class PositionManager:
         rospy.loginfo("service manage position created") 
         
         self.get_position_list_server = rospy.Service(
-                '/niryo_one/position/get_position_list', GetPositionList, self.callback_get_Position_list)
+                '/niryo_one/position/get_position_list', GetPositionList, self.callback_get_position_list)
         rospy.loginfo("get list position created") 
         
     def create_position_response(self, status, message, position=None):
@@ -136,7 +136,7 @@ class PositionManager:
 
 
 
-    def callback_get_Position_list(self, req):
+    def callback_get_position_list(self, req = None):
         pos_list = self.get_all_positions()
         msg_list = []
         for pos in pos_list:
@@ -169,18 +169,6 @@ class PositionManager:
 
 
 if __name__ == '__main__':
-    '''rospy.init_node('position_manager')
-    position_manager = PositionManager('/home/sarra/')
-    rospy.spin()
-    rospy.wait_for_service('/niryo_one/position/get_position_list')
-    rospy.loginfo("waitingg")
-    client_service = rospy.ServiceProxy('/niryo_one/position/get_position_list', GetPositionList)
-    #p=Position("mmm",joints=[1,0,0,0,0,0])
-    #p=Position()
-
-    resp1 = client_service()
-
-    print (resp1)'''
     pass
 
     
