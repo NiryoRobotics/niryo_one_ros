@@ -50,6 +50,9 @@ add_service_files(
   SetSequenceAutorun.srv
   ManagePosition.srv
   GetPositionList.srv 
+=======
+  ManageTrajectory.srv 
+>>>>>>> create ManageTrajectory service
 )
 
 add_action_files(

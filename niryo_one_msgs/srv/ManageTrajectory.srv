@@ -1,0 +1,16 @@
+int32 cmd_type
+
+int32 trajectory_id
+string trajectory_name
+string description 
+niryo_one_msgs/TrajectoryPlan trajectory_plan
+
+---
+int32 status
+string message
+
+int32 trajectory_id
+string trajectory_name
+string description
+niryo_one_msgs/TrajectoryPlan trajectory_plan
+ 
