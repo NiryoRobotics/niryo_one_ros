@@ -27,7 +27,9 @@ from niryo_one_commander.position.position_command_type import PositionCommandTy
 from niryo_one_commander.moveit_utils import get_forward_kinematic
 
 from niryo_one_msgs.msg import Position  as PositionMessage 
-from niryo_one_msgs.srv import ManagePosition 
+from niryo_one_msgs.srv import GetPositionList
+
+from niryo_one_msgs.srv import ManagePosition
 from niryo_one_msgs.msg import RPY
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
@@ -38,6 +40,10 @@ class PositionManager:
         self.fh = PositionFileHandler(position_dir)
         self.manage_position_server = rospy.Service('/niryo_one/position/manage_position', ManagePosition, self.callback_manage_position)
         rospy.loginfo("service manage position created") 
+        
+        self.get_position_list_server = rospy.Service(
+                '/niryo_one/position/get_position_list', GetPositionList, self.callback_get_Position_list)
+        rospy.loginfo("get list position created") 
         
     def create_position_response(self, status, message, position=None):
         position_msg = PositionMessage()
@@ -126,9 +132,57 @@ class PositionManager:
             return(position.position_name)
         except  NiryoOneFileException as e:
             return None
+    
+
+
+
+    def callback_get_Position_list(self, req):
+        pos_list = self.get_all_positions()
+        msg_list = []
+        for pos in pos_list:
+            position_msg = PositionMessage()
+            position_msg.position_name = pos.position_name
+            position_msg.position_id = pos.position_id
+            position_msg.joints = pos.joints 
+            position_msg.rpy = Position.RPY(pos.rpy.roll, pos.rpy.pitch, pos.rpy.yaw)
+            position_msg.point = Position.Point( pos.point.x, pos.point.y, pos.point.z) 
+            position_msg.quaternion = Position.Quaternion(pos.quaternion.x, pos.quaternion.y,
+		 pos.quaternion.z, pos.quaternion.w)
+            msg_list.append(position_msg)
+        return { 'positions': msg_list }
+ 
+
+
+
+    def get_all_positions(self):
+        filenames = self.fh.get_all_filenames()
+        position_list = []
+        for f in filenames:
+            try:
+                position_name = self.fh.position_name_from_filename(f)
+                pos = self.get_position(position_name)
+                if pos != None:
+                    position_list.append(pos)
+            except NiryoOneFileException as e:
+                pass
+        return position_list
+
 
 if __name__ == '__main__':
-    pass 
+    '''rospy.init_node('position_manager')
+    position_manager = PositionManager('/home/sarra/')
+    rospy.spin()
+    rospy.wait_for_service('/niryo_one/position/get_position_list')
+    rospy.loginfo("waitingg")
+    client_service = rospy.ServiceProxy('/niryo_one/position/get_position_list', GetPositionList)
+    #p=Position("mmm",joints=[1,0,0,0,0,0])
+    #p=Position()
+
+    resp1 = client_service()
+
+    print (resp1)'''
+    pass
+
     
 
 

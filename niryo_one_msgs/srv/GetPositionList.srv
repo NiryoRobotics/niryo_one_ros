@@ -1,0 +1,4 @@
+int32 value
+
+---
+niryo_one_msgs/Position[] positions

@@ -48,7 +48,8 @@ add_service_files(
   GetSequenceList.srv
   ManageSequence.srv
   SetSequenceAutorun.srv
-  ManagePosition.srv 
+  ManagePosition.srv
+  GetPositionList.srv 
 )
 
 add_action_files(
