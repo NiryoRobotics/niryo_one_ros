@@ -49,10 +49,9 @@ add_service_files(
   ManageSequence.srv
   SetSequenceAutorun.srv
   ManagePosition.srv
-  GetPositionList.srv 
-=======
-  ManageTrajectory.srv 
->>>>>>> create ManageTrajectory service
+  GetPositionList.srv
+  ManageTrajectory.srv
+  GetTrajectoryList.srv  
 )
 
 add_action_files(

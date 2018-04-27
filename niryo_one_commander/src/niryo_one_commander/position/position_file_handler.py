@@ -27,7 +27,7 @@ import re
 from threading import Lock
 
 from niryo_one_commander.position.position import Position 
-from niryo_one_user_interface.sequences.niryo_one_file_exception import NiryoOneFileException
+from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
 
 class PositionFileHandler:
    

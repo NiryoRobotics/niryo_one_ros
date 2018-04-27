@@ -21,7 +21,7 @@
 
 import rospy
 from niryo_one_commander.position.position  import Position 
-from niryo_one_commander.position.niryo_one_file_exception import NiryoOneFileException
+from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
 from niryo_one_commander.position.position_file_handler import PositionFileHandler
 from niryo_one_commander.position.position_command_type import PositionCommandType
 from niryo_one_commander.moveit_utils import get_forward_kinematic
