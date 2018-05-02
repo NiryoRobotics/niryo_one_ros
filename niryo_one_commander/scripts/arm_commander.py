@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # arm_commander.py
-# Copyright (C) 2017 Niryo
+# Copyright (C) 2018 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -70,7 +70,6 @@ class ArmCommander:
                     return CommandStatus.ROS_ERROR, "Unknown error, try to restart, or contact the support to know more"
             else:
                 # todo cancel goal
-                #previous_plan = plan
                 plan = None
                 raise RobotCommanderException(CommandStatus.CONTROLLER_PROBLEMS,
                         "Trajectory timeout - Try to restart the robot")

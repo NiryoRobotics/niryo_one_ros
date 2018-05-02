@@ -24,6 +24,7 @@ from tf.transformations import quaternion_from_euler
 
 from std_msgs.msg import Float64
 from niryo_one_msgs.msg import RobotState
+from geometry_msgs.msg import Quaternion
 
 PI = 3.14159
 
