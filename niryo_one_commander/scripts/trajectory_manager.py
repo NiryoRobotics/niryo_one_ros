@@ -19,12 +19,10 @@
 
 
 import rospy
-import os
-from niryo_one_user_interface.sequences.niryo_one_file_exception import NiryoOneFileException
+from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
 from niryo_one_commander.trajectory.trajectory import Trajectory
 from niryo_one_commander.trajectory.trajectory_command_type import TrajectoryCommandType
 from niryo_one_commander.trajectory.trajectory_file_handler import TrajectoryFileHandler
-from niryo_one_msgs.msg import TrajectoryPlan 
 from niryo_one_msgs.msg import Trajectory
 from niryo_one_msgs.srv import ManageTrajectory
 from niryo_one_msgs.srv import GetTrajectoryList
