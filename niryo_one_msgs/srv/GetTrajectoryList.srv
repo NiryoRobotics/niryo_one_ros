@@ -1,6 +1,3 @@
 
 ---
-int32[] trajectory_id 
-string[] trajectory_name
-string[] description  
-niryo_one_msgs/TrajectoryPlan[] trajectory_plan 
+niryo_one_msgs/Trajectory[] trajectory

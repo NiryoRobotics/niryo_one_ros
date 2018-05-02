@@ -16,13 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import rospy
+ 
 import os
 import re
 from threading import Lock
 from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
-from niryo_one_commander.trajectory.trajectory import Trajectory
 import jsonpickle
 
 class TrajectoryFileHandler:
@@ -76,20 +74,28 @@ class TrajectoryFileHandler:
                 max_id = current_id
         return max_id + 1
                      
-    def write_trajectroy_with_json(self,traj):
-        filename = self.filename_from_trajectory_id(traj.trajectory_id)
+    def write_trajectroy(self,traj):
+        filename = self.filename_from_trajectory_id(traj.id)
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
-                json_obj = jsonpickle.encode(traj)
-                f.write(json_obj)
+                f.write(self.object_to_json(traj))
                 
-    def read_trajectory_with_json(self,trajectory_id ): 
+    def read_trajectory(self,trajectory_id ): 
         filename = self.filename_from_trajectory_id(trajectory_id)
         # Check if exists
         if not self.does_file_exist(filename):
             raise NiryoOneFileException(' ' + str(trajectory_id)+ ' does not exist')
         with self.lock:
             with open(self.base_dir + filename, 'r') as f:
-                json_str = f.read()
-                traj = jsonpickle.decode(json_str)
-                return traj
+                try : 
+                    json_str = f.read()
+                    return self.json_to_object(json_str)
+                except: 
+                    raise NiryoOneFileException("Could not read trajectory with id " 
+                        + str(trajectory_id) )
+    
+    def object_to_json(self, obj): 
+        return jsonpickle.encode(obj)
+    
+    def json_to_object(self, json_str): 
+        return jsonpickle.decode(json_str)

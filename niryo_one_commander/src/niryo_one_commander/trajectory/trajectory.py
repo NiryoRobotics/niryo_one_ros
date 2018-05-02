@@ -16,17 +16,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from trajectory_msgs.msg import JointTrajectory
+from niryo_one_msgs.msg import TrajectoryPlan
 
 class Trajectory: 
 
-    def __init__(self, trajectory_id = '', trajectory_name = "", description = "", group_name = "", 
-            joint_trajectory= JointTrajectory() ):
-        self.trajectory_id = trajectory_id
-        self.trajectory_name = trajectory_name
+    def __init__(self, id = 0 , name = "", description = "", 
+            trajectory_plan = TrajectoryPlan() ):
+        self.id = id
+        self.name = name
         self.description = description
-        self.group_name = group_name
-        self.joint_trajectory = joint_trajectory
+        self.trajectory_plan = trajectory_plan 
 
 
 

@@ -25,6 +25,7 @@ from niryo_one_commander.trajectory.trajectory import Trajectory
 from niryo_one_commander.trajectory.trajectory_command_type import TrajectoryCommandType
 from niryo_one_commander.trajectory.trajectory_file_handler import TrajectoryFileHandler
 from niryo_one_msgs.msg import TrajectoryPlan 
+from niryo_one_msgs.msg import Trajectory
 from niryo_one_msgs.srv import ManageTrajectory
 from niryo_one_msgs.srv import GetTrajectoryList
 
@@ -42,18 +43,14 @@ class TrajectoryManager:
     def callback_get_trajectory_list(self, req = None): 
         traj_list = self.get_all_trajectories()
         msg_list = []
-        id_list = []
-        name_list = []
-        description_list =[]
         for traj in traj_list:
-            trajectory_msg = TrajectoryPlan()
-            trajectory_msg.group_name = traj.group_name
-            trajectory_msg.trajectory.joint_trajectory = traj.joint_trajectory
+            trajectory_msg = Trajectory()
+            trajectory_msg.description= traj.description
+            trajectory_msg.name = traj.name
+            trajectory_msg.id = traj.id
+            trajectory_msg.trajectory_plan = traj.trajectory_plan
             msg_list.append(trajectory_msg)
-            id_list.append(traj.trajectory_id)
-            name_list.append(traj.trajectory_name) 
-            description_list.append(traj.description)
-        return{ 'trajectory_id': id_list, 'trajectory_name': name_list,'description': description_list ,'trajectory_plan': msg_list }
+        return{ 'trajectory': msg_list }
 
     def get_all_trajectories(self): 
         filenames = self.fh.get_all_filenames()
@@ -69,19 +66,20 @@ class TrajectoryManager:
         return trajectory_list
 
     def create_trajectory_response(self, status, message, trajectory = None):
-        trajectory_msg = TrajectoryPlan()
+        trajectory_msg = Trajectory()
         if trajectory != None:
-            trajectory_msg.group_name = trajectory.group_name
-            trajectory_msg.trajectory.joint_trajectory = trajectory.joint_trajectory
-            return { 'status': status, 'message': message, 'trajectory_id': trajectory.trajectory_id,
-                'trajectory_name':  trajectory.trajectory_name, 'description': trajectory.description,'trajectory_plan': trajectory_msg }
+            trajectory_msg.trajectory_plan = trajectory.trajectory_plan
+            trajectory_msg.id = trajectory.id
+            trajectory_msg.name = trajectory.name
+            trajectory_msg.description = trajectory.description
+            return { 'status': status, 'message': message,'trajectory': trajectory_msg }
         return { 'status': status, 'message': message }
 
     def callback_manage_trajectory(self, req):
         cmd_type = req.cmd_type
-        trajectory_id = req.trajectory_id
-        trajectory_data = Trajectory( trajectory_id = req.trajectory_id, trajectory_name = req.trajectory_name, description = req.description, group_name = req.trajectory_plan.group_name, 
-            joint_trajectory = req.trajectory_plan.trajectory.joint_trajectory ) 
+        trajectory_id = req.trajectory.id
+        trajectory_data = Trajectory( id = req.trajectory.id, name = req.trajectory.name, description = req.trajectory.description, 
+            trajectory_plan = req.trajectory.trajectory_plan ) 
          # GET an existing trajectory 
         if cmd_type == TrajectoryCommandType.GET:
             traj = self.get_trajectory(trajectory_id)
@@ -123,27 +121,32 @@ class TrajectoryManager:
         return True
 
     def update_trajectory(self, traj, trajectory_data) : 
-        traj.trajectory_name = trajectory_data.trajectory_name
+        traj.name = trajectory_data.name
         traj.description = trajectory_data.description
-        traj.group_name = trajectory_data.group_name
-        traj.joint_trajectory = trajectory_data.joint_trajectory       
+        traj.trajectory_plan = trajectory_data.trajectory_plan       
         try:
-            self.fh.write_trajectroy_with_json(traj)
+            self.fh.write_trajectroy(traj)
         except NiryoOneFileException as e:
             return False
         return True
 
     def create_new_trajectory(self, traj): 
         new_id = self.fh.pick_new_id()
-        traj.trajectory_id = new_id 
+        traj.id = new_id 
         try: 
-            self.fh.write_trajectroy_with_json(traj)
+            self.fh.write_trajectroy(traj)
         except NiryoOneFileException as e:
             return -1
         return new_id
 
     def get_trajectory(self, trajectory_id):
         try:	
-            return self.fh.read_trajectory_with_json(trajectory_id)
+            return self.fh.read_trajectory(trajectory_id)
         except NiryoOneFileException as e:
-            return None   
+            return None  
+
+if __name__ == '__main__':
+    rospy.init_node('niryo_one_trajectory_manager')
+    t = TrajectoryManager('/home/sarra/trajectory_niryo')
+    #rospy.on_shutdown(s.on_shutdown);
+    rospy.spin()

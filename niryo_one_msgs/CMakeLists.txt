@@ -28,6 +28,7 @@ add_message_files(
   TrajectoryPlan.msg
   MatlabMoveResult.msg
   Position.msg
+  Trajectory.msg 
 )
 
 add_service_files(
