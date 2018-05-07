@@ -8,6 +8,7 @@ niryo_one_msgs/ShiftPose shift
 niryo_one_msgs/TrajectoryPlan Trajectory
 geometry_msgs/Pose pose_quat
 string  saved_position_name
+int32 saved_trajectory_id 
 
 niryo_one_msgs/ToolCommand tool_cmd
 
