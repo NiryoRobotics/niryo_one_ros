@@ -28,10 +28,11 @@ from niryo_one_commander.command_type import CommandType
 
 class ValidateParameters(): 
 
-    def __init__(self, validation, position_manager):
+    def __init__(self, validation, position_manager, trajectory_manager):
         self.validation = validation 
         self.pos_manager = position_manager
-
+        self.trajectory_manager = trajectory_manager
+    
     def validate_params(self, cmd): 
         cmd_type = cmd.cmd_type
         if cmd_type == CommandType.JOINTS:
@@ -54,8 +55,20 @@ class ValidateParameters():
             self.validate_orientation_quaternion(cmd.pose_quat.orientation)
         elif cmd_type == CommandType.SAVED_POSITION: 
             self.validate_saved_position(cmd.saved_position_name)
+        elif CommandType.SAVED_TRAJECTORY:
+            self.validate_saved_trajectory(cmd)
+
         else:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Wrong command type")
+
+
+    def validate_saved_trajectory(self, cmd): 
+        rospy.loginfo("Checking saved trajectory validity")
+        saved_traj = self.trajectory_manager.get_trajectory(cmd.saved_trajectory_id)
+        if saved_traj == None :
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Saved trajectory  not found") 
+        self.validate_trajectory(saved_traj.trajectory_plan)
+         
 
     def validate_saved_position(self, position_name):
         rospy.loginfo("Checking joints validity")
@@ -67,7 +80,11 @@ class ValidateParameters():
     def validate_trajectory(self, plan):
         rospy.loginfo("Checking trajectory validity")
         #Do soemthing here to check if the trajectory is valid
-        dummy = 0
+        n =len(plan.trajectory.joint_trajectory.points)
+        for i in range(0,n-1): 
+            self.validate_joints(plan.trajectory.joint_trajectory.points[i].positions)
+        
+       
     
     def validate_joints(self, joint_array):
         v = self.validation['joint_limits']

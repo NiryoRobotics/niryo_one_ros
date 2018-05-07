@@ -88,7 +88,6 @@ class TrajectoryManager:
         elif cmd_type == TrajectoryCommandType.CREATE:
             new_trajectory_id = self.create_new_trajectory(trajectory_data)
             new_trajectory = self.get_trajectory(new_trajectory_id)
-            print new_trajectory_id
             if new_trajectory == None:
                 return self.create_trajectory_response(400, "Failed to create trajectory")
             return self.create_trajectory_response(200, "Trajectory has been created", new_trajectory)
