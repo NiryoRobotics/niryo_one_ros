@@ -1,5 +1,5 @@
 <launch>
-    <arg name="simulation_mode" default="true" />
+    <arg name="simulation_mode" default="false" />
 
     <!-- Moveit move_group -->
     <include file="$(find niryo_one_moveit_config)/launch/move_group.launch" />

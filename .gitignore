@@ -4,6 +4,5 @@ urdf.rviz
 node_modules/
 tmp_blockly/
 .vscode
-test_trajectory.py
-test.py
+*_test.py
 
