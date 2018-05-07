@@ -27,4 +27,5 @@ class CommandType(object):
     TOOL       = 6
     EXECUTE_TRAJ = 7
     POSE_QUAT  = 8
-    SAVED_POSITION =9 
+    SAVED_POSITION =9
+    SAVED_TRAJECTORY = 10  
