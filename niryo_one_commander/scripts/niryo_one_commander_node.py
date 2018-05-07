@@ -19,10 +19,11 @@
 
 
 import rospy
-
+from niryo_one_msgs.msg import TrajectoryPlan 
+from std_msgs.msg import Header
 from position_manager import PositionManager
+from trajectory_manager import TrajectoryManager
 from niryo_one_robot_state_publisher import NiryoRobotStatePublisher
-#from robot_action_server import RobotActionServer
 from robot_commander import RobotCommander 
 
 class NiryoOneCommanderNode(): 
@@ -34,9 +35,11 @@ class NiryoOneCommanderNode():
         # Position Manager  
         positions_dir = rospy.get_param("~positions_dir")
         self.pos_manager = PositionManager(positions_dir)
-        
+        #trajectory_manager 
+        trajectories_dir = rospy.get_param("~trajectories_dir")
+        self.traj_manager = TrajectoryManager(trajectories_dir)
         # robot commander 
-        self.robot_commander = RobotCommander(self.pos_manager)
+        self.robot_commander = RobotCommander(self.pos_manager, self.traj_manager)
         self.robot_commander.start()
         
 if __name__ == '__main__':

@@ -70,18 +70,21 @@ class RobotCommander:
 	self.reset_controller()
         rospy.loginfo("Send Moveit trajectory")
         return self.arm_commander.execute_plan(plan)
-    
+
     def set_plan_and_execute(self, traj):
         self.reset_controller()
         rospy.loginfo("Send newly set trajectory to execute")
+        if traj == None :
+            raise RobotCommanderException(
+                CommandStatus.PLAN_FAILED, "Moveit failed to execute plan.")  
         return self.arm_commander.execute_plan(traj.trajectory)
 
     def reset_controller(self):
         msg = Empty() 
         self.reset_controller_pub.publish(msg)
 
-    def __init__(self, position_manager):
-
+    def __init__(self, position_manager, trajectory_manager):
+        self.trajectory_manager = trajectory_manager
         self.pos_manager=position_manager
         moveit_commander.roscpp_initialize(sys.argv)
 
@@ -111,14 +114,18 @@ class RobotCommander:
                 Bool, self.callback_joystick_enabled)
         
         self.validation = rospy.get_param("/niryo_one/robot_command_validation")
-        self.validate_parameters = ValidateParameters(self.validation, self.pos_manager)
+        self.validate_parameters = ValidateParameters(self.validation, self.pos_manager, self.trajectory_manager)
 
     def set_saved_position(self, cmd):
         rospy.loginfo("set saved position")
         pos = self.pos_manager.get_position(cmd.saved_position_name)
-        rospy.loginfo(pos)
         self.arm_commander.set_joint_target(pos.joints) 
 
+    def set_saved_trajectory(self, cmd):
+        traj = self.trajectory_manager.get_trajectory(cmd.saved_trajectory_id) 
+        status,message = self.set_plan_and_execute(traj.trajectory_plan)
+        return status,message 
+    
     def execute_command(self, cmd):
         cmd_type = cmd.cmd_type
         status = CommandStatus.ROS_ERROR
@@ -131,6 +138,10 @@ class RobotCommander:
         else: # move command
             if cmd_type == CommandType.EXECUTE_TRAJ:
                 status, message = self.set_plan_and_execute(cmd.Trajectory)
+            elif cmd_type == CommandType.SAVED_TRAJECTORY: 
+                status,message = self.set_saved_trajectory(cmd)
+                rospy.loginfo('command execute traj saved set saved trajectory ')
+
             else:
                 if cmd_type == CommandType.JOINTS:
                     self.arm_commander.set_joint_target(cmd.joints)
@@ -148,9 +159,10 @@ class RobotCommander:
                 elif cmd_type == CommandType.SAVED_POSITION: 
                     self.set_saved_position(cmd)
 
+            
+
                 status, message = self.compute_and_execute_plan()
         return (status, message)
-
 
     def cancel_command(self):
         self.arm_commander.stop_current_plan()
@@ -245,6 +257,7 @@ class RobotCommander:
 
     def execute_command_action(self):
         cmd = self.current_goal_handle.goal.goal.cmd 
+        rospy.loginfo("passing to executing command")
         result = self.create_result(CommandStatus.ROS_ERROR, "error with executing commad")
         response = None
         try: 
@@ -282,7 +295,6 @@ class RobotCommander:
 if __name__ == '__main__':
     
     pass
-
 
 
 

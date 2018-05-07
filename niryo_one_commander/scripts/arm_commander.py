@@ -50,11 +50,9 @@ class ArmCommander:
             self.traj_finished_event.clear()
             self.current_goal_id = None
             self.current_goal_result = GoalStatus.LOST
-
             # send traj and wait 
             self.move_group_arm.arm.execute(plan, wait=False)
             if self.traj_finished_event.wait(TRAJECTORY_TIMEOUT):
-                #previous_plan = plan
                 plan = None
 
                 if self.current_goal_result == GoalStatus.SUCCEEDED:
