@@ -30,7 +30,6 @@ from niryo_one_commander.move_group_arm import MoveGroupArm
 from niryo_one_commander.robot_commander_exception import RobotCommanderException
 from niryo_one_commander.command_status import CommandStatus
 
-TRAJECTORY_TIMEOUT = 15
 
 class ArmCommander:
 
@@ -38,11 +37,13 @@ class ArmCommander:
     def execute_plan(self, plan , wait=False):
         if plan:
             # reset event
+
             self.traj_finished_event.clear()
             self.current_goal_id = None
             self.current_goal_result = GoalStatus.LOST
             # send traj and wait 
             self.move_group_arm.arm.execute(plan, wait=False)
+            TRAJECTORY_TIMEOUT = 1.5 * self.get_plan_time(plan) 
             if self.traj_finished_event.wait(TRAJECTORY_TIMEOUT):
                 plan = None
 
