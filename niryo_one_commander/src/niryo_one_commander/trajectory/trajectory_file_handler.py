@@ -16,12 +16,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
- 
+import rospy 
 import os
 import re
 from threading import Lock
-from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
 import jsonpickle
+from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
+from niryo_one_commander.robot_commander_exception import RobotCommanderException
+from niryo_one_commander.parameters_validation import ParametersValidation
+
 
 class TrajectoryFileHandler:
        
@@ -35,7 +38,9 @@ class TrajectoryFileHandler:
             print("Create trajectory dir " + str(self.base_dir))
             os.makedirs(self.base_dir)
         self.lock = Lock()
-    
+        self.validation = rospy.get_param("/niryo_one/robot_command_validation")
+        self.parameters_validation = ParametersValidation(self.validation)
+
     def get_all_filenames(self):
         filenames = []
         try:
@@ -78,7 +83,12 @@ class TrajectoryFileHandler:
         filename = self.filename_from_trajectory_id(traj.id)
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
+                try: 
+                    self.parameters_validation.validate_trajectory(traj.trajectory_plan)
+                except RobotCommanderException as e:
+                    raise NiryoOneFileException(e)
                 f.write(self.object_to_json(traj))
+                
                 
     def read_trajectory(self,trajectory_id ): 
         filename = self.filename_from_trajectory_id(trajectory_id)

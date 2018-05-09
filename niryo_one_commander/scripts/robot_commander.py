@@ -46,7 +46,7 @@ from niryo_one_msgs.msg import RobotMoveResult
 from arm_commander import ArmCommander
 from tool_commander import ToolCommander
 from niryo_one_commander.move_group_arm import MoveGroupArm
-from niryo_one_commander.validate_params import ValidateParameters
+from niryo_one_commander.parameters_validation import ParametersValidation
 
 # State publisher
 from niryo_one_robot_state_publisher import NiryoRobotStatePublisher
@@ -114,7 +114,7 @@ class RobotCommander:
                 Bool, self.callback_joystick_enabled)
         
         self.validation = rospy.get_param("/niryo_one/robot_command_validation")
-        self.validate_parameters = ValidateParameters(self.validation, self.pos_manager, self.trajectory_manager)
+        self.parameters_validation = ParametersValidation(self.validation)
 
     def set_saved_position(self, cmd):
         rospy.loginfo("set saved position")
@@ -123,9 +123,7 @@ class RobotCommander:
 
     def set_saved_trajectory(self, cmd):
         traj = self.trajectory_manager.get_trajectory(cmd.saved_trajectory_id) 
-        status,message = self.set_plan_and_execute(traj.trajectory_plan)
-        return status,message 
-    
+        return self.set_plan_and_execute(traj.trajectory_plan)
     def execute_command(self, cmd):
         cmd_type = cmd.cmd_type
         status = CommandStatus.ROS_ERROR
@@ -140,8 +138,6 @@ class RobotCommander:
                 status, message = self.set_plan_and_execute(cmd.Trajectory)
             elif cmd_type == CommandType.SAVED_TRAJECTORY: 
                 status,message = self.set_saved_trajectory(cmd)
-                rospy.loginfo('command execute traj saved set saved trajectory ')
-
             else:
                 if cmd_type == CommandType.JOINTS:
                     self.arm_commander.set_joint_target(cmd.joints)
@@ -158,8 +154,6 @@ class RobotCommander:
                     self.arm_commander.set_pose_quat_target(cmd.pose_quat)
                 elif cmd_type == CommandType.SAVED_POSITION: 
                     self.set_saved_position(cmd)
-
-            
 
                 status, message = self.compute_and_execute_plan()
         return (status, message)
@@ -222,6 +216,7 @@ class RobotCommander:
 
         # check if still have a goal -> set_rejected() 
         if self.current_goal_handle is not None:
+
             result = self.create_result(CommandStatus.GOAL_STILL_ACTIVE, 
                 "Current command is still active. Cancel it if you want to execute a new one")
             goal_handle.set_rejected(result)
@@ -230,7 +225,7 @@ class RobotCommander:
         # validate parameters -> set_rejected (msg : validation or commander error)
         try:
             rospy.loginfo("Robot Acton Sever - checking paramter Validity")
-            self.validate_parameters.validate_params(goal_handle.goal.goal.cmd)
+            self.validate_params(goal_handle.goal.goal.cmd)
         except RobotCommanderException as e:
             result = self.create_result(e.status, e.message)
             goal_handle.set_rejected(result)
@@ -289,6 +284,56 @@ class RobotCommander:
         except RobotCommanderException:
             rospy.logwarn("Could not cancel current command ")
     
+
+  # command validation 
+
+       
+    def validate_params(self, cmd): 
+        cmd_type = cmd.cmd_type
+        if cmd_type == CommandType.JOINTS:
+            self.parameters_validation.validate_joints(cmd.joints)
+        elif cmd_type == CommandType.POSE:
+            self.parameters_validation.validate_position(cmd.position)
+            self.parameters_validation.validate_orientation(cmd.rpy)
+        elif cmd_type == CommandType.POSITION:
+            self.parameters_validation.validate_position(cmd.position)
+        elif cmd_type == CommandType.RPY:
+           self.parameters_validation.validate_orientation(cmd.rpy)
+        elif cmd_type == CommandType.SHIFT_POSE:
+           self.parameters_validation.validate_shift_pose(cmd.shift)
+        elif cmd_type == CommandType.EXECUTE_TRAJ:
+           self.parameters_validation.validate_trajectory(cmd.Trajectory)
+        elif cmd_type == CommandType.TOOL:
+           self.parameters_validation.validate_tool_command(cmd.tool_cmd)
+        elif cmd_type == CommandType.POSE_QUAT:
+            self.parameters_validation.validate_position(cmd.pose_quat.position)
+            self.parameters_validation.validate_orientation_quaternion(cmd.pose_quat.orientation)
+        elif cmd_type == CommandType.SAVED_POSITION: 
+            self.validate_saved_position(cmd.saved_position_name)
+        elif CommandType.SAVED_TRAJECTORY:
+            self.validate_saved_trajectory(cmd)
+
+        else:
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Wrong command type")
+
+
+    def validate_saved_trajectory(self, cmd): 
+        rospy.loginfo("Checking saved trajectory validity")
+        saved_traj = self.trajectory_manager.get_trajectory(cmd.saved_trajectory_id)
+        if saved_traj == None :
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Saved trajectory  not found") 
+        self.parameters_validation.validate_trajectory(saved_traj.trajectory_plan)
+         
+
+    def validate_saved_position(self, position_name):
+        rospy.loginfo("Checking joints validity")
+        saved_position = self.pos_manager.get_position(position_name)
+        if saved_position == None :
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Saved position not found") 
+        self.parameters_validation.validate_joints(saved_position.joints)
+
+
+
 
 
 

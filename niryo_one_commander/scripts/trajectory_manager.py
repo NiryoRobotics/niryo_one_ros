@@ -143,7 +143,7 @@ class TrajectoryManager:
             return None  
 
 if __name__ == '__main__':
-    rospy.init_node('niryo_one_trajectory_manager')
-    t = TrajectoryManager('/home/sarra/trajectory_niryo')
-    #rospy.on_shutdown(s.on_shutdown);
-    rospy.spin()
+    '''rospy.init_node('niryo_one_trajectory_manager')
+    t = TrajectoryManager('~/trajectory_niryo')
+    rospy.spin()'''
+    pass
