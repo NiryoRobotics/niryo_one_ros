@@ -19,8 +19,6 @@
 
 
 import rospy
-from niryo_one_msgs.msg import TrajectoryPlan 
-from std_msgs.msg import Header
 from position_manager import PositionManager
 from trajectory_manager import TrajectoryManager
 from niryo_one_robot_state_publisher import NiryoRobotStatePublisher
@@ -43,7 +41,7 @@ class NiryoOneCommanderNode():
         self.robot_commander.start()
         
 if __name__ == '__main__':
-    rospy.init_node('niryo_one_commander_node')
+    rospy.init_node('niryo_one_commander')
     niryo_one_commander_node = NiryoOneCommanderNode()
     rospy.spin()
 

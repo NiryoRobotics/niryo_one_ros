@@ -16,7 +16,7 @@
     <param name="/move_group/start_state_max_bounds_error" value="0.3" />
   
     <!-- Robot commander -->
-    <node name="niryo_one_commander_node" pkg="niryo_one_commander" type="niryo_one_commander_node.py" output="screen" respawn="false">
+    <node name="niryo_one_commander" pkg="niryo_one_commander" type="niryo_one_commander_node.py" output="screen" respawn="false">
         <param name="reference_frame"            type="string" value="ground_link" />
         <param name="move_group_commander_name"  type="string" value="arm" />
         <param name="allow_replanning"           type="bool"   value="true" />
