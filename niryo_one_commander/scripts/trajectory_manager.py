@@ -23,6 +23,9 @@ from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
 from niryo_one_commander.trajectory.trajectory import Trajectory
 from niryo_one_commander.trajectory.trajectory_command_type import TrajectoryCommandType
 from niryo_one_commander.trajectory.trajectory_file_handler import TrajectoryFileHandler
+from niryo_one_commander.robot_commander_exception import RobotCommanderException
+from niryo_one_commander.parameters_validation import ParametersValidation
+
 from niryo_one_msgs.msg import Trajectory
 from niryo_one_msgs.srv import ManageTrajectory
 from niryo_one_msgs.srv import GetTrajectoryList
@@ -37,6 +40,8 @@ class TrajectoryManager:
         self.get_trajectory_list_server = rospy.Service(
                 '/niryo_one/trajectory/get_trajectory_list', GetTrajectoryList, self.callback_get_trajectory_list)
         rospy.loginfo("/niryo_one/trajectory/get_trajectory_list")
+        self.validation = rospy.get_param("/niryo_one/robot_command_validation")
+        self.parameters_validation = ParametersValidation(self.validation)
 
     def callback_get_trajectory_list(self, req = None): 
         traj_list = self.get_all_trajectories()
@@ -122,6 +127,11 @@ class TrajectoryManager:
         traj.description = trajectory_data.description
         traj.trajectory_plan = trajectory_data.trajectory_plan       
         try:
+            self.parameters_validation.validate_trajectory(traj.trajectory_plan)
+        except RobotCommanderException as e:
+            rospy.logerr(e)
+            return False 
+        try: 
             self.fh.write_trajectroy(traj)
         except NiryoOneFileException as e:
             return False
@@ -130,6 +140,11 @@ class TrajectoryManager:
     def create_new_trajectory(self, traj): 
         new_id = self.fh.pick_new_id()
         traj.id = new_id 
+        try:
+             self.parameters_validation.validate_trajectory(traj.trajectory_plan)
+        except RobotCommanderException as e:
+            rospy.logerr(e)
+            return -1 
         try: 
             self.fh.write_trajectroy(traj)
         except NiryoOneFileException as e:

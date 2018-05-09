@@ -22,9 +22,6 @@ import re
 from threading import Lock
 import jsonpickle
 from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
-from niryo_one_commander.robot_commander_exception import RobotCommanderException
-from niryo_one_commander.parameters_validation import ParametersValidation
-
 
 class TrajectoryFileHandler:
        
@@ -38,8 +35,6 @@ class TrajectoryFileHandler:
             print("Create trajectory dir " + str(self.base_dir))
             os.makedirs(self.base_dir)
         self.lock = Lock()
-        self.validation = rospy.get_param("/niryo_one/robot_command_validation")
-        self.parameters_validation = ParametersValidation(self.validation)
 
     def get_all_filenames(self):
         filenames = []
@@ -82,11 +77,7 @@ class TrajectoryFileHandler:
     def write_trajectroy(self,traj):
         filename = self.filename_from_trajectory_id(traj.id)
         with self.lock: 
-            with open(self.base_dir + filename, 'w') as f:
-                try: 
-                    self.parameters_validation.validate_trajectory(traj.trajectory_plan)
-                except RobotCommanderException as e:
-                    raise NiryoOneFileException(e)
+            with open(self.base_dir + filename, 'w') as f: 
                 f.write(self.object_to_json(traj))
                 
                 
@@ -100,9 +91,9 @@ class TrajectoryFileHandler:
                 try : 
                     json_str = f.read()
                     return self.json_to_object(json_str)
-                except: 
+                except Exeption as e : 
                     raise NiryoOneFileException("Could not read trajectory with id " 
-                        + str(trajectory_id) )
+                        + str(trajectory_id)+ str(e) )
     
     def object_to_json(self, obj): 
         return jsonpickle.encode(obj)
