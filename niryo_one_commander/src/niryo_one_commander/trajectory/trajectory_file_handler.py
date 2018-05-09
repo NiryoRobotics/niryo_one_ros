@@ -91,7 +91,7 @@ class TrajectoryFileHandler:
                 try : 
                     json_str = f.read()
                     return self.json_to_object(json_str)
-                except Exeption as e : 
+                except Exception as e : 
                     raise NiryoOneFileException("Could not read trajectory with id " 
                         + str(trajectory_id)+ str(e) )
     

@@ -109,26 +109,30 @@ class PositionFileHandler:
             with open(self.base_dir + filename, 'r') as f:
                 pos = Position()
                 for line in f:
-                    if line.startswith('Position_Name:'):
-                        pos.position_name = str(next(f).rstrip())
-                    if line.startswith("Position_Id:"):
-                        pos.position_id = int(next(f).rstrip())
-                    if line.startswith("Joints:"): 
-                        pos.joints = list(str(next(f).rstrip()).split(','))
-                        pos.joints = map(float ,pos.joints)
-                    if line.startswith("RPY:"):
-                        pos.rpy.roll = float(str(next(f).rstrip()))
-                        pos.rpy.pitch = float(str(next(f).rstrip()))
-                        pos.rpy.yaw = float(str(next(f).rstrip()))
-                    if line.startswith("Point:"):
-                        pos.point.x = float(str(next(f).rstrip()))
-                        pos.point.y = float(str(next(f).rstrip()))
-                        pos.point.z = float(str(next(f).rstrip())) 
-                    if line.startswith("Quaternion:"):
-                        pos.quaternion.x = float(str(next(f).rstrip()))
-                        pos.quaternion.y = float(str(next(f).rstrip()))
-                        pos.quaternion.z = float(str(next(f).rstrip())) 
-                        pos.quaternion.w = float(str(next(f).rstrip())) 
+                    try: 
+                        if line.startswith('Position_Name:'):
+                            pos.position_name = str(next(f).rstrip())
+                        if line.startswith("Position_Id:"):
+                            pos.position_id = int(next(f).rstrip())
+                        if line.startswith("Joints:"): 
+                            pos.joints = list(str(next(f).rstrip()).split(','))
+                            pos.joints = map(float ,pos.joints)
+                        if line.startswith("RPY:"):
+                            pos.rpy.roll = float(str(next(f).rstrip()))
+                            pos.rpy.pitch = float(str(next(f).rstrip()))
+                            pos.rpy.yaw = float(str(next(f).rstrip()))
+                        if line.startswith("Point:"):
+                            pos.point.x = float(str(next(f).rstrip()))
+                            pos.point.y = float(str(next(f).rstrip()))
+                            pos.point.z = float(str(next(f).rstrip())) 
+                        if line.startswith("Quaternion:"):
+                            pos.quaternion.x = float(str(next(f).rstrip()))
+                            pos.quaternion.y = float(str(next(f).rstrip()))
+                            pos.quaternion.z = float(str(next(f).rstrip())) 
+                            pos.quaternion.w = float(str(next(f).rstrip())) 
+                    except Exception as e: 
+                        raise NiryoOneFileException("Could not read trajectory with id " 
+                                + str(trajectory_id) + str(e) )
 
                 return pos 
 
