@@ -94,8 +94,8 @@ class SequenceFileHandler:
                                 except StopIteration:
                                     raise NiryoOneFileException("Malformed file - Python code")
                     return seq
-            except Exception:
-                raise NiryoOneFileException("Failed to open or read from file for sequence id : " + str(id))
+            except Exception as e :
+                raise NiryoOneFileException("Failed to open or read from file for sequence id : " + str(id) + str(e))
 
     def write_sequence(self, seq):
         filename = self.filename_from_sequence_id(seq.id)
