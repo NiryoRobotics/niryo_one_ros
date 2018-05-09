@@ -17,25 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import rospy, sys
+import rospy
 import threading
-from niryo_one_commander.move_group_arm import MoveGroupArm
-
-from copy import deepcopy
-from math import sqrt
-from tf.transformations import quaternion_from_euler
-
-from geometry_msgs.msg import PoseStamped, Pose
-from geometry_msgs.msg import Quaternion
-from sensor_msgs.msg import JointState 
+ 
 from actionlib_msgs.msg import GoalStatus
-from actionlib_msgs.msg import GoalStatusArray
-from moveit_msgs.msg import RobotState
 
 from trajectory_msgs.msg import JointTrajectory
 from control_msgs.msg import FollowJointTrajectoryActionGoal
 from control_msgs.msg import FollowJointTrajectoryActionResult
 
+from niryo_one_commander.move_group_arm import MoveGroupArm
 from niryo_one_commander.robot_commander_exception import RobotCommanderException
 from niryo_one_commander.command_status import CommandStatus
 
