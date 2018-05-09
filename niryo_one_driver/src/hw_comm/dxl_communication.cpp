@@ -705,7 +705,8 @@ void DxlCommunication::setGoalPositionV2(double axis_4_pos, double axis_5_pos, d
 {
     if (hardware_version == 2) {
         m4.setPositionCommand(rad_pos_to_xl430_pos(axis_4_pos));
-        m5.setPositionCommand(rad_pos_to_xl430_pos(axis_5_pos));
+        // m5 for V2 is placed at the previous m5_2 place
+        m5.setPositionCommand(XL430_MIDDLE_POSITION * 2 - rad_pos_to_xl430_pos(axis_5_pos));
         m6.setPositionCommand(rad_pos_to_xl320_pos(axis_6_pos));
         
         // if motor disabled, pos_state = pos_cmd (echo position)
@@ -734,7 +735,7 @@ void DxlCommunication::getCurrentPositionV2(double *axis_4_pos, double *axis_5_p
 {
     if (hardware_version == 2) {
         *axis_4_pos = xl430_pos_to_rad_pos(m4.getPositionState());
-        *axis_5_pos = xl430_pos_to_rad_pos(m5.getPositionState());
+        *axis_5_pos = xl430_pos_to_rad_pos(XL430_MIDDLE_POSITION * 2 - m5.getPositionState());
         *axis_6_pos = xl320_pos_to_rad_pos(m6.getPositionState());
     }
 }
