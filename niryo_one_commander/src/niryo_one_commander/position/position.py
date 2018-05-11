@@ -19,14 +19,12 @@
 
 
 class Position:
-    
     class RPY: 
        
         def __init__(self, roll = 0, pitch = 0, yaw = 0): 
             self.roll = roll
             self.pitch = pitch 
-            self.yaw = yaw 
-
+            self.yaw = yaw
     class Point: 
 
         def __init__(self, x = 0, y = 0, z = 0 ): 
@@ -42,12 +40,9 @@ class Position:
             self.z = z
             self.w = w
 
-
-    def __init__(self,name = "", id = 0, joints = [0,0,0,0,0,0], rpy = RPY(), point = Point(), quaternion = Quaternion()): 
-
+    def __init__(self, name = "", joints = [0,0,0,0,0,0], rpy = RPY(), point = Point(), quaternion = Quaternion()): 
 
         self.name = name 
-        self.id = id 
         self.joints = joints 
         self.rpy = rpy
         self.point = point

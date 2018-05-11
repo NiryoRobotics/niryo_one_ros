@@ -48,15 +48,13 @@ class PositionFileHandler:
     def filename_from_position_name(self, position_name): 
         return ('position_' + position_name )   
     
-    def write_position(self, position ): 
+    def write_position(self, position): 
         filename = self.filename_from_position_name(position.name)
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
                 try : 
                     f.write("Position_Name:\n") 
                     f.write(str(position.name) + "\n") 
-                    f.write("Position_Id:\n") 
-                    f.write(str(position.id) + "\n") 
                     f.write("Joints:\n")
                     f.write(str(position.joints).strip('()') + "\n") 
                     f.write( "RPY:\n") 
@@ -73,7 +71,7 @@ class PositionFileHandler:
                     f.write( str(position.quaternion.z) + "\n") 
                     f.write( str(position.quaternion.w) + "\n")
                 except Exception as e : 
-                    raise NiryoOneFileException("Could not write position " 
+                    raise NiryoOneFileException("Could not write position " + " : "
                                 + str(e) )
 
 
@@ -104,8 +102,6 @@ class PositionFileHandler:
                     try: 
                         if line.startswith('Position_Name:'):
                             pos.name = str(next(f).rstrip())
-                        if line.startswith("Position_Id:"):
-                            pos.id = int(next(f).rstrip())
                         if line.startswith("Joints:"): 
                             pos.joints = list(str(next(f).rstrip()).split(','))
                             pos.joints = map(float ,pos.joints)
@@ -123,8 +119,8 @@ class PositionFileHandler:
                             pos.quaternion.z = float(str(next(f).rstrip())) 
                             pos.quaternion.w = float(str(next(f).rstrip())) 
                     except Exception as e: 
-                        raise NiryoOneFileException("Could not read position with name " 
-                                + position_name + str(e) )
+                        raise NiryoOneFileException("Could not read position  " 
+                                + position_name + " : " +  str(e) )
 
                 return pos 
 
@@ -134,7 +130,7 @@ class PositionFileHandler:
             try:
                 os.remove(self.base_dir + filename)
             except OSError as e:
-                raise NiryoOneFileException("Could not remove position with name " + position_name + " : " + str(e))
+                raise NiryoOneFileException("Could not remove position " + position_name + " : " + str(e))
     
     def check_position_name(self, position_name): 
         filenames = self.get_all_filenames()

@@ -49,11 +49,11 @@ class PositionManager:
         
         self.validation = rospy.get_param("/niryo_one/robot_command_validation")
         self.parameters_validation = ParametersValidation(self.validation)
+    
     def create_position_response(self, status, message, position=None):
         position_msg = PositionMessage()
         if position != None:
             position_msg.name = position.name
-            position_msg.id = position.id
             position_msg.joints = position.joints 
             position_msg.rpy = Position.RPY(position.rpy.roll, position.rpy.pitch, position.rpy.yaw)
             position_msg.point = Position.Point( position.point.x, position.point.y, position.point.z) 
@@ -69,35 +69,35 @@ class PositionManager:
         point = Position.Point(position_msg.point.x, position_msg.point.y, position_msg.point.z)
         quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,
 		  position_msg.quaternion.w )
-        position_data = Position( name = req.position_name , id = position_msg.id,
-		    joints = position_msg.joints , rpy=rpy, point = point, quaternion =  quaternion)     
+        position_data = Position( name = req.position_name,
+            joints = position_msg.joints, rpy=rpy, point = point, quaternion = quaternion)     
         # GET an existing position 
         if cmd_type == PositionCommandType.GET:
             pos = self.get_position(position_name)
             if pos == None:
-                return self.create_position_response(400, "No position found with name : " + position_name)
-            return self.create_position_response(200, "position has been found", pos)
+                return self.create_position_response(400, "No position found  : " + position_name)
+            return self.create_position_response(200, "position has been found : ", pos)
     
     # CREATE new position    
         elif cmd_type == PositionCommandType.CREATE:
-            new_position_name = self.create_new_position(position_data)
+            (new_position_name, msg) = self.create_new_position(position_data)
             if new_position_name == None :
-                return self.create_position_response(400, "failed to create a new position with this name "
+                return self.create_position_response(400, str(msg)  + " : "
                     + position_name )
             new_position = self.get_position(new_position_name)
             if new_position == None :
-                return self.create_position_response(400, "Failed to create position")
-            return self.create_position_response(200, "position has been created", new_position)
+                return self.create_position_response(400, msg)
+            return self.create_position_response(200, msg , new_position)
     
     # UPDATE existing sequence
         elif cmd_type == PositionCommandType.UPDATE:
             pos = self.get_position(position_name)
             if pos == None:
                 return self.create_position_response(400, "No position found with this name : " + position_name)
-            success = self.update_position(pos, position_data)
+            (success, update_msg)= self.update_position(pos, position_data)
             if not success:
-                return self.create_position_response(400, "Could not update position with this name : " + position_name)
-            return self.create_position_response(200, "Position has been updated", pos)
+                return self.create_position_response(400, update_msg + position_name)
+            return self.create_position_response(200, update_msg, pos)
     
        # DELETE sequence
         elif cmd_type == PositionCommandType.DELETE:
@@ -117,15 +117,15 @@ class PositionManager:
         try:
             self.parameters_validation.validate_joints(position_data.joints)
         except RobotCommanderException as e:
-            rospy.logerr(e, "Invalide joints value") 
-            return False
+            rospy.logwarn(str(e)  + " Invalide joints value") 
+            return (False ," Could not update position : Invalide joints values ")
         position.joints = position_data.joints
         (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)                     
         try:
             self.fh.write_position(position)
         except NiryoOneFileException as e:
-            return False
-        return True
+            return (False , " Could not update position : "+ str (e))
+        return (True , " Position has been updated ")
 
     def get_position(self, position_name):
         try:	
@@ -137,16 +137,16 @@ class PositionManager:
         try:
             self.parameters_validation.validate_joints(position.joints)
         except RobotCommanderException as e:
-            rospy.logerr(e, "Invalide joints values")
-            return None  
+            rospy.logwarn(str(e) + " Invalide joints values ")
+            return (None," failed to create a new position: Invalide joints values ")
         try:   
             if self.fh.check_position_name(position.name) == False : 
-                return None
+                return(None," failed to create a new position : position name already ") 
 	        (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)    
             self.fh.write_position(position)
-            return(position.name)
+            return(position.name, " position has been created ")
         except  NiryoOneFileException as e:
-            return None
+            return(None, " failed to create a new position: "+ str (e)) 
     
 
 
@@ -157,7 +157,6 @@ class PositionManager:
         for pos in pos_list:
             position_msg = PositionMessage()
             position_msg.name = pos.name
-            position_msg.id = pos.id
             position_msg.joints = pos.joints 
             position_msg.rpy = Position.RPY(pos.rpy.roll, pos.rpy.pitch, pos.rpy.yaw)
             position_msg.point = Position.Point( pos.point.x, pos.point.y, pos.point.z) 

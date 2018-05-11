@@ -1,5 +1,4 @@
 string name
-int32 id
 
 float64[] joints 
 niryo_one_msgs/RPY rpy
