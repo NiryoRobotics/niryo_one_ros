@@ -91,20 +91,20 @@ class TrajectoryManager:
             return self.create_trajectory_response(200, "trajectory has been found", traj)
          # Create a new trajectory 
         elif cmd_type == TrajectoryCommandType.CREATE:
-            new_trajectory_id = self.create_new_trajectory(trajectory_data)
+            (new_trajectory_id, msg) = self.create_new_trajectory(trajectory_data)
             new_trajectory = self.get_trajectory(new_trajectory_id)
             if new_trajectory == None:
-                return self.create_trajectory_response(400, "Failed to create trajectory")
-            return self.create_trajectory_response(200, "Trajectory has been created", new_trajectory)
+                return self.create_trajectory_response(400, msg)
+            return self.create_trajectory_response(200, msg, new_trajectory)
         # UPDATE existing trajectory
         elif cmd_type == TrajectoryCommandType.UPDATE:
             traj = self.get_trajectory(trajectory_id)
             if traj == None:
                 return self.create_trajectory_response(400, "No trajectory found with id : " + str(trajectory_id))
-            success = self.update_trajectory(traj, trajectory_data)
+            success, update_msg = self.update_trajectory(traj, trajectory_data)
             if not success:
-                return self.create_trajectory_response(400, "Could not update trajectory with id : " + str(trajectory_id))
-            return self.create_trajectory_response(200, "Trajectory has been updated", traj)
+                return self.create_trajectory_response(400, update_msg + str(trajectory_id))
+            return self.create_trajectory_response(200, update_msg, traj)
         # DELETE sequence
         elif cmd_type == TrajectoryCommandType.DELETE:
             success = self.delete_trajectory(trajectory_id)
@@ -129,13 +129,13 @@ class TrajectoryManager:
         try:
             self.parameters_validation.validate_trajectory(traj.trajectory_plan)
         except RobotCommanderException as e:
-            rospy.logerr(e)
-            return False 
+            rospy.logwarn(str(e) + " Invalid trajectory ")
+            return (False , "Could not update trajectory : Invalid trajectory with id : ")
         try: 
             self.fh.write_trajectroy(traj)
         except NiryoOneFileException as e:
-            return False
-        return True
+            return (False," Could not update trajectory with id : " )
+        return (True ," Trajectory has been updated : ")
 
     def create_new_trajectory(self, traj): 
         new_id = self.fh.pick_new_id()
@@ -143,13 +143,14 @@ class TrajectoryManager:
         try:
              self.parameters_validation.validate_trajectory(traj.trajectory_plan)
         except RobotCommanderException as e:
-            rospy.logerr(e)
-            return -1 
+            rospy.logwarn(str(e) + " Invalid trajectory")
+            return (-1  ,"Failed to create trajectory: invalid trajectory ")
+
         try: 
             self.fh.write_trajectroy(traj)
         except NiryoOneFileException as e:
-            return -1
-        return new_id
+            return (-1, "Failed to create trajectory ")
+        return (new_id, "trajectory has been created : ")
 
     def get_trajectory(self, trajectory_id):
         try:	
@@ -158,7 +159,5 @@ class TrajectoryManager:
             return None  
 
 if __name__ == '__main__':
-    '''rospy.init_node('niryo_one_trajectory_manager')
-    t = TrajectoryManager('~/trajectory_niryo')
-    rospy.spin()'''
+ 
     pass
