@@ -124,7 +124,7 @@ class PositionManager:
         try:
             self.fh.write_position(position)
         except NiryoOneFileException as e:
-            return (False , " Could not update position : "+ str (e))
+            return (False , " Could not update position : "+ str(e))
         return (True , " Position has been updated ")
 
     def get_position(self, position_name):
@@ -146,7 +146,7 @@ class PositionManager:
             self.fh.write_position(position)
             return(position.name, " position has been created ")
         except  NiryoOneFileException as e:
-            return(None, " failed to create a new position: "+ str (e)) 
+            return(None, " failed to create a new position: "+ str(e)) 
     
 
 
