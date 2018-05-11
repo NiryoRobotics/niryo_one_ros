@@ -69,42 +69,46 @@ class PositionManager:
         point = Position.Point(position_msg.point.x, position_msg.point.y, position_msg.point.z)
         quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,
 		  position_msg.quaternion.w )
-        position_data = Position( name = req.position_name,
+        position_data = Position( name = position_msg.name,
             joints = position_msg.joints, rpy=rpy, point = point, quaternion = quaternion)     
+
         # GET an existing position 
         if cmd_type == PositionCommandType.GET:
             pos = self.get_position(position_name)
             if pos == None:
-                return self.create_position_response(400, "No position found  : " + position_name)
-            return self.create_position_response(200, "position has been found : ", pos)
+                return self.create_position_response(400, "No position found with name : " + str(position_name))
+            return self.create_position_response(200, "Position has been found", pos)
     
-    # CREATE new position    
+        # CREATE new position    
         elif cmd_type == PositionCommandType.CREATE:
             (new_position_name, msg) = self.create_new_position(position_data)
             if new_position_name == None :
-                return self.create_position_response(400, str(msg)  + " : "
-                    + position_name )
+                return self.create_position_response(400, msg)
             new_position = self.get_position(new_position_name)
             if new_position == None :
-                return self.create_position_response(400, msg)
+                return self.create_position_response(400, "Failed to create new position")
             return self.create_position_response(200, msg , new_position)
     
-    # UPDATE existing sequence
+        # UPDATE existing sequence
         elif cmd_type == PositionCommandType.UPDATE:
             pos = self.get_position(position_name)
             if pos == None:
-                return self.create_position_response(400, "No position found with this name : " + position_name)
-            (success, update_msg)= self.update_position(pos, position_data)
+                return self.create_position_response(400, "No position found with name : " + position_name)
+            (success, update_msg) = self.update_position(pos, position_data)
             if not success:
-                return self.create_position_response(400, update_msg + position_name)
+                return self.create_position_response(400, update_msg)
             return self.create_position_response(200, update_msg, pos)
     
-       # DELETE sequence
+        # DELETE sequence
         elif cmd_type == PositionCommandType.DELETE:
             success = self.delete_position(position_name)
             if not success:
                 return self.create_position_response(400, "Could not delete position with name : " + position_name)
-            return self.create_position_response(200, "Position  has been deleted")
+            return self.create_position_response(200, "Position has been deleted")
+        
+        # Wrong cmd_type 
+        else:
+            return self.create_sequence_response(400, "Wrong command type")
     
     def delete_position(self, position_name):
         try:
@@ -117,15 +121,15 @@ class PositionManager:
         try:
             self.parameters_validation.validate_joints(position_data.joints)
         except RobotCommanderException as e:
-            rospy.logwarn(str(e)  + " Invalide joints value") 
-            return (False ," Could not update position : Invalide joints values ")
+            rospy.logwarn("Invalid joints value when updating position : " + str(e.message)) 
+            return False , "Could not update position : " + str(e.message)
         position.joints = position_data.joints
         (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)                     
         try:
             self.fh.write_position(position)
         except NiryoOneFileException as e:
-            return (False , " Could not update position : "+ str(e))
-        return (True , " Position has been updated ")
+            return False , "Could not update position : " + str(e)
+        return True , "Position has been updated"
 
     def get_position(self, position_name):
         try:	
@@ -134,23 +138,20 @@ class PositionManager:
             return None
 
     def create_new_position(self, position) :     
+        if self.fh.check_position_name(position.name) == False : 
+            return None, "Failed to create new position : position " + str(position.name) + " already exists"
         try:
             self.parameters_validation.validate_joints(position.joints)
         except RobotCommanderException as e:
-            rospy.logwarn(str(e) + " Invalide joints values ")
-            return (None," failed to create a new position: Invalide joints values ")
+            rospy.logwarn("Invalid joints values when creating position : " + str(e.message))
+            return None, "Failed to create new position : " + str(e.message)
         try:   
-            if self.fh.check_position_name(position.name) == False : 
-                return(None," failed to create a new position : position name already ") 
-	        (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)    
+            (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)    
             self.fh.write_position(position)
-            return(position.name, " position has been created ")
+            return position.name, "Position has been created"
         except  NiryoOneFileException as e:
-            return(None, " failed to create a new position: "+ str(e)) 
+            return None, "Failed to create new position : "+ str(e) 
     
-
-
-
     def callback_get_position_list(self, req = None):
         pos_list = self.get_all_positions()
         msg_list = []
@@ -164,9 +165,6 @@ class PositionManager:
 		 pos.quaternion.z, pos.quaternion.w)
             msg_list.append(position_msg)
         return { 'positions': msg_list }
- 
-
-
 
     def get_all_positions(self):
         filenames = self.fh.get_all_filenames()
