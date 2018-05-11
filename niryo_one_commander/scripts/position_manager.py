@@ -48,8 +48,8 @@ class PositionManager:
     def create_position_response(self, status, message, position=None):
         position_msg = PositionMessage()
         if position != None:
-            position_msg.position_name = position.position_name
-            position_msg.position_id = position.position_id
+            position_msg.name = position.name
+            position_msg.id = position.id
             position_msg.joints = position.joints 
             position_msg.rpy = Position.RPY(position.rpy.roll, position.rpy.pitch, position.rpy.yaw)
             position_msg.point = Position.Point( position.point.x, position.point.y, position.point.z) 
@@ -65,7 +65,7 @@ class PositionManager:
         point = Position.Point(position_msg.point.x, position_msg.point.y, position_msg.point.z)
         quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,
 		  position_msg.quaternion.w )
-        position_data = Position(position_name = position_msg.position_name, position_id = position_msg.position_id, 
+        position_data = Position(name = position_msg.name, id = position_msg.id, 
 		joints = position_msg.joints  , rpy=rpy, point = point, quaternion =  quaternion)     
         # GET an existing position 
         if cmd_type == PositionCommandType.GET:
@@ -107,7 +107,7 @@ class PositionManager:
         return True
     
     def update_position(self, position, position_data):
-        position.position_name = position_data.position_name
+        position.name = position_data.name
         position.joints = position_data.joints
         (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)
 	
@@ -129,7 +129,7 @@ class PositionManager:
 	    position.position_id =  self.fh.pick_new_id()
 	    (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)    
             self.fh.write_position(position)
-            return(position.position_name)
+            return(position.name)
         except  NiryoOneFileException as e:
             return None
     
@@ -141,8 +141,8 @@ class PositionManager:
         msg_list = []
         for pos in pos_list:
             position_msg = PositionMessage()
-            position_msg.position_name = pos.position_name
-            position_msg.position_id = pos.position_id
+            position_msg.name = pos.name
+            position_msg.id = pos.id
             position_msg.joints = pos.joints 
             position_msg.rpy = Position.RPY(pos.rpy.roll, pos.rpy.pitch, pos.rpy.yaw)
             position_msg.point = Position.Point( pos.point.x, pos.point.y, pos.point.z) 

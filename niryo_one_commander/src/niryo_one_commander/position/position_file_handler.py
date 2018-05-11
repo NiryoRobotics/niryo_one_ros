@@ -62,13 +62,13 @@ class PositionFileHandler:
 	return 'position_' + str(position_id) + '_' + position_name    
     
     def write_position(self, position ): 
-        filename = self.filename_from_position_name_id(position.position_name,position.position_id)
+        filename = self.filename_from_position_name_id(position.name,position.id)
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
                 f.write("Position_Name:\n") 
-                f.write(str(position.position_name) + "\n") 
+                f.write(str(position.name) + "\n") 
                 f.write("Position_Id:\n") 
-                f.write(str(position.position_id) + "\n") 
+                f.write(str(position.id) + "\n") 
                 f.write("Joints:\n")
                 f.write(str(position.joints).strip('()') + "\n") 
                 f.write( "RPY:\n") 
@@ -111,9 +111,9 @@ class PositionFileHandler:
                 for line in f:
                     try: 
                         if line.startswith('Position_Name:'):
-                            pos.position_name = str(next(f).rstrip())
+                            pos.name = str(next(f).rstrip())
                         if line.startswith("Position_Id:"):
-                            pos.position_id = int(next(f).rstrip())
+                            pos.id = int(next(f).rstrip())
                         if line.startswith("Joints:"): 
                             pos.joints = list(str(next(f).rstrip()).split(','))
                             pos.joints = map(float ,pos.joints)
@@ -131,8 +131,8 @@ class PositionFileHandler:
                             pos.quaternion.z = float(str(next(f).rstrip())) 
                             pos.quaternion.w = float(str(next(f).rstrip())) 
                     except Exception as e: 
-                        raise NiryoOneFileException("Could not read trajectory with id " 
-                                + str(trajectory_id) + str(e) )
+                        raise NiryoOneFileException("Could not read position with id " 
+                                + position_name + str(e) )
 
                 return pos 
 

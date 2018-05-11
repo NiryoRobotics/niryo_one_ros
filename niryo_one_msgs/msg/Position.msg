@@ -1,6 +1,5 @@
-string position_name
-
-int32 position_id
+string name
+int32 id
 
 float64[] joints 
 niryo_one_msgs/RPY rpy

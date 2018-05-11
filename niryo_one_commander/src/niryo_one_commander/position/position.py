@@ -43,11 +43,11 @@ class Position:
             self.w = w
 
 
-    def __init__(self,position_name = "", position_id = 0, joints = [0,0,0,0,0,0], rpy = RPY(), point = Point(), quaternion = Quaternion()): 
+    def __init__(self,name = "", id = 0, joints = [0,0,0,0,0,0], rpy = RPY(), point = Point(), quaternion = Quaternion()): 
 
 
-        self.position_name = position_name 
-        self.position_id = position_id 
+        self.name = name 
+        self.id = id 
         self.joints = joints 
         self.rpy = rpy
         self.point = point
