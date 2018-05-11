@@ -42,48 +42,40 @@ class PositionFileHandler:
             os.makedirs(self.base_dir)
         self.lock = Lock()
     
-    def position_name_from_filename(self, filename):
-	index = filename.find('_',9)
-	position_name = ''
-	for i in range((index+1), len(filename)) : 
-            position_name = position_name + filename[i]
-	return position_name
+    def position_name_from_filename(self, filename): 
+        return  filename.replace('position_', '')
 	
-
-    def filename_from_position_name(self, position_name):
-        filenames=self.get_all_filenames()
-	for filename in filenames: 
-	    r=filename.find(position_name, 9)
-	    if r>0 : 
- 		return(filename)
-	return None
-
-    def filename_from_position_name_id(self, position_name, position_id): 
-	return 'position_' + str(position_id) + '_' + position_name    
+    def filename_from_position_name(self, position_name): 
+        return ('position_' + position_name )   
     
     def write_position(self, position ): 
-        filename = self.filename_from_position_name_id(position.name,position.id)
+        filename = self.filename_from_position_name(position.name)
         with self.lock: 
             with open(self.base_dir + filename, 'w') as f:
-                f.write("Position_Name:\n") 
-                f.write(str(position.name) + "\n") 
-                f.write("Position_Id:\n") 
-                f.write(str(position.id) + "\n") 
-                f.write("Joints:\n")
-                f.write(str(position.joints).strip('()') + "\n") 
-                f.write( "RPY:\n") 
-                f.write( str(position.rpy.roll) + "\n") 
-                f.write( str(position.rpy.pitch) + "\n") 
-                f.write( str(position.rpy.yaw) + "\n") 
-                f.write( "Point:\n") 
-                f.write( str(position.point.x) + "\n") 
-                f.write( str(position.point.y) + "\n") 
-                f.write( str(position.point.z) + "\n")
-                f.write( "Quaternion:\n") 
-                f.write( str(position.quaternion.x) + "\n") 
-                f.write( str(position.quaternion.y) + "\n") 
-                f.write( str(position.quaternion.z) + "\n") 
-                f.write( str(position.quaternion.w) + "\n")
+                try : 
+                    f.write("Position_Name:\n") 
+                    f.write(str(position.name) + "\n") 
+                    f.write("Position_Id:\n") 
+                    f.write(str(position.id) + "\n") 
+                    f.write("Joints:\n")
+                    f.write(str(position.joints).strip('()') + "\n") 
+                    f.write( "RPY:\n") 
+                    f.write( str(position.rpy.roll) + "\n") 
+                    f.write( str(position.rpy.pitch) + "\n") 
+                    f.write( str(position.rpy.yaw) + "\n") 
+                    f.write( "Point:\n") 
+                    f.write( str(position.point.x) + "\n") 
+                    f.write( str(position.point.y) + "\n") 
+                    f.write( str(position.point.z) + "\n")
+                    f.write( "Quaternion:\n") 
+                    f.write( str(position.quaternion.x) + "\n") 
+                    f.write( str(position.quaternion.y) + "\n") 
+                    f.write( str(position.quaternion.z) + "\n") 
+                    f.write( str(position.quaternion.w) + "\n")
+                except Exception as e : 
+                    raise NiryoOneFileException("Could not write position " 
+                                + str(e) )
+
 
 
     def does_file_exist(self, filename):
@@ -96,7 +88,7 @@ class PositionFileHandler:
             filenames = os.listdir(self.base_dir)
         except OSError:
             pass
-        r = re.compile("^position_\d+_.+$")
+        r = re.compile("^position_.+$")
         # Keep only correct filenames
         return filter(r.match, filenames)
 
@@ -131,7 +123,7 @@ class PositionFileHandler:
                             pos.quaternion.z = float(str(next(f).rstrip())) 
                             pos.quaternion.w = float(str(next(f).rstrip())) 
                     except Exception as e: 
-                        raise NiryoOneFileException("Could not read position with id " 
+                        raise NiryoOneFileException("Could not read position with name " 
                                 + position_name + str(e) )
 
                 return pos 
@@ -142,22 +134,15 @@ class PositionFileHandler:
             try:
                 os.remove(self.base_dir + filename)
             except OSError as e:
-                raise NiryoOneFileException("Could not remove position with id " + position_name + " : " + str(e))
+                raise NiryoOneFileException("Could not remove position with name " + position_name + " : " + str(e))
     
-
-        # choose a non used, incremental id
-    def pick_new_id(self):
+    def check_position_name(self, position_name): 
         filenames = self.get_all_filenames()
-        max_id = 0
         for filename in filenames:
-            current_id = self.position_id_from_filename(filename)
-            if current_id > max_id:
-                max_id = current_id
-        return max_id + 1
-
-    def position_id_from_filename(self, filename):
-	position_id = filename.replace('position_', '')
-        return int(position_id.replace('_' + self.position_name_from_filename(filename), ''))
+            current_position_name = self.position_name_from_filename(filename)
+            if  position_name == current_position_name : 
+                return False 
+        return True 
 
 if __name__ == '__main__':
-    pass 
+        pass 

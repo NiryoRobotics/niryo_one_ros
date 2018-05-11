@@ -65,20 +65,23 @@ class PositionManager:
         point = Position.Point(position_msg.point.x, position_msg.point.y, position_msg.point.z)
         quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,
 		  position_msg.quaternion.w )
-        position_data = Position(name = position_msg.name, id = position_msg.id, 
-		joints = position_msg.joints  , rpy=rpy, point = point, quaternion =  quaternion)     
+        position_data = Position( name = req.position_name , id = position_msg.id,
+		    joints = position_msg.joints , rpy=rpy, point = point, quaternion =  quaternion)     
         # GET an existing position 
         if cmd_type == PositionCommandType.GET:
             pos = self.get_position(position_name)
             if pos == None:
-                return self.create_position_response(400, "No position found with id : " + position_name)
+                return self.create_position_response(400, "No position found with name : " + position_name)
             return self.create_position_response(200, "position has been found", pos)
     
     # CREATE new position    
         elif cmd_type == PositionCommandType.CREATE:
             new_position_name = self.create_new_position(position_data)
+            if new_position_name == None :
+                return self.create_position_response(400, "failed to create a new position with this name "
+                    + position_name + " try another name")
             new_position = self.get_position(new_position_name)
-            if new_position == None:
+            if new_position == None :
                 return self.create_position_response(400, "Failed to create position")
             return self.create_position_response(200, "position has been created", new_position)
     
@@ -107,7 +110,7 @@ class PositionManager:
         return True
     
     def update_position(self, position, position_data):
-        position.name = position_data.name
+        
         position.joints = position_data.joints
         (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)
 	
@@ -126,8 +129,10 @@ class PositionManager:
 
     def create_new_position(self, position) : 
         try:
-	    position.position_id =  self.fh.pick_new_id()
-	    (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)    
+ 
+            if self.fh.check_position_name(position.name) == False : 
+                return None 
+	        (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)    
             self.fh.write_position(position)
             return(position.name)
         except  NiryoOneFileException as e:
