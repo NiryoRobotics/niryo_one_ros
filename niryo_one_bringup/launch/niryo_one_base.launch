@@ -1,7 +1,7 @@
 <launch>
     <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
 
-    <arg name="hardware_version" default="1" /> 
+    <arg name="hardware_version" default="2" /> 
     <arg name="urdf_without_meshes" default="true" />
     <arg name="niryo_one_sim_mode" default="false" />
     <arg name="execute_on_niryo_one_raspberry_pi_image" default="true" /> 
@@ -13,7 +13,8 @@
     </group>
 
     <group ns="niryo_one/robot_command_validation">
-        <rosparam file="$(find niryo_one_bringup)/config/robot_command_validation.yaml" />
+        <rosparam file="$(find niryo_one_bringup)/config/v1/robot_command_validation.yaml" if="$(eval hardware_version == 1)" />
+        <rosparam file="$(find niryo_one_bringup)/config/v2/robot_command_validation.yaml" if="$(eval hardware_version == 2)" />
     </group>
 
     <group ns="niryo_one/motors">
@@ -43,6 +44,12 @@
     <!-- load URDF -->
     <!-- on Raspberry Pi 3 (ARM architecture) we get a segfault when using visual and collision stuff -->
     <param name="urdf_without_meshes" value="$(arg urdf_without_meshes)" />
-    <param name="robot_description" command="cat $(find niryo_one_description)/urdf/without_mesh_niryo_one.urdf" if="$(arg urdf_without_meshes)"/>
-    <param name="robot_description" command="cat $(find niryo_one_description)/urdf/niryo_one.urdf" unless="$(arg urdf_without_meshes)"/>
+    <group if="$(eval hardware_version == 1)">
+        <param name="robot_description" command="cat $(find niryo_one_description)/urdf/v1/without_mesh_niryo_one.urdf" if="$(arg urdf_without_meshes)"/>
+        <param name="robot_description" command="cat $(find niryo_one_description)/urdf/v1/niryo_one.urdf" unless="$(arg urdf_without_meshes)"/>
+    </group>
+    <group if="$(eval hardware_version == 2)">
+        <param name="robot_description" command="cat $(find niryo_one_description)/urdf/v2/without_mesh_niryo_one.urdf" if="$(arg urdf_without_meshes)"/>
+        <param name="robot_description" command="cat $(find niryo_one_description)/urdf/v2/niryo_one.urdf" unless="$(arg urdf_without_meshes)"/>
+    </group>
 </launch>
