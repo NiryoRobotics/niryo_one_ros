@@ -61,13 +61,16 @@ class CanCommunication {
     public:
 
         CanCommunication();
-        int init();
+        int init(int hardware_version);
+        int setupCommunication();
         
         void startHardwareControlLoop(bool limited_mode);
         void stopHardwareControlLoop();
 
-        void setGoalPosition(double axis_1_pos_goal, double axis_2_pos_goal, double axis_3_pos_goal, double axis_4_pos_goal);
-        void getCurrentPosition(double *axis_1_pos, double *axis_2_pos, double *axis_3_pos, double *axis_4_pos); 
+        void setGoalPositionV1(double axis_1_pos_goal, double axis_2_pos_goal, double axis_3_pos_goal, double axis_4_pos_goal);
+        void setGoalPositionV2(double axis_1_pos_goal, double axis_2_pos_goal, double axis_3_pos_goal);
+        void getCurrentPositionV1(double *axis_1_pos, double *axis_2_pos, double *axis_3_pos, double *axis_4_pos); 
+        void getCurrentPositionV2(double *axis_1_pos, double *axis_2_pos, double *axis_3_pos); 
 
         void getHardwareStatus(bool *is_connection_ok, std::string &error_message, 
                 int *calibration_needed, bool *calibration_in_progress,
@@ -100,6 +103,9 @@ class CanCommunication {
         void synchronizeSteppers(bool begin_traj);
 
     private:
+        
+        // Niryo One hardware version
+        int hardware_version;
         
         int spi_channel;
         int spi_baudrate;
@@ -136,7 +142,7 @@ class CanCommunication {
         StepperMotorState m1;
         StepperMotorState m2;
         StepperMotorState m3;
-        StepperMotorState m4;
+        StepperMotorState m4; // NOT used for Niryo One V2
         std::vector<StepperMotorState*> motors;
 
         // enable flags (no read flag)

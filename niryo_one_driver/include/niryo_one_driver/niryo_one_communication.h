@@ -30,11 +30,13 @@
 
 #include "niryo_one_driver/communication_base.h"
 
+#include "niryo_one_driver/change_hardware_version.h"
+
 class NiryoOneCommunication : public CommunicationBase {
 
     public:
    
-        NiryoOneCommunication();
+        NiryoOneCommunication(int hardware_version);
         int init();
 
         void manageHardwareConnection();
@@ -72,12 +74,15 @@ class NiryoOneCommunication : public CommunicationBase {
         int pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, uint16_t pull_air_hold_torque);
         int pushAirVacuumPump(uint8_t id, uint16_t push_air_position);
         
-        bool activateDcMotor(bool activate);
-        
         // steppers
         void synchronizeMotors(bool begin_traj);
 
+        // check hardware version (V1/V2)
+        void checkHardwareVersionFromDxlMotors();
+
     private:
+
+        int hardware_version;
 
         boost::shared_ptr<DxlCommunication> dxlComm;
         boost::shared_ptr<CanCommunication> canComm;
@@ -98,8 +103,11 @@ class NiryoOneCommunication : public CommunicationBase {
         bool scanAndCheckMotors();
 
         // used when can or dxl is disabled
-        double pos_can_disabled[4] = { 0.0, 0.628, -1.4, 0.0 };
-        double pos_dxl_disabled[2] = { 0.0, 0.0 };
+        double pos_can_disabled_v1[4] = { 0.0, 0.628, -1.4, 0.0 };
+        double pos_dxl_disabled_v1[2] = { 0.0, 0.0 };
+
+        double pos_can_disabled_v2[3] = { 0.0, 0.628, -1.4 };
+        double pos_dxl_disabled_v2[3] = { 0.0, 0.0, 0.0 };
 
         // for new calibration request
         bool new_calibration_requested;

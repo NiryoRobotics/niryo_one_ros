@@ -209,20 +209,3 @@ class VacuumPump(ToolBase):
         self.pull_air_hold_torque = pull_air_hold_torque
         self.push_air_position = self.push_air_position
 
-
-class DcMotor(ToolBase):
-    
-    def get_type(self):
-        return "dc_motor"
-    
-    def validate_command(self, cmd):
-        pass
-
-    def activate_dc_motor(self):
-        pass
-
-    def deactivate_dc_motor(self):
-        pass
-
-    def __init__(self, tool_id, tool_name, ros_command_interface):
-        super(DcMotor, self).__init__(tool_id, tool_name, ros_command_interface)

@@ -28,6 +28,7 @@
 
 #include "niryo_one_driver/communication_base.h"
 #include "niryo_one_driver/rpi_diagnostics.h"
+#include "niryo_one_driver/change_hardware_version.h"
 
 #include "niryo_one_msgs/SetInt.h"
 #include "niryo_one_msgs/SetLeds.h"
@@ -38,6 +39,8 @@
 #include "niryo_one_msgs/PullAirVacuumPump.h"
 #include "niryo_one_msgs/PushAirVacuumPump.h"
 
+#include "niryo_one_msgs/ChangeHardwareVersion.h"
+
 #include "niryo_one_msgs/HardwareStatus.h"
 #include "niryo_one_msgs/SoftwareVersion.h"
 #include "std_msgs/Bool.h"
@@ -47,7 +50,7 @@ class RosInterface {
     public:
 
         RosInterface(CommunicationBase* niryo_one_comm, RpiDiagnostics* rpi_diagnostics,
-                bool *flag_reset_controllers, bool learning_mode_on);
+                bool *flag_reset_controllers, bool learning_mode_on, int hardware_version);
 
         void startServiceServers();
         void startPublishers();
@@ -60,6 +63,7 @@ class RosInterface {
         ros::NodeHandle nh_;
 
         bool* flag_reset_controllers;
+        int hardware_version;
         bool learning_mode_on;
         int calibration_needed;
 
@@ -89,7 +93,6 @@ class RosInterface {
         ros::ServiceServer request_new_calibration_server;
 
         ros::ServiceServer activate_learning_mode_server;
-        ros::ServiceServer activate_dc_motor_server;
         ros::ServiceServer activate_leds_server;
 
         ros::ServiceServer ping_and_set_dxl_tool_server;
@@ -98,13 +101,14 @@ class RosInterface {
         ros::ServiceServer pull_air_vacuum_pump_server;
         ros::ServiceServer push_air_vacuum_pump_server;
 
+        ros::ServiceServer change_hardware_version_server;
+
         // callbacks
         
         bool callbackCalibrateMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
         bool callbackRequestNewCalibration(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
 
         bool callbackActivateLearningMode(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
-        bool callbackActivateDcMotor(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
         bool callbackActivateLeds(niryo_one_msgs::SetLeds::Request &req, niryo_one_msgs::SetLeds::Response &res);
         
         bool callbackPingAndSetDxlTool(niryo_one_msgs::PingDxlTool::Request &req, niryo_one_msgs::PingDxlTool::Response &res);
@@ -114,6 +118,9 @@ class RosInterface {
 
         bool callbackPullAirVacuumPump(niryo_one_msgs::PullAirVacuumPump::Request &req, niryo_one_msgs::PullAirVacuumPump::Response &res);
         bool callbackPushAirVacuumPump(niryo_one_msgs::PushAirVacuumPump::Request &req, niryo_one_msgs::PushAirVacuumPump::Response &res);
+
+        bool callbackChangeHardwareVersion(niryo_one_msgs::ChangeHardwareVersion::Request &req,
+                niryo_one_msgs::ChangeHardwareVersion::Response &res);
 
 };
 

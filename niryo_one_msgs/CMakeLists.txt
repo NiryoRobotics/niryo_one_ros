@@ -53,6 +53,7 @@ add_service_files(
   GetPositionList.srv
   ManageTrajectory.srv
   GetTrajectoryList.srv  
+  ChangeHardwareVersion.srv
 )
 
 add_action_files(

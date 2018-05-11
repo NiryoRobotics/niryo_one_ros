@@ -31,6 +31,19 @@ double CanCommunication::steps_to_rad_pos(int32_t steps, double gear_ratio, doub
 
 CanCommunication::CanCommunication()
 {
+
+}
+
+int CanCommunication::init(int hardware_version)
+{
+    this->hardware_version = hardware_version;
+    
+    if (hardware_version != 1 && hardware_version != 2) {
+        debug_error_message = "Incorrect hardware version, should be 1 or 2";
+        ROS_ERROR("%s", debug_error_message.c_str());
+        return -1;
+    }
+
     ros::param::get("~spi_channel", spi_channel);
     ros::param::get("~spi_baudrate", spi_baudrate);
     ros::param::get("~gpio_can_interrupt", gpio_can_interrupt);
@@ -56,37 +69,37 @@ CanCommunication::CanCommunication()
     ros::param::get("/niryo_one/motors/can_required_motors", required_steppers_ids);
     
     double gear_ratio_1, gear_ratio_2, gear_ratio_3, gear_ratio_4;
-    ros::param::get("~stepper_1_gear_ratio", gear_ratio_1);
-    ros::param::get("~stepper_2_gear_ratio", gear_ratio_2);
-    ros::param::get("~stepper_3_gear_ratio", gear_ratio_3);
-    ros::param::get("~stepper_4_gear_ratio", gear_ratio_4);
+    ros::param::get("/niryo_one/motors/stepper_1_gear_ratio", gear_ratio_1);
+    ros::param::get("/niryo_one/motors/stepper_2_gear_ratio", gear_ratio_2);
+    ros::param::get("/niryo_one/motors/stepper_3_gear_ratio", gear_ratio_3);
+    ros::param::get("/niryo_one/motors/stepper_4_gear_ratio", gear_ratio_4);
     ROS_INFO("Gear ratios : (1 : %lf, 2 : %lf, 3 : %lf, 4 : %lf)", gear_ratio_1, gear_ratio_2, gear_ratio_3, gear_ratio_4);
 
     double home_position_1, home_position_2, home_position_3, home_position_4;
-    ros::param::get("~stepper_1_home_position", home_position_1);
-    ros::param::get("~stepper_2_home_position", home_position_2);
-    ros::param::get("~stepper_3_home_position", home_position_3);
-    ros::param::get("~stepper_4_home_position", home_position_4);
+    ros::param::get("/niryo_one/motors/stepper_1_home_position", home_position_1);
+    ros::param::get("/niryo_one/motors/stepper_2_home_position", home_position_2);
+    ros::param::get("/niryo_one/motors/stepper_3_home_position", home_position_3);
+    ros::param::get("/niryo_one/motors/stepper_4_home_position", home_position_4);
     ROS_INFO("Home positions : (1 : %lf, 2 : %lf, 3 : %lf, 4 : %lf)", home_position_1, home_position_2, home_position_3, home_position_4);
 
     double offset_position_1, offset_position_2, offset_position_3, offset_position_4;
-    ros::param::get("~stepper_1_offset_position", offset_position_1);
-    ros::param::get("~stepper_2_offset_position", offset_position_2);
-    ros::param::get("~stepper_3_offset_position", offset_position_3);
-    ros::param::get("~stepper_4_offset_position", offset_position_4);
+    ros::param::get("/niryo_one/motors/stepper_1_offset_position", offset_position_1);
+    ros::param::get("/niryo_one/motors/stepper_2_offset_position", offset_position_2);
+    ros::param::get("/niryo_one/motors/stepper_3_offset_position", offset_position_3);
+    ros::param::get("/niryo_one/motors/stepper_4_offset_position", offset_position_4);
     ROS_INFO("Angle offsets : (1 : %lf, 2 : %lf, 3 : %lf, 4 : %lf)", offset_position_1, offset_position_2, offset_position_3, offset_position_4);
 
     double direction_1, direction_2, direction_3, direction_4;
-    ros::param::get("~stepper_1_direction", direction_1);
-    ros::param::get("~stepper_2_direction", direction_2); 
-    ros::param::get("~stepper_3_direction", direction_3);
-    ros::param::get("~stepper_4_direction", direction_4);
+    ros::param::get("/niryo_one/motors/stepper_1_direction", direction_1);
+    ros::param::get("/niryo_one/motors/stepper_2_direction", direction_2); 
+    ros::param::get("/niryo_one/motors/stepper_3_direction", direction_3);
+    ros::param::get("/niryo_one/motors/stepper_4_direction", direction_4);
 
     int max_effort_1, max_effort_2, max_effort_3, max_effort_4;
-    ros::param::get("~stepper_1_max_effort", max_effort_1);
-    ros::param::get("~stepper_2_max_effort", max_effort_2);
-    ros::param::get("~stepper_3_max_effort", max_effort_3);
-    ros::param::get("~stepper_4_max_effort", max_effort_4);
+    ros::param::get("/niryo_one/motors/stepper_1_max_effort", max_effort_1);
+    ros::param::get("/niryo_one/motors/stepper_2_max_effort", max_effort_2);
+    ros::param::get("/niryo_one/motors/stepper_3_max_effort", max_effort_3);
+    ros::param::get("/niryo_one/motors/stepper_4_max_effort", max_effort_4);
 
     // Create motors with previous params
     m1 = StepperMotorState("Stepper Axis 1", CAN_MOTOR_1_ID, gear_ratio_1, direction_1, 
@@ -101,6 +114,9 @@ CanCommunication::CanCommunication()
             rad_pos_to_steps(home_position_3, gear_ratio_3, direction_3),
             rad_pos_to_steps(offset_position_3, gear_ratio_3, direction_3),
             8, max_effort_3);
+
+    // this motor is declared for hardware_version 1 & 2
+    // but will be disabled for hardware_version 2 (replaced by a XL430-W250 Dynamixel motor)
     m4 = StepperMotorState("Stepper Axis 4", CAN_MOTOR_4_ID, gear_ratio_4, direction_4,
             rad_pos_to_steps(home_position_4, gear_ratio_4, direction_4),
             rad_pos_to_steps(offset_position_4, gear_ratio_4, direction_4),
@@ -110,19 +126,19 @@ CanCommunication::CanCommunication()
         if      (required_steppers_ids.at(i) == m1.getId()) { m1.enable(); }
         else if (required_steppers_ids.at(i) == m2.getId()) { m2.enable(); }
         else if (required_steppers_ids.at(i) == m3.getId()) { m3.enable(); }
-        else if (required_steppers_ids.at(i) == m4.getId()) { m4.enable(); }
+        else if (hardware_version == 1 && required_steppers_ids.at(i) == m4.getId()) { m4.enable(); }
         else {
-            debug_error_message = "Incorrect configuration : Wrong ID given in Ros Param /niryo_one_motors/can_required_motors. " 
-            "You need to fix this !";
+            debug_error_message = "Incorrect configuration : Wrong ID (" + std::to_string(required_steppers_ids.at(i))
+                + ") given in Ros Param /niryo_one_motors/can_required_motors. You need to fix this !";
             ROS_ERROR("%s", debug_error_message.c_str());
-            return;
+            return -1;
         }
     }
     if (required_steppers_ids.size() == 0) {
         debug_error_message = "Incorrect configuration : Ros Param /niryo_one_motors/can_required_motors "
         "should contain a list with at least one motor. You need to fix this !";
         ROS_ERROR("%s", debug_error_message.c_str());
-        return;
+        return -1;
     }
 
     ROS_INFO("%d motors should be connected to CAN bus", (int) required_steppers_ids.size());
@@ -131,7 +147,9 @@ CanCommunication::CanCommunication()
     motors.push_back(&m1);
     motors.push_back(&m2);
     motors.push_back(&m3);
-    motors.push_back(&m4);
+    if (hardware_version == 1) {
+        motors.push_back(&m4);
+    }
 
     // set hw control init state
     torque_on = 0;
@@ -151,9 +169,11 @@ CanCommunication::CanCommunication()
     steppers_calibration_mode = CAN_STEPPERS_CALIBRATION_MODE_AUTO; // default
     write_synchronize_begin_traj = true;
     calibration_in_progress = false;
+
+    return setupCommunication();
 }
 
-int CanCommunication::init()
+int CanCommunication::setupCommunication()
 {
     int gpio_result = can->setupInterruptGpio();
     if (gpio_result != CAN_OK) {
@@ -166,7 +186,8 @@ int CanCommunication::init()
         ROS_ERROR("Failed to start spi communication for CAN bus"); 
         return spi_result;
     }
-
+    
+    // will return 0 on success
     return can->init();
 }
 
@@ -199,7 +220,7 @@ void CanCommunication::startHardwareControlLoop(bool limited_mode)
     hw_control_loop_keep_alive = true;
    
     if (!hardware_control_loop_thread) {
-        ROS_ERROR("START ctrl loop thread can");
+        ROS_WARN("START ctrl loop thread can");
         hardware_control_loop_thread.reset(new std::thread(boost::bind(&CanCommunication::hardwareControlLoop, this)));
     }
 }
@@ -243,6 +264,9 @@ void CanCommunication::hardwareControlRead()
        
         if (!motor_found) {
             ROS_ERROR("Received can frame with wrong id : %d", motor_id);
+            debug_error_message = "Unallowed connected motor : ";
+            debug_error_message += std::to_string(motor_id);
+            is_can_connection_ok = false;
             return;
         }
 
@@ -323,9 +347,6 @@ void CanCommunication::hardwareControlRead()
             ROS_ERROR("Received can frame with unknown control byte");
             return;
         }
-    
-        //ROS_INFO("pos1 : %d, pos2 : %d, pos3 : %d, pos4 :%d", m1.getPositionState(), m2.getPositionState(), m3.getPositionState(), m4.getPositionState());
-        //ROS_INFO("pos1 : %lf", steps_to_rad_pos(m3.getPositionState(), m3.getGearRatio(), 1.0));
     }
 }
 
@@ -444,7 +465,7 @@ void CanCommunication::hardwareControlCheckConnection()
                     if (motors.at(i)->getHwFailCounter() >= max_fail_counter) {
                         is_can_connection_ok = false;
                         debug_error_message = "Connection problem with CAN bus. Motor ";
-                        debug_error_message += motors.at(i)->getId();
+                        debug_error_message += std::to_string(motors.at(i)->getId());
                         debug_error_message += " is not connected";
                         return;
                     }
@@ -534,6 +555,10 @@ void CanCommunication::setCalibrationFlag(bool flag)
  */
 int CanCommunication::calibrateMotors()
 {
+    if (!is_can_connection_ok) {
+        return CAN_STEPPERS_CALIBRATION_FAIL;
+    }
+
     // this flag should be cleared by a user action to continue
     if (waiting_for_user_trigger_calibration) {
         return CAN_STEPPERS_CALIBRATION_WAITING_USER_INPUT;
@@ -586,7 +611,7 @@ int CanCommunication::sendCalibrationCommandForOneMotor(StepperMotorState* motor
         int calibration_direction, int calibration_timeout)
 {
     if (!motor->isEnabled()) {
-        return CAN_STEPPERS_CALIBRATION_OK;
+        return CAN_OK;
     }
     
     if (can->sendCalibrationCommand(motor->getId(), motor->getOffsetPosition(), delay_between_steps,
@@ -759,27 +784,56 @@ int CanCommunication::autoCalibration()
     return CAN_STEPPERS_CALIBRATION_OK;
 }
 
-void CanCommunication::setGoalPosition(double axis_1_pos_goal, double axis_2_pos_goal, double axis_3_pos_goal, double axis_4_pos_goal)
+void CanCommunication::setGoalPositionV1(double axis_1_pos_goal, double axis_2_pos_goal, double axis_3_pos_goal, double axis_4_pos_goal)
 {
-    m1.setPositionCommand(rad_pos_to_steps(axis_1_pos_goal, m1.getGearRatio(), m1.getDirection()));
-    m2.setPositionCommand(rad_pos_to_steps(axis_2_pos_goal, m2.getGearRatio(), m2.getDirection()));
-    m3.setPositionCommand(rad_pos_to_steps(axis_3_pos_goal, m3.getGearRatio(), m3.getDirection()));
-    m4.setPositionCommand(rad_pos_to_steps(axis_4_pos_goal, m4.getGearRatio(), m4.getDirection()));
+    if (hardware_version == 1) {
+        m1.setPositionCommand(rad_pos_to_steps(axis_1_pos_goal, m1.getGearRatio(), m1.getDirection()));
+        m2.setPositionCommand(rad_pos_to_steps(axis_2_pos_goal, m2.getGearRatio(), m2.getDirection()));
+        m3.setPositionCommand(rad_pos_to_steps(axis_3_pos_goal, m3.getGearRatio(), m3.getDirection()));
+        m4.setPositionCommand(rad_pos_to_steps(axis_4_pos_goal, m4.getGearRatio(), m4.getDirection()));
 
-    // if motor disabled, pos_state = pos_cmd (echo position)
-    for (int i = 0 ; i < motors.size(); i++) {
-        if (!motors.at(i)->isEnabled()) {
-            motors.at(i)->setPositionState(motors.at(i)->getPositionCommand());
+        // if motor disabled, pos_state = pos_cmd (echo position)
+        for (int i = 0 ; i < motors.size(); i++) {
+            if (!motors.at(i)->isEnabled()) {
+                motors.at(i)->setPositionState(motors.at(i)->getPositionCommand());
+            }
         }
     }
 }
 
-void CanCommunication::getCurrentPosition(double *axis_1_pos, double *axis_2_pos, double *axis_3_pos, double *axis_4_pos)
+void CanCommunication::setGoalPositionV2(double axis_1_pos_goal, double axis_2_pos_goal, double axis_3_pos_goal)
 {
-    *axis_1_pos = steps_to_rad_pos(m1.getPositionState(), m1.getGearRatio(), m1.getDirection());
-    *axis_2_pos = steps_to_rad_pos(m2.getPositionState(), m2.getGearRatio(), m2.getDirection());
-    *axis_3_pos = steps_to_rad_pos(m3.getPositionState(), m3.getGearRatio(), m3.getDirection());
-    *axis_4_pos = steps_to_rad_pos(m4.getPositionState(), m4.getGearRatio(), m4.getDirection());
+    if (hardware_version == 2) {
+        m1.setPositionCommand(rad_pos_to_steps(axis_1_pos_goal, m1.getGearRatio(), m1.getDirection()));
+        m2.setPositionCommand(rad_pos_to_steps(axis_2_pos_goal, m2.getGearRatio(), m2.getDirection()));
+        m3.setPositionCommand(rad_pos_to_steps(axis_3_pos_goal, m3.getGearRatio(), m3.getDirection()));
+        
+        // if motor disabled, pos_state = pos_cmd (echo position)
+        for (int i = 0 ; i < motors.size(); i++) {
+            if (!motors.at(i)->isEnabled()) {
+                motors.at(i)->setPositionState(motors.at(i)->getPositionCommand());
+            }
+        }
+    }
+}
+
+void CanCommunication::getCurrentPositionV1(double *axis_1_pos, double *axis_2_pos, double *axis_3_pos, double *axis_4_pos)
+{
+    if (hardware_version == 1) {
+        *axis_1_pos = steps_to_rad_pos(m1.getPositionState(), m1.getGearRatio(), m1.getDirection());
+        *axis_2_pos = steps_to_rad_pos(m2.getPositionState(), m2.getGearRatio(), m2.getDirection());
+        *axis_3_pos = steps_to_rad_pos(m3.getPositionState(), m3.getGearRatio(), m3.getDirection());
+        *axis_4_pos = steps_to_rad_pos(m4.getPositionState(), m4.getGearRatio(), m4.getDirection());
+    }
+}
+
+void CanCommunication::getCurrentPositionV2(double *axis_1_pos, double *axis_2_pos, double *axis_3_pos)
+{
+    if (hardware_version == 2) {
+        *axis_1_pos = steps_to_rad_pos(m1.getPositionState(), m1.getGearRatio(), m1.getDirection());
+        *axis_2_pos = steps_to_rad_pos(m2.getPositionState(), m2.getGearRatio(), m2.getDirection());
+        *axis_3_pos = steps_to_rad_pos(m3.getPositionState(), m3.getGearRatio(), m3.getDirection());
+    }
 }
 
 void CanCommunication::setMicroSteps(std::vector<uint8_t> micro_steps_list)
@@ -817,7 +871,7 @@ void CanCommunication::getHardwareStatus(bool *is_connection_ok, std::string &er
         std::vector<int32_t> &hw_errors)
 {
     *(is_connection_ok) = is_can_connection_ok;
-    *(calibration_needed) = waiting_for_user_trigger_calibration; 
+    *(calibration_needed) = (waiting_for_user_trigger_calibration && is_can_connection_ok); 
     *(calibration_in_progress) = this->calibration_in_progress;
     error_message = debug_error_message;
 
@@ -828,11 +882,13 @@ void CanCommunication::getHardwareStatus(bool *is_connection_ok, std::string &er
     hw_errors.clear();
 
     for (int i = 0 ; i < motors.size(); i++) {
-        motor_names.push_back(motors.at(i)->getName());
-        motor_types.push_back("niryo_stepper");
-        temperatures.push_back(motors.at(i)->getTemperatureState());
-        voltages.push_back(0.0);
-        hw_errors.push_back(motors.at(i)->getHardwareErrorState());
+        if (motors.at(i)->isEnabled()) {
+            motor_names.push_back(motors.at(i)->getName());
+            motor_types.push_back("Niryo Stepper");
+            temperatures.push_back(motors.at(i)->getTemperatureState());
+            voltages.push_back(0.0);
+            hw_errors.push_back(motors.at(i)->getHardwareErrorState());
+        }
     }
 }
 
@@ -843,8 +899,10 @@ void CanCommunication::getFirmwareVersions(std::vector<std::string> &motor_names
     firmware_versions.clear();
 
     for (int i = 0; i < motors.size(); i++) {
-        motor_names.push_back(motors.at(i)->getName());
-        firmware_versions.push_back(motors.at(i)->getFirmwareVersion());
+        if (motors.at(i)->isEnabled()) {
+            motor_names.push_back(motors.at(i)->getName());
+            firmware_versions.push_back(motors.at(i)->getFirmwareVersion());
+        }
     }
 }
 
@@ -884,9 +942,10 @@ int CanCommunication::scanAndCheck()
     bool m4_ok = !m4.isEnabled();
    
     double time_begin_scan = ros::Time::now().toSec();
+    double min_time_to_wait = 0.25;
     double timeout = 0.5;
 
-    while (!m1_ok || !m2_ok || !m3_ok || !m4_ok) {
+    while (!m1_ok || !m2_ok || !m3_ok || !m4_ok || (ros::Time::now().toSec() - time_begin_scan < min_time_to_wait)) {
         ros::Duration(0.001).sleep(); // check at 1000 Hz
         
         if (can->canReadData()) {
@@ -907,14 +966,14 @@ int CanCommunication::scanAndCheck()
             else if (motor_id == m3.getId()) {
                 m3_ok = true;
             }
-            else if (motor_id == m4.getId()) {
+            else if (hardware_version == 1 && motor_id == m4.getId()) { // m4 only for Niryo One V1
                 m4_ok = true;
             }
             else { // detect unallowed motor
-                ROS_ERROR("Received can frame with wrong id : %d", motor_id);
+                ROS_ERROR("Scan And Check : Received can frame with wrong id : %d", motor_id);
                 hw_is_busy = false;
-                debug_error_message = "Unknown connected motor : ";
-                debug_error_message = std::to_string(motor_id);
+                debug_error_message = "Unallowed connected motor : ";
+                debug_error_message += std::to_string(motor_id);
                 return CAN_SCAN_NOT_ALLOWED;
             }
         }

@@ -4,6 +4,9 @@ std_msgs/Header header
 # Raspberry Pi board
 int32 rpi_temperature 
 
+# Robot version : 1 (previous one) or 2 (current one)
+int32 hardware_version
+
 # Motors
 bool connection_up
 string error_message

@@ -20,12 +20,13 @@
 #include "niryo_one_driver/ros_interface.h"
 
 RosInterface::RosInterface(CommunicationBase* niryo_one_comm, RpiDiagnostics* rpi_diagnostics,
-        bool *flag_reset_controllers, bool learning_mode_on)
+        bool *flag_reset_controllers, bool learning_mode_on, int hardware_version)
 {
     comm = niryo_one_comm;
     this->rpi_diagnostics = rpi_diagnostics;
     this->learning_mode_on = learning_mode_on;
     this->flag_reset_controllers = flag_reset_controllers;
+    this->hardware_version = hardware_version;
     
     ros::param::get("/niryo_one/info/image_version", rpi_image_version);
     ros::param::get("/niryo_one/info/ros_version", ros_niryo_one_version);
@@ -118,17 +119,6 @@ bool RosInterface::callbackActivateLearningMode(niryo_one_msgs::SetInt::Request 
     return true;
 }
 
-bool RosInterface::callbackActivateDcMotor(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res)
-{
-    ROS_INFO("Inside callback dc motor");
-    int result = comm->activateDcMotor(req.value);
-
-    // todo check result
-    res.status = 200;
-    res.message = (req.value) ? "Activating DC motor" : "Deactivating DC motor";
-    return true;
-}
-
 bool RosInterface::callbackActivateLeds(niryo_one_msgs::SetLeds::Request &req, niryo_one_msgs::SetLeds::Response &res)
 {
     std::vector<int> leds = req.values;
@@ -160,15 +150,32 @@ bool RosInterface::callbackCloseGripper(niryo_one_msgs::CloseGripper::Request &r
 
 bool RosInterface::callbackPullAirVacuumPump(niryo_one_msgs::PullAirVacuumPump::Request &req, niryo_one_msgs::PullAirVacuumPump::Response &res)
 {
-    ROS_INFO("CALLBACK pull air vp");
     res.state = comm->pullAirVacuumPump(req.id, req.pull_air_position, req.pull_air_hold_torque);
     return true;
 }
 
 bool RosInterface::callbackPushAirVacuumPump(niryo_one_msgs::PushAirVacuumPump::Request &req, niryo_one_msgs::PushAirVacuumPump::Response &res)
 {
-    ROS_INFO("CALLBACK push air vp");
     res.state = comm->pushAirVacuumPump(req.id, req.push_air_position);
+    return true;
+}
+
+bool RosInterface::callbackChangeHardwareVersion(niryo_one_msgs::ChangeHardwareVersion::Request &req,
+        niryo_one_msgs::ChangeHardwareVersion::Response &res)
+{
+    int result = change_hardware_version_and_reboot(req.old_version, req.new_version);
+    if (result == CHANGE_HW_VERSION_OK) {
+        res.status = 200;
+        res.message = "Successfully changed hardware version.";
+    }
+    else if (result == CHANGE_HW_VERSION_FAIL) {
+        res.status = 400;
+        res.message = "Failed to change hardware version, please check the ROS logs";
+    }
+    else if (result == CHANGE_HW_VERSION_NOT_ARM) {
+        res.status = 400;
+        res.message = "Not allowed to change hardware version on non-ARM system";
+    }
     return true;
 }
 
@@ -178,7 +185,6 @@ void RosInterface::startServiceServers()
     request_new_calibration_server = nh_.advertiseService("niryo_one/request_new_calibration", &RosInterface::callbackRequestNewCalibration, this);
 
     activate_learning_mode_server = nh_.advertiseService("niryo_one/activate_learning_mode", &RosInterface::callbackActivateLearningMode, this);
-    activate_dc_motor_server = nh_.advertiseService("niryo_one/activate_dc_motor", &RosInterface::callbackActivateDcMotor, this);
     activate_leds_server = nh_.advertiseService("niryo_one/set_dxl_leds", &RosInterface::callbackActivateLeds, this);
 
     ping_and_set_dxl_tool_server = nh_.advertiseService("niryo_one/tools/ping_and_set_dxl_tool", &RosInterface::callbackPingAndSetDxlTool, this);
@@ -186,6 +192,8 @@ void RosInterface::startServiceServers()
     close_gripper_server = nh_.advertiseService("niryo_one/tools/close_gripper", &RosInterface::callbackCloseGripper, this);
     pull_air_vacuum_pump_server = nh_.advertiseService("niryo_one/tools/pull_air_vacuum_pump", &RosInterface::callbackPullAirVacuumPump, this);
     push_air_vacuum_pump_server = nh_.advertiseService("niryo_one/tools/push_air_vacuum_pump", &RosInterface::callbackPushAirVacuumPump, this);
+
+    change_hardware_version_server = nh_.advertiseService("niryo_one/change_hardware_version", &RosInterface::callbackChangeHardwareVersion, this);
 }
 
 void RosInterface::publishHardwareStatus()
@@ -212,6 +220,7 @@ void RosInterface::publishHardwareStatus()
         niryo_one_msgs::HardwareStatus msg;
         msg.header.stamp = ros::Time::now();
         msg.rpi_temperature = rpi_diagnostics->getRpiCpuTemperature();
+        msg.hardware_version = hardware_version;
         msg.connection_up = connection_up;
         msg.error_message = error_message;
         msg.calibration_needed = calibration_needed;
