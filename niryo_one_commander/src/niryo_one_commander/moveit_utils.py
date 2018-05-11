@@ -20,17 +20,15 @@
 
 import rospy 
 import tf 
-import moveit_commander
 from niryo_one_commander.position.position import Position 
 
-from moveit_msgs.msg import RobotState 
+from moveit_msgs.msg import RobotState
 from moveit_msgs.srv import GetPositionFK
 from std_msgs.msg import Header
 
 
 def get_forward_kinematic(joints): 
 
-    arm = moveit_commander.MoveGroupCommander('arm')
     try:
 	  rospy.wait_for_service('compute_fk',2)
     except (rospy.ServiceException, rospy.ROSException), e:
@@ -78,8 +76,4 @@ def get_rpy_from_quaternion(rot):
 
 if __name__ == '__main__':
     pass 
-'''    rospy.init_node('robot_commander')
-    joints = [0,0,0,0,0,0]
-    (points, rpy, quaternion) =  get_forward_kinematic(joints)
-    rospy.spin()
-'''
+

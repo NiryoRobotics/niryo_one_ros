@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# sequence_position_type.py
+#position_command_type.py
 # Copyright (C) 2018 Niryo
 # All rights reserved.
 #

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# command_type.py
-# Copyright (C) 2017 Niryo
+#trajectory.py
+# Copyright (C) 2018 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from niryo_one_msgs.msg import TrajectoryPlan
+
+class Trajectory: 
+
+    def __init__(self, id = 0 , name = "", description = "", 
+            trajectory_plan = TrajectoryPlan() ):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.trajectory_plan = trajectory_plan 
 
 
-class CommandType(object):
-    JOINTS     = 1
-    POSE       = 2
-    POSITION   = 3
-    RPY        = 4
-    SHIFT_POSE = 5
-    TOOL       = 6
-    EXECUTE_TRAJ = 7
-    POSE_QUAT  = 8
-    SAVED_POSITION =9
-    SAVED_TRAJECTORY = 10  
+
+

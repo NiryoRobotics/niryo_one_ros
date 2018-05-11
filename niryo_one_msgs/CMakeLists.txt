@@ -28,6 +28,7 @@ add_message_files(
   TrajectoryPlan.msg
   MatlabMoveResult.msg
   Position.msg
+  Trajectory.msg 
 )
 
 add_service_files(
@@ -49,7 +50,9 @@ add_service_files(
   ManageSequence.srv
   SetSequenceAutorun.srv
   ManagePosition.srv
-  GetPositionList.srv 
+  GetPositionList.srv
+  ManageTrajectory.srv
+  GetTrajectoryList.srv  
 )
 
 add_action_files(

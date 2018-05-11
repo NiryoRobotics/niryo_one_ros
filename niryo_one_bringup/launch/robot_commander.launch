@@ -16,7 +16,7 @@
     <param name="/move_group/start_state_max_bounds_error" value="0.3" />
   
     <!-- Robot commander -->
-    <node name="niryo_one_commander_node" pkg="niryo_one_commander" type="niryo_one_commander_node.py" output="screen" respawn="false">
+    <node name="niryo_one_commander" pkg="niryo_one_commander" type="niryo_one_commander_node.py" output="screen" respawn="false">
         <param name="reference_frame"            type="string" value="ground_link" />
         <param name="move_group_commander_name"  type="string" value="arm" />
         <param name="allow_replanning"           type="bool"   value="true" />
@@ -25,6 +25,8 @@
         <param name="goal_orientation_tolerance" type="double" value="0.001" />
         <param name="positions_dir" type="string"  value="/home/niryo/niryo_one_positions" unless="$(arg simulation_mode)"/>
         <param name="positions_dir" type="string"  value="~/niryo_one_positions"           if="$(arg simulation_mode)"/>
+        <param name="trajectories_dir" type="string"  value="/home/niryo/niryo_one_trajectories" unless="$(arg simulation_mode)"/>
+        <param name="trajectories_dir" type="string"  value="~/niryo_one_trajectories"           if="$(arg simulation_mode)"/>
 
     </node>
 </launch>
