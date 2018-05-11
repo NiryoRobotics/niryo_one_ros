@@ -53,7 +53,7 @@ class TrajectoryManager:
             trajectory_msg.id = traj.id
             trajectory_msg.trajectory_plan = traj.trajectory_plan
             msg_list.append(trajectory_msg)
-        return{ 'trajectory': msg_list }
+        return{ 'trajectories': msg_list }
 
     def get_all_trajectories(self): 
         filenames = self.fh.get_all_filenames()
@@ -80,8 +80,8 @@ class TrajectoryManager:
 
     def callback_manage_trajectory(self, req):
         cmd_type = req.cmd_type
-        trajectory_id = req.trajectory.id
-        trajectory_data = Trajectory( id = req.trajectory.id, name = req.trajectory.name, description = req.trajectory.description, 
+        trajectory_id = req.trajectory_id
+        trajectory_data = Trajectory( id = req.trajectory_id, name = req.trajectory.name, description = req.trajectory.description, 
             trajectory_plan = req.trajectory.trajectory_plan ) 
          # GET an existing trajectory 
         if cmd_type == TrajectoryCommandType.GET:

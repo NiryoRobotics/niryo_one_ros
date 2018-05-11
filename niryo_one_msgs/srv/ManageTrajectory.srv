@@ -1,5 +1,6 @@
 int32 cmd_type
 
+int32 trajectory_id 
 niryo_one_msgs/Trajectory trajectory
 ---
 int32 status
@@ -7,3 +8,4 @@ string message
 
 niryo_one_msgs/Trajectory trajectory
 
+ 
