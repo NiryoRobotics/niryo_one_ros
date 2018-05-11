@@ -24,6 +24,8 @@ from niryo_one_commander.position.position  import Position
 from niryo_one_commander.niryo_one_file_exception import NiryoOneFileException
 from niryo_one_commander.position.position_file_handler import PositionFileHandler
 from niryo_one_commander.position.position_command_type import PositionCommandType
+from niryo_one_commander.robot_commander_exception import RobotCommanderException
+from niryo_one_commander.parameters_validation import ParametersValidation
 from niryo_one_commander.moveit_utils import get_forward_kinematic
 
 from niryo_one_msgs.msg import Position  as PositionMessage 
@@ -45,6 +47,8 @@ class PositionManager:
                 '/niryo_one/position/get_position_list', GetPositionList, self.callback_get_position_list)
         rospy.loginfo("get list position created") 
         
+        self.validation = rospy.get_param("/niryo_one/robot_command_validation")
+        self.parameters_validation = ParametersValidation(self.validation)
     def create_position_response(self, status, message, position=None):
         position_msg = PositionMessage()
         if position != None:
@@ -79,7 +83,7 @@ class PositionManager:
             new_position_name = self.create_new_position(position_data)
             if new_position_name == None :
                 return self.create_position_response(400, "failed to create a new position with this name "
-                    + position_name + " try another name")
+                    + position_name )
             new_position = self.get_position(new_position_name)
             if new_position == None :
                 return self.create_position_response(400, "Failed to create position")
@@ -110,11 +114,13 @@ class PositionManager:
         return True
     
     def update_position(self, position, position_data):
-        
+        try:
+            self.parameters_validation.validate_joints(position_data.joints)
+        except RobotCommanderException as e:
+            rospy.logerr(e, "Invalide joints value") 
+            return False
         position.joints = position_data.joints
-        (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)
-	
-                                
+        (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)                     
         try:
             self.fh.write_position(position)
         except NiryoOneFileException as e:
@@ -127,11 +133,15 @@ class PositionManager:
         except NiryoOneFileException as e:
             return None
 
-    def create_new_position(self, position) : 
+    def create_new_position(self, position) :     
         try:
- 
+            self.parameters_validation.validate_joints(position.joints)
+        except RobotCommanderException as e:
+            rospy.logerr(e, "Invalide joints values")
+            return None  
+        try:   
             if self.fh.check_position_name(position.name) == False : 
-                return None 
+                return None
 	        (position.point, position.rpy, position.quaternion) = get_forward_kinematic(position.joints)    
             self.fh.write_position(position)
             return(position.name)
