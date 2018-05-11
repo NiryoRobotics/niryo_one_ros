@@ -81,7 +81,7 @@ class TrajectoryManager:
     def callback_manage_trajectory(self, req):
         cmd_type = req.cmd_type
         trajectory_id = req.trajectory_id
-        trajectory_data = Trajectory( id = req.trajectory_id, name = req.trajectory.name, description = req.trajectory.description, 
+        trajectory_data = Trajectory( name = req.trajectory.name, description = req.trajectory.description, 
             trajectory_plan = req.trajectory.trajectory_plan ) 
          # GET an existing trajectory 
         if cmd_type == TrajectoryCommandType.GET:
