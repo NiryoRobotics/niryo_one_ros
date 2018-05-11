@@ -54,8 +54,6 @@ class ToolController:
             elif tool['type'] == 'vacuum_pump':
                 new_tool = VacuumPump(tool['id'], tool['name'], self.ros_command_interface, tool['specs']['pull_air_position'],
                         tool['specs']['pull_air_hold_torque'], tool['specs']['push_air_position'])
-            elif tool['type'] == 'dc_motor':
-                new_tool = DcMotor(tool['id'], tool['name'], self.ros_command_interface)
             else:
                 rospy.logwarn("ERROR : TYPE NOT RECOGNIZED from tool config list : " + str(tool['type']))
                 continue

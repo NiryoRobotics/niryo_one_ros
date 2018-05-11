@@ -93,7 +93,6 @@ class RosInterface {
         ros::ServiceServer request_new_calibration_server;
 
         ros::ServiceServer activate_learning_mode_server;
-        ros::ServiceServer activate_dc_motor_server;
         ros::ServiceServer activate_leds_server;
 
         ros::ServiceServer ping_and_set_dxl_tool_server;
@@ -110,7 +109,6 @@ class RosInterface {
         bool callbackRequestNewCalibration(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
 
         bool callbackActivateLearningMode(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
-        bool callbackActivateDcMotor(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
         bool callbackActivateLeds(niryo_one_msgs::SetLeds::Request &req, niryo_one_msgs::SetLeds::Response &res);
         
         bool callbackPingAndSetDxlTool(niryo_one_msgs::PingDxlTool::Request &req, niryo_one_msgs::PingDxlTool::Response &res);

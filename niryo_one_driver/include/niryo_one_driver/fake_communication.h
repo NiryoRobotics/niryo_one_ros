@@ -70,8 +70,6 @@ class FakeCommunication : public CommunicationBase {
         int pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, uint16_t pull_air_hold_torque);
         int pushAirVacuumPump(uint8_t id, uint16_t push_air_position);
         
-        bool activateDcMotor(bool activate);
-
         // steppers
         void synchronizeMotors(bool begin_traj);
 

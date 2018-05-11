@@ -119,17 +119,6 @@ bool RosInterface::callbackActivateLearningMode(niryo_one_msgs::SetInt::Request 
     return true;
 }
 
-bool RosInterface::callbackActivateDcMotor(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res)
-{
-    ROS_INFO("Inside callback dc motor");
-    int result = comm->activateDcMotor(req.value);
-
-    // todo check result
-    res.status = 200;
-    res.message = (req.value) ? "Activating DC motor" : "Deactivating DC motor";
-    return true;
-}
-
 bool RosInterface::callbackActivateLeds(niryo_one_msgs::SetLeds::Request &req, niryo_one_msgs::SetLeds::Response &res)
 {
     std::vector<int> leds = req.values;
@@ -196,7 +185,6 @@ void RosInterface::startServiceServers()
     request_new_calibration_server = nh_.advertiseService("niryo_one/request_new_calibration", &RosInterface::callbackRequestNewCalibration, this);
 
     activate_learning_mode_server = nh_.advertiseService("niryo_one/activate_learning_mode", &RosInterface::callbackActivateLearningMode, this);
-    activate_dc_motor_server = nh_.advertiseService("niryo_one/activate_dc_motor", &RosInterface::callbackActivateDcMotor, this);
     activate_leds_server = nh_.advertiseService("niryo_one/set_dxl_leds", &RosInterface::callbackActivateLeds, this);
 
     ping_and_set_dxl_tool_server = nh_.advertiseService("niryo_one/tools/ping_and_set_dxl_tool", &RosInterface::callbackPingAndSetDxlTool, this);

@@ -78,12 +78,4 @@ tool_list:
           pull_air_position: 250
           pull_air_hold_torque: 128
           push_air_position: 760
-    - name: "DC Motor 1"
-      type: "dc_motor"
-      id: 32
-      available_commands:
-          []
-      specs:
-          []
-
 

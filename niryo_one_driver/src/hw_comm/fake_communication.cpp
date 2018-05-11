@@ -131,12 +131,6 @@ bool FakeCommunication::setLeds(std::vector<int> &leds, std::string &message)
     return true;
 }
         
-bool FakeCommunication::activateDcMotor(bool activate)
-{
-    ROS_INFO("Activate dc motor : %d", activate);
-    return 1;
-}
-        
 int FakeCommunication::pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, uint16_t pull_air_hold_torque)
 {
     ROS_INFO("Pull air on vacuum pump with id : %03d", id);

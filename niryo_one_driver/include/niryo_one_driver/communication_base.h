@@ -66,8 +66,6 @@ class CommunicationBase {
         virtual int pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, uint16_t pull_air_hold_torque) = 0;
         virtual int pushAirVacuumPump(uint8_t id, uint16_t push_air_position) = 0;
         
-        virtual bool activateDcMotor(bool activate) = 0;
-
         // steppers
         virtual void synchronizeMotors(bool begin_traj) = 0;
 

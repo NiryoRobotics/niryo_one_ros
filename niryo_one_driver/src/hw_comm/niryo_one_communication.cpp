@@ -489,11 +489,6 @@ bool NiryoOneCommunication::setLeds(std::vector<int> &leds, std::string &message
     return true;
 }
 
-bool NiryoOneCommunication::activateDcMotor(bool activate)
-{
-    return true;
-}
-
 int NiryoOneCommunication::pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, uint16_t pull_air_hold_torque)
 {
     if (dxl_enabled) {
