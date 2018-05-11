@@ -69,37 +69,37 @@ int CanCommunication::init(int hardware_version)
     ros::param::get("/niryo_one/motors/can_required_motors", required_steppers_ids);
     
     double gear_ratio_1, gear_ratio_2, gear_ratio_3, gear_ratio_4;
-    ros::param::get("~stepper_1_gear_ratio", gear_ratio_1);
-    ros::param::get("~stepper_2_gear_ratio", gear_ratio_2);
-    ros::param::get("~stepper_3_gear_ratio", gear_ratio_3);
-    ros::param::get("~stepper_4_gear_ratio", gear_ratio_4);
+    ros::param::get("/niryo_one/motors/stepper_1_gear_ratio", gear_ratio_1);
+    ros::param::get("/niryo_one/motors/stepper_2_gear_ratio", gear_ratio_2);
+    ros::param::get("/niryo_one/motors/stepper_3_gear_ratio", gear_ratio_3);
+    ros::param::get("/niryo_one/motors/stepper_4_gear_ratio", gear_ratio_4);
     ROS_INFO("Gear ratios : (1 : %lf, 2 : %lf, 3 : %lf, 4 : %lf)", gear_ratio_1, gear_ratio_2, gear_ratio_3, gear_ratio_4);
 
     double home_position_1, home_position_2, home_position_3, home_position_4;
-    ros::param::get("~stepper_1_home_position", home_position_1);
-    ros::param::get("~stepper_2_home_position", home_position_2);
-    ros::param::get("~stepper_3_home_position", home_position_3);
-    ros::param::get("~stepper_4_home_position", home_position_4);
+    ros::param::get("/niryo_one/motors/stepper_1_home_position", home_position_1);
+    ros::param::get("/niryo_one/motors/stepper_2_home_position", home_position_2);
+    ros::param::get("/niryo_one/motors/stepper_3_home_position", home_position_3);
+    ros::param::get("/niryo_one/motors/stepper_4_home_position", home_position_4);
     ROS_INFO("Home positions : (1 : %lf, 2 : %lf, 3 : %lf, 4 : %lf)", home_position_1, home_position_2, home_position_3, home_position_4);
 
     double offset_position_1, offset_position_2, offset_position_3, offset_position_4;
-    ros::param::get("~stepper_1_offset_position", offset_position_1);
-    ros::param::get("~stepper_2_offset_position", offset_position_2);
-    ros::param::get("~stepper_3_offset_position", offset_position_3);
-    ros::param::get("~stepper_4_offset_position", offset_position_4);
+    ros::param::get("/niryo_one/motors/stepper_1_offset_position", offset_position_1);
+    ros::param::get("/niryo_one/motors/stepper_2_offset_position", offset_position_2);
+    ros::param::get("/niryo_one/motors/stepper_3_offset_position", offset_position_3);
+    ros::param::get("/niryo_one/motors/stepper_4_offset_position", offset_position_4);
     ROS_INFO("Angle offsets : (1 : %lf, 2 : %lf, 3 : %lf, 4 : %lf)", offset_position_1, offset_position_2, offset_position_3, offset_position_4);
 
     double direction_1, direction_2, direction_3, direction_4;
-    ros::param::get("~stepper_1_direction", direction_1);
-    ros::param::get("~stepper_2_direction", direction_2); 
-    ros::param::get("~stepper_3_direction", direction_3);
-    ros::param::get("~stepper_4_direction", direction_4);
+    ros::param::get("/niryo_one/motors/stepper_1_direction", direction_1);
+    ros::param::get("/niryo_one/motors/stepper_2_direction", direction_2); 
+    ros::param::get("/niryo_one/motors/stepper_3_direction", direction_3);
+    ros::param::get("/niryo_one/motors/stepper_4_direction", direction_4);
 
     int max_effort_1, max_effort_2, max_effort_3, max_effort_4;
-    ros::param::get("~stepper_1_max_effort", max_effort_1);
-    ros::param::get("~stepper_2_max_effort", max_effort_2);
-    ros::param::get("~stepper_3_max_effort", max_effort_3);
-    ros::param::get("~stepper_4_max_effort", max_effort_4);
+    ros::param::get("/niryo_one/motors/stepper_1_max_effort", max_effort_1);
+    ros::param::get("/niryo_one/motors/stepper_2_max_effort", max_effort_2);
+    ros::param::get("/niryo_one/motors/stepper_3_max_effort", max_effort_3);
+    ros::param::get("/niryo_one/motors/stepper_4_max_effort", max_effort_4);
 
     // Create motors with previous params
     m1 = StepperMotorState("Stepper Axis 1", CAN_MOTOR_1_ID, gear_ratio_1, direction_1, 

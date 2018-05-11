@@ -20,6 +20,8 @@
     <group ns="niryo_one/motors">
         <rosparam file="$(find niryo_one_bringup)/config/v1/niryo_one_motors.yaml" if="$(eval hardware_version == 1)"/>
         <rosparam file="$(find niryo_one_bringup)/config/v2/niryo_one_motors.yaml" if="$(eval hardware_version == 2)"/>
+        <rosparam file="$(find niryo_one_bringup)/config/v1/stepper_params.yaml" if="$(eval hardware_version == 1)"/>
+        <rosparam file="$(find niryo_one_bringup)/config/v2/stepper_params.yaml" if="$(eval hardware_version == 2)"/>
     </group>
 
     <group ns="niryo_one/python_api">
