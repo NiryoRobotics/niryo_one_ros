@@ -49,9 +49,11 @@
     <group if="$(eval hardware_version == 1)">
         <param name="robot_description" command="cat $(find niryo_one_description)/urdf/v1/without_mesh_niryo_one.urdf" if="$(arg urdf_without_meshes)"/>
         <param name="robot_description" command="cat $(find niryo_one_description)/urdf/v1/niryo_one.urdf" unless="$(arg urdf_without_meshes)"/>
+        <param name="robot_description_tf2" command="cat $(find niryo_one_description)/urdf/v1/niryo_one.urdf" />
     </group>
     <group if="$(eval hardware_version == 2)">
         <param name="robot_description" command="cat $(find niryo_one_description)/urdf/v2/without_mesh_niryo_one.urdf" if="$(arg urdf_without_meshes)"/>
         <param name="robot_description" command="cat $(find niryo_one_description)/urdf/v2/niryo_one.urdf" unless="$(arg urdf_without_meshes)"/>
+        <param name="robot_description_tf2" command="cat $(find niryo_one_description)/urdf/v2/niryo_one.urdf" />
     </group>
 </launch>

@@ -7,6 +7,7 @@
     <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/>
 
     <!-- rosbridge websocket server -->
+    <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher"/>
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
     <!-- Setup interface -->
