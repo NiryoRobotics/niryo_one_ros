@@ -56,15 +56,7 @@
     <xacro:include filename="$(find niryo_one_description)/urdf/v1/niryo_one.gazebo.xacro" />
 	<!-- Links -->
 
-    <link name="ground_link"/>
-		<inertial>
-			<origin xyz="0 0 0" rpy="0 0 0"/>
-      		<mass value="1"/>
-      		<inertia
-        		ixx="0.0" ixy="0.0" ixz="0.0"
-        		iyy="0.0" iyz="0.0"
-        		izz="0.0"/>
-    	</inertial>				
+    <link name="ground_link"/>	
     <link name="base_link">
 		<visual>
 			<origin xyz="0 0 0" rpy="0 0 0" />
@@ -146,7 +138,7 @@
 		<visual>
 			<origin xyz="0 0 0" rpy="0 0 0" />
 			<geometry>
-                <!--	<box size="0.1 0.1 0.048"/> -->
+            	<!--box size="0.01 0.01 0.01"/-->
                 <mesh filename="package://niryo_one_description/meshes/collada/elbow_link.dae" /> 
 			</geometry>
 			<material name="">
@@ -315,10 +307,76 @@
         <child link="gripper_link" />
         <origin xyz="0 0 ${distance_hand_gripper}" rpy="${-PI/2} ${-PI/2} 0" />
 	</joint>
-    
 
-  
+	<!--transmission-->
 
+	<transmission name="base_shoulder_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="joint_1">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="base_shoulder_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+	
+	<transmission name="shoulder_arm_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="joint_2">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="shoulder_arm_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
 
+	<transmission name="arm_elbow_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="joint_3">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="arm_elbow_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
 
+	<transmission name="elbow_forarm_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="joint_4">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elbow_forarm_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+	<transmission name="forarm_wirst_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="joint_5">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="forarm_wirst_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+	
+	<transmission name="wirst_gripper_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="joint_6">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="wirst_gripper_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+	<!--plugin-->
+	<gazebo>
+  		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+  		</plugin>
+  	</gazebo>
+	
 </robot>
