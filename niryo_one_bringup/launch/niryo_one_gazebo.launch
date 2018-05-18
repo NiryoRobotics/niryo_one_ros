@@ -1,4 +1,6 @@
 <launch>
+  <arg name="execute_on_niryo_one_raspberry_pi_image" value="false"/>
+  <arg name="urdf_without_meshes" default="false" />
 
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
   <arg name="paused" default="false"/>
@@ -28,7 +30,12 @@
   <rosparam file="$(find niryo_one_driver)/config/niryo_one_controllers.yaml" command="load"/>
 
   <!-- load the controllers -->
-   
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="hardware_control_loop  joint_state_controller niryo_one_follow_joint_trajectory_controller"/> 
-  
+
+  <include file="$(find niryo_one_bringup)/launch/controllers.launch">
+    <arg name="simulation_mode" value="true" />
+  </include>
+  <include file="$(find niryo_one_bringup)/launch/robot_commander.launch">
+    <arg name="simulation_mode" value="true" />
+  </include>
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 </launch>
