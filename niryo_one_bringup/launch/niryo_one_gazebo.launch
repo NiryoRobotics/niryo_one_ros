@@ -1,6 +1,7 @@
 <launch>
   <arg name="execute_on_niryo_one_raspberry_pi_image" value="false"/>
   <arg name="urdf_without_meshes" default="false" />
+   <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/>
 
   <!-- these are the arguments you can pass this launch file, for example paused:=true -->
   <arg name="paused" default="false"/>
@@ -8,6 +9,7 @@
   <arg name="gui" default="true"/>
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
+  
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find niryo_one_description)/urdf/v1/niryo_one.urdf.xacro'" />
@@ -24,13 +26,10 @@
     <arg name="headless" value="$(arg headless)"/>
   </include>
   
-  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <!--spawn robot in gazebo -->
   <node name="niryo_one_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model niryo_one" respawn="false" />	
-    <!-- Load joint controller configurations from YAML file to parameter server -->
-  <rosparam file="$(find niryo_one_driver)/config/niryo_one_controllers.yaml" command="load"/>
-
+  
   <!-- load the controllers -->
-
   <include file="$(find niryo_one_bringup)/launch/controllers.launch">
     <arg name="simulation_mode" value="true" />
   </include>

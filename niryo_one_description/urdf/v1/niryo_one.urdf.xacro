@@ -57,8 +57,8 @@
 	<xacro:include filename="$(find niryo_one_description)/urdf/gazebo_utils/utils.xacro" />
 	<xacro:include filename="$(find niryo_one_description)/urdf/gazebo_utils/niryo_one.transmission.xacro" />
 	<!-- Links -->
-
-    <link name="ground_link"/>	
+	<link name="ground_link"/>
+	
     <link name="base_link">
 		<visual>
 			<origin xyz="0 0 0" rpy="0 0 0" />
@@ -248,14 +248,12 @@
 
 	</link>
 	
-
-
 	<!--Joints -->
     
 	<joint name="ground_joint" type="fixed">
         <parent link="ground_link" />
         <child link="base_link" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
     </joint>
 
 	<joint name="joint_1" type="revolute">
