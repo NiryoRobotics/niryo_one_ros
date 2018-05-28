@@ -78,12 +78,12 @@ class ToolController:
 
     def tool_on_goal(self, goal):
         cmd = goal.cmd 
-        #rospy.loginfo("received goal : " + str(goal))
+        #rospy.loginfo("Tool controller - received goal : " + str(goal))
       
         if self.current_tool is None:
             self.server.set_aborted(self.create_action_result(400, "No tool selected"))
             return
-
+        
         # 1. Check tool id
         if cmd.tool_id != self.current_tool.get_id():
             self.server.set_aborted(self.create_action_result(400,
@@ -108,7 +108,7 @@ class ToolController:
         except ToolValidationException, e:
             self.server.set_aborted(self.create_action_result(400, str(e)))
             return
-
+        
         # 4. Execute cmd -> retrieve cmd name in command list and execute on current tool
         self.current_tool.set_as_active()
         success = False
@@ -124,6 +124,7 @@ class ToolController:
             self.server.set_succeeded(
                 self.create_action_result(200, "Tool action successfully finished"))
         else: 
+            rospy.loginfo("Tool controller - error : " + str(message))
             self.server.set_aborted(self.create_action_result(400, message))
             
     def callback_change_tool(self, req):

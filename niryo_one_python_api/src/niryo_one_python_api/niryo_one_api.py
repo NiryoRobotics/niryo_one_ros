@@ -135,7 +135,7 @@ class NiryoOne:
             if not client.wait_for_result(timeout=rospy.Duration(self.action_execute_timeout)):
                 client.cancel_goal()
                 client.stop_tracking_goal()
-                raise NiryoOneException('Action Server timeout' + str(action_name))
+                raise NiryoOneException('Action Server timeout : ' + str(action_name))
 
             goal_state = client.get_state()
             response = client.get_result()

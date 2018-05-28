@@ -253,14 +253,15 @@ class RobotCommander:
     def execute_command_action(self):
         cmd = self.current_goal_handle.goal.goal.cmd 
         rospy.loginfo("passing to executing command")
-        result = self.create_result(CommandStatus.ROS_ERROR, "error with executing commad")
+        result = self.create_result(CommandStatus.ROS_ERROR, "error with executing command")
         response = None
         try: 
             (status, message) = self.execute_command(cmd)
             response = self.create_result(status, message)
             result = response 
-        except RobotCommanderException :
-            rospy.loginfo ("error with executing command ") 
+        except RobotCommanderException as e :
+            result = self.create_result(e.status, e.message)
+            rospy.loginfo ("An exception was thrown during command execution") 
 
         if not response:
             self.current_goal_handle.set_aborted(result)

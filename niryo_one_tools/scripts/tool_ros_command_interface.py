@@ -88,7 +88,7 @@ class ToolRosCommandInterface:
 
     def digital_output_tool_setup(self, gpio_pin):
         try:
-            rospy.wait_for_service('niryo_one/rpi/set_digital_io_mode')
+            rospy.wait_for_service('niryo_one/rpi/set_digital_io_mode', 2)
         except rospy.ROSException:
             return 400, "Digital IO panel service is not connected"
         try:
@@ -99,7 +99,7 @@ class ToolRosCommandInterface:
 
     def digital_output_tool_activate(self, gpio_pin, activate):
         try:
-            rospy.wait_for_service('niryo_one/rpi/set_digital_io_state')
+            rospy.wait_for_service('niryo_one/rpi/set_digital_io_state', 2)
         except rospy.ROSException:
             return 400, "Digital IO panel service is not connected"
         try:
