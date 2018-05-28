@@ -10,11 +10,6 @@
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
   
-
-  <!-- Load the URDF into the ROS Parameter Server -->
-  <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find niryo_one_description)/urdf/v1/niryo_one.urdf.xacro'" />
-  <param name="robot_description" command="$(arg urdf_file)" />
-
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find niryo_one_gazebo)/worlds/niryo_one.world"/>
@@ -23,13 +18,11 @@
     <arg name="gui" value="$(arg gui)" />
     <arg name="paused" value="$(arg paused)"/>
     <arg name="use_sim_time" value="$(arg use_sim_time)"/>
-    <arg name="headless" value="$(arg headless)"/>
+    <arg name="headless" value="$(arg headless)"/>   
   </include>
-  
-  <!--spawn robot in gazebo -->
+  <!-- push robot_description to factory and spawn robot in gazebo -->
   <node name="niryo_one_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model niryo_one" respawn="false" />	
   
-  <!-- load the controllers -->
   <include file="$(find niryo_one_bringup)/launch/controllers.launch">
     <arg name="simulation_mode" value="true" />
   </include>

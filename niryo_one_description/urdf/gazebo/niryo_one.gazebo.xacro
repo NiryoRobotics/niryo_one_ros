@@ -20,7 +20,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="niryo_one">
 
   <gazebo reference="ground_link">
-		<material>Gazebo/Back</material>
+		<material>Gazebo/Black</material>
 		<turnGravityOff>true</turnGravityOff>
 	</gazebo>
 

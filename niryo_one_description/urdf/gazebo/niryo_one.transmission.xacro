@@ -25,8 +25,8 @@
       <joint name="joint_1">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </joint>
-      <actuator name="base_shoulder_motor">
-        <mechanicalReduction>1</mechanicalReduction>
+      <actuator name="base_shoulder_stepper">
+        <mechanicalReduction>6.0625</mechanicalReduction>
 		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </actuator>
     </transmission>
@@ -36,8 +36,8 @@
       <joint name="joint_2">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </joint>
-      <actuator name="shoulder_arm_motor">
-        <mechanicalReduction>1</mechanicalReduction>
+      <actuator name="shoulder_arm_stepper">
+        <mechanicalReduction>8.3125</mechanicalReduction>
 		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </actuator>
     </transmission>
@@ -47,8 +47,8 @@
       <joint name="joint_3">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </joint>
-      <actuator name="arm_elbow_motor">
-        <mechanicalReduction>1</mechanicalReduction>
+      <actuator name="arm_elbow_stepper">
+        <mechanicalReduction>7.875</mechanicalReduction>
 		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </actuator>
     </transmission>
@@ -59,7 +59,7 @@
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </joint>
       <actuator name="elbow_forarm_motor">
-        <mechanicalReduction>1</mechanicalReduction>
+        <mechanicalReduction>5.0</mechanicalReduction>
       </actuator>
     </transmission>
 
