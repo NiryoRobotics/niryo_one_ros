@@ -150,6 +150,10 @@ Params:
 
 Deactivate electromagnet on digital I/O <pin> (place object). This will set the pin state to LOW.
 
+##### get\_saved\_position\_list
+
+Get all saved positions on the robot
+
 ##### wait
 
 Params:

@@ -30,6 +30,7 @@ from niryo_one_msgs.msg import RobotMoveGoal
 from niryo_one_msgs.srv import SetInt
 from niryo_one_msgs.srv import GetDigitalIO
 from niryo_one_msgs.srv import SetDigitalIO
+from niryo_one_msgs.srv import GetPositionList
 
 from niryo_one_commander.command_type import CommandType as MoveCommandType
 
@@ -264,6 +265,11 @@ class NiryoOne:
             goal.cmd.tool_cmd.cmd_type = self.tool_command_list['deactivate_digital_io']
             goal.cmd.tool_cmd.gpio = pin
             return self.execute_action('niryo_one/commander/robot_action', RobotMoveAction, goal)
+
+        def get_saved_position_list(self):
+            result = self.call_service('niryo_one/position/get_position_list', 
+                    GetPositionList, [])
+            return result.positions
 
         def wait(self, time_sleep):
             rospy.sleep(time_sleep)
