@@ -32,6 +32,10 @@ except NiryoOneException as e:
 
 ### Documentation - Class methods
 
+##### auto\_calibrate
+
+Calibrate robot motors. If calibration is not needed, this method will do nothing.
+
 ##### activate\_learning\_mode
 
 Params: 

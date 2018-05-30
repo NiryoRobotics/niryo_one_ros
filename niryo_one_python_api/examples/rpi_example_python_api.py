@@ -11,8 +11,15 @@ print "--- Start"
 n = NiryoOne()
 
 try:
+    # Calibrate robot first
+    n.auto_calibrate()
+    print "Calibration finished !"
+
+    time.sleep(1)
+
     # Test learning mode
     n.activate_learning_mode(False)
+
 
     # Test electromagnet on GPIO 2
     pin = GPIO_1A

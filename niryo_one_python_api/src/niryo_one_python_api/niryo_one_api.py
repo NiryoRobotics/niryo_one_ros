@@ -26,6 +26,7 @@ from std_msgs.msg import String
 
 from niryo_one_msgs.msg import RobotMoveAction
 from niryo_one_msgs.msg import RobotMoveGoal
+from niryo_one_msgs.msg import HardwareStatus
 
 from niryo_one_msgs.srv import SetInt
 from niryo_one_msgs.srv import GetDigitalIO
@@ -156,6 +157,23 @@ class NiryoOne:
         #    
         # Interface
         #
+
+        def auto_calibrate(self):
+            result = self.call_service('niryo_one/calibrate_motors',
+                    SetInt, [1])
+            if result.status != 200:
+                raise NiryoOneException(result.message)
+            # Wait until calibration is finished
+            rospy.sleep(1)
+            calibration_finished = False
+            while not calibration_finished:
+                try:
+                    hw_status = rospy.wait_for_message('niryo_one/hardware_status', 
+                            HardwareStatus, timeout=5)
+                    if not hw_status.calibration_in_progress:
+                        calibration_finished = True
+                except rospy.ROSException as e:
+                    raise NiryoOneException(str(e))
        
         def activate_learning_mode(self, activate):
             result = self.call_service('niryo_one/activate_learning_mode', 
