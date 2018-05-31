@@ -33,6 +33,7 @@ from niryo_one_msgs.msg import Sequence as SequenceMessage
 from niryo_one_commander.command_status import CommandStatus
 
 from sequence_manager import SequenceManager
+from niryo_one_user_interface.sequences.sequence_code_executor import SequenceCodeExecutor
 from niryo_one_user_interface.sequences.sequence_action_type import SequenceActionType
 
 
@@ -41,6 +42,8 @@ class SequenceActionServer:
     def __init__(self, sequence_manager):
         self.server = actionlib.ActionServer('niryo_one/sequences/execute',
                 SequenceAction, self.on_goal, self.on_cancel, auto_start=False)
+
+        self.seq_code_executor = SequenceCodeExecutor()
 
         self.current_goal_handle = None
 
@@ -85,8 +88,7 @@ class SequenceActionServer:
             rospy.loginfo("No current goal, nothing to do")
 
     def cancel_current_command(self):
-        pass
-        # for now, a quick way to terminate a blockly command is to activate learning mode
+        self.seq_code_executor.cancel_execution()
     
     def execute_action(self):
         cmd_type = self.current_goal_handle.goal.goal.cmd_type
@@ -129,23 +131,21 @@ class SequenceActionServer:
             self.seq_manager.save_last_executed_sequence(sequence)
 
         # 4. Execute code
-        try:
-            exec code
-        except NiryoOneException, e:
-            result = self.create_result(CommandStatus.SEQUENCE_FAILED, str(e)) 
+        exec_result = self.seq_code_executor.execute_generated_code(code)
+       
+        # 5. Return exec result
+        if exec_result['status'] == 300:
+            result = self.create_result(CommandStatus.STOPPED, exec_result['message'])
+            self.current_goal_handle.set_canceled(result)
+        elif exec_result['status'] == 200:
+            result = self.create_result(CommandStatus.SUCCESS, exec_result['message'])
+            self.current_goal_handle.set_succeeded(result)
+        else:
+            result = self.create_result(CommandStatus.SEQUENCE_FAILED, exec_result['message'])
             self.current_goal_handle.set_aborted(result)
-            self.current_goal_handle = None
-            return
-        except Exception, e:
-            result = self.create_result(CommandStatus.SEQUENCE_FAILED, str(e)) 
-            self.current_goal_handle.set_aborted(result)
-            self.current_goal_handle = None
-            return
-    
-        result = self.create_result(CommandStatus.SUCCESS, "Successfully executed Sequence code")
-        self.current_goal_handle.set_succeeded(result)
+
         self.current_goal_handle = None
-         
+
 
 if __name__ == '__main__':
     #rospy.init_node('sequence_action_server')

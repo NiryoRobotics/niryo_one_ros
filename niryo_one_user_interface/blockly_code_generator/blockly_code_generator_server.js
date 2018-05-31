@@ -54,7 +54,8 @@ const generateCode = (dirPath) => {
         return { status: 400, message: 'Failed to parse given Xml' };
     }
     
-    var code = '#!/usr/bin/env python\n\nfrom niryo_one_python_api.niryo_one_api import *\n\nn = NiryoOne()\n\n';
+    var code = '#!/usr/bin/env python\n\nfrom niryo_one_python_api.niryo_one_api import *\n'
+        + 'import rospy\nrospy.init_node(\'niryo_one_generated_code_execution\')\nn = NiryoOne()\n\n';
     
     try {
         code += Blockly.Python.workspaceToCode(workspace);
