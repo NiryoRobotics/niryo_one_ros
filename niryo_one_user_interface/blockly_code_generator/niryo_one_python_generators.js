@@ -379,6 +379,19 @@ Blockly.Blocks['niryo_one_gpio_state'] = {
     }
 };
 
+Blockly.Blocks['niryo_one_comment'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("Comment :")
+            .appendField(new Blockly.FieldTextInput(""), "COMMENT_TEXT");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#3D4D9A");
+        this.setTooltip("This block will not be executed.");
+        this.setHelpUrl("");
+    }
+};
+
 /*
  * Generators
  */
@@ -540,6 +553,13 @@ Blockly.Python['niryo_one_gpio_state'] = function (block) {
   var dropdown_gpio_state_select = block.getFieldValue('GPIO_STATE_SELECT');
   var code = dropdown_gpio_state_select;
   return [code, Blockly.Python.ORDER_NONE];
+};
+
+
+Blockly.Python['niryo_one_comment'] = function(block) {
+  var text_comment_text = block.getFieldValue('COMMENT_TEXT');
+  var code = '# ' + text_comment_text + '\n';
+  return code;
 };
 
 /*
