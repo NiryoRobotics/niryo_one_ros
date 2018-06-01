@@ -31,17 +31,17 @@ Blockly.Blocks['niryo_one_move_joints'] = {
             .appendField("Move Joints");
         this.appendDummyInput()
             .appendField("j1")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "JOINTS_1")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "JOINTS_1")
             .appendField("j2")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "JOINTS_2")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "JOINTS_2")
             .appendField("j3")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "JOINTS_3")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "JOINTS_3")
             .appendField("j4")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "JOINTS_4")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "JOINTS_4")
             .appendField("j5")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "JOINTS_5")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "JOINTS_5")
             .appendField("j6")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "JOINTS_6");
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "JOINTS_6");
         this.setInputsInline(true);
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
@@ -57,18 +57,60 @@ Blockly.Blocks['niryo_one_move_pose'] = {
             .appendField("Move Pose");
         this.appendDummyInput()
             .appendField("x")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "POSE_X")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "POSE_X")
             .appendField("y")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "POSE_Y")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "POSE_Y")
             .appendField("z")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "POSE_Z")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "POSE_Z")
             .appendField("roll")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "POSE_ROLL")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "POSE_ROLL")
             .appendField("pitch")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "POSE_PITCH")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "POSE_PITCH")
             .appendField("yaw")
-            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.01), "POSE_YAW");
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "POSE_YAW");
         this.setInputsInline(true);
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#3D4D9A");
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
+Blockly.Blocks['niryo_one_shift_pose'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("Shift");
+        this.appendDummyInput()
+            .appendField(new Blockly.FieldDropdown([["pos. x", "0"], ["pos. y", "1"], ["pos. z", "2"], ["rot. x", "3"], ["rot. y", "4"], ["rot. z", "5"]]), "SHIFT_POSE_AXIS")
+            .appendField("by")
+            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 0.001), "SHIFT_POSE_VALUE");
+        this.setInputsInline(true);
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#3D4D9A");
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
+Blockly.Blocks['niryo_one_auto_calibrate'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("Calibrate motors");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#3D4D9A");
+        this.setTooltip("Will auto calibrate motors. If already calibrated, will do nothing.");
+        this.setHelpUrl("");
+    }
+};
+
+Blockly.Blocks['niryo_one_activate_learning_mode'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField(new Blockly.FieldDropdown([["Activate", "1"], ["Deactivate", "0"]]), "LEARNING_MODE_VALUE")
+            .appendField("learning mode");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour("#3D4D9A");
@@ -365,6 +407,26 @@ Blockly.Python['niryo_one_move_pose'] = function (block) {
   var code = 'n.move_pose(' + number_pose_x + ', ' + number_pose_y + ', ' +
     number_pose_z + ', ' + number_pose_roll + ', ' + number_pose_pitch +
     ', ' + number_pose_yaw + ")\n";
+  return code;
+};
+
+Blockly.Python['niryo_one_shift_pose'] = function (block) {
+  var dropdown_shift_pose_axis = block.getFieldValue('SHIFT_POSE_AXIS');
+  var number_shift_pose_value = block.getFieldValue('SHIFT_POSE_VALUE');
+
+  var code = 'n.shift_pose(' + dropdown_shift_pose_axis + ', ' +
+    number_shift_pose_value + ')\n';
+  return code;
+};
+
+Blockly.Python['niryo_one_auto_calibrate'] = function (block) {
+  var code = 'n.auto_calibrate()\n';
+  return code;
+};
+
+Blockly.Python['niryo_one_activate_learning_mode'] = function (block) {
+  var dropdown_learning_mode_value = block.getFieldValue('LEARNING_MODE_VALUE');
+  var code = 'n.activate_learning_mode(' + dropdown_learning_mode_value + ')\n';
   return code;
 };
 
