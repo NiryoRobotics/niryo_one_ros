@@ -552,8 +552,9 @@ void CanCommunication::setCalibrationFlag(bool flag)
  * to home position before using this mode
  * 2. If mode is automatic, it will send a calibration command to all motors, and wait until it receives a confirmation
  * from all motors (success, timeout, bad params)
+ *  Also, the auto calibration is done with multiple steps, 
  */
-int CanCommunication::calibrateMotors()
+int CanCommunication::calibrateMotors(int calibration_step)
 {
     if (!is_can_connection_ok) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
@@ -564,22 +565,31 @@ int CanCommunication::calibrateMotors()
         return CAN_STEPPERS_CALIBRATION_WAITING_USER_INPUT;
     }
 
-    ROS_INFO("START Calibrating stepper motors");
+    ROS_INFO("START Calibrating stepper motors, step number %d", calibration_step);
     stopHardwareControlLoop();
     ros::Duration(0.1).sleep();
 
     // If user wants to do a manual calibration, just send offset to current position
     if (steppers_calibration_mode == CAN_STEPPERS_CALIBRATION_MODE_MANUAL) {
+        if (calibration_step > 1) {
+            return CAN_STEPPERS_CALIBRATION_OK; // do manual calibration only once
+        }
         calibration_in_progress = true;
         int result = manualCalibration();
         calibration_in_progress = false;
         return result;
     }
     else if (steppers_calibration_mode == CAN_STEPPERS_CALIBRATION_MODE_AUTO) {
-        calibration_in_progress = true;
-        int result = autoCalibration();
-        calibration_in_progress = false;
-        return result;
+        if (calibration_step == 1) {
+            calibration_in_progress = true;
+            int result = autoCalibrationStep1();
+            return result;
+        }
+        else if (calibration_step == 2) {
+            int result = autoCalibrationStep2();
+            calibration_in_progress = false;
+            return result;
+        }
     }
     else {
         return CAN_STEPPERS_CALIBRATION_FAIL;
@@ -721,7 +731,7 @@ int CanCommunication::relativeMoveMotor(StepperMotorState* motor, int steps, int
     return CAN_OK;
 }
 
-int CanCommunication::autoCalibration()
+int CanCommunication::autoCalibrationStep1()
 {
     int calibration_timeout = 30; // seconds
     int result;
@@ -735,6 +745,14 @@ int CanCommunication::autoCalibration()
     if (relativeMoveMotor(&m3, rad_pos_to_steps(0.5, m3.getGearRatio(), m3.getDirection()), 1500, true) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL; 
     }
+   
+    return CAN_STEPPERS_CALIBRATION_OK;
+}
+
+int CanCommunication::autoCalibrationStep2()
+{
+    int calibration_timeout = 30; // seconds
+    int result;
 
     // 2. Send calibration cmd 1 + 2 + 4
     if (sendCalibrationCommandForOneMotor(&m1, 800, 1, calibration_timeout) != CAN_OK) {

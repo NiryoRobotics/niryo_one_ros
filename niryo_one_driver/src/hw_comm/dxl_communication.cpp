@@ -676,6 +676,35 @@ void DxlCommunication::hardwareControlLoop()
         }
     }
 }
+/*
+ * Only use this method during calibration !!
+ * This will make all Dynamixel go to their home position
+ * so the axis 3 can be correctly calibrated
+ */
+void DxlCommunication::moveAllMotorsToHomePosition()
+{
+    // 1. Set cmd home position
+    if (hardware_version == 1) {
+        m5_1.setPositionCommand(XL320_MIDDLE_POSITION);
+        m5_2.setPositionCommand(XL320_MIDDLE_POSITION);
+        m6.setPositionCommand(XL320_MIDDLE_POSITION);
+    }
+    else if (hardware_version == 2) {
+        m4.setPositionCommand(XL430_MIDDLE_POSITION);
+        m5.setPositionCommand(XL430_MIDDLE_POSITION);
+        m6.setPositionCommand(XL320_MIDDLE_POSITION);
+    }
+    // if motor disabled, pos_state = pos_cmd (echo position)
+    for (int i = 0 ; i < motors.size(); i++) {
+        if (!motors.at(i)->isEnabled()) {
+            motors.at(i)->setPositionState(motors.at(i)->getPositionCommand());
+        }
+    }
+    
+    // 2. Set torque on (override default). Motors will be deactivated after calibration is finished
+    torque_on = true;
+    write_torque_on_enable = true;
+}
 
 void DxlCommunication::setControlMode(int control_mode)
 {

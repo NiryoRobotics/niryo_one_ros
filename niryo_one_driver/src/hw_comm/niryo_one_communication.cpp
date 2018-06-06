@@ -1,5 +1,5 @@
 /*
-    dxl_sdk_test.cpp
+    niryo_one_communication.cpp
     Copyright (C) 2017 Niryo
     All rights reserved.
 
@@ -124,9 +124,20 @@ void NiryoOneCommunication::manageCanConnectionLoop()
             motors_ok = false;
 
             while (!motors_ok) {
-                // check if calibration could be done (user flag + execution success)
-                int calibration_result = canComm->calibrateMotors(); 
-                if (calibration_result == CAN_STEPPERS_CALIBRATION_OK) { 
+                int calibration_step1_result = CAN_STEPPERS_CALIBRATION_FAIL;
+                int calibration_step2_result = CAN_STEPPERS_CALIBRATION_FAIL;
+                
+                calibration_step1_result = canComm->calibrateMotors(1);
+                if (calibration_step1_result == CAN_STEPPERS_CALIBRATION_OK) {
+                    if (dxl_enabled) {
+                        ROS_INFO("Asking Dynamixel motors to go to home position");
+                        dxlComm->moveAllMotorsToHomePosition();
+                    }
+                    calibration_step2_result = canComm->calibrateMotors(2);
+                }
+
+                if ((calibration_step1_result == CAN_STEPPERS_CALIBRATION_OK) 
+                        && (calibration_step2_result == CAN_STEPPERS_CALIBRATION_OK)) {
                     motors_ok = true;
                     activateLearningMode(true);
                 }
@@ -140,7 +151,7 @@ void NiryoOneCommunication::manageCanConnectionLoop()
                     }
 
                     // last calibration has failed, reset flag
-                    if (calibration_result != CAN_STEPPERS_CALIBRATION_WAITING_USER_INPUT) {
+                    if (calibration_step1_result != CAN_STEPPERS_CALIBRATION_WAITING_USER_INPUT) {
                         canComm->setCalibrationFlag(true);
                         // go back to limited mode (during calibration, hw control loop is stopped)
                         canComm->startHardwareControlLoop(true); 

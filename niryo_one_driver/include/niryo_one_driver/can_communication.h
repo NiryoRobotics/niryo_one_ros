@@ -88,9 +88,10 @@ class CanCommunication {
         void setMaxEffort(std::vector<uint8_t> max_effort_list);
         
         bool isCalibrationInProgress();
-        int calibrateMotors();
+        int calibrateMotors(int calibration_step);
         int manualCalibration();
-        int autoCalibration();
+        int autoCalibrationStep1();
+        int autoCalibrationStep2();
         int sendCalibrationCommandForOneMotor(StepperMotorState* motor, int delay_between_steps,
                 int calibration_direction, int calibration_timeout);
         int getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout);
