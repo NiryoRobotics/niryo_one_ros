@@ -754,7 +754,7 @@ int CanCommunication::autoCalibrationStep2()
     int calibration_timeout = 30; // seconds
     int result;
 
-    // 2. Send calibration cmd 1 + 2 + 4
+    // 2. Send calibration cmd 1 + 2 + 4 (+3 if hw version == 2)
     if (sendCalibrationCommandForOneMotor(&m1, 800, 1, calibration_timeout) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
@@ -766,16 +766,25 @@ int CanCommunication::autoCalibrationStep2()
     if (sendCalibrationCommandForOneMotor(&m4, 800, 1, calibration_timeout) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
+    
+    if (hardware_version == 2) {
+        if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
+    }
 
     // 2.1 Wait calibration result
     std::vector<StepperMotorState*> steppers = { &m1, &m2, &m4 };
+    if (hardware_version == 2) {
+        steppers.push_back(&m3);
+    }
     if (getCalibrationResults(steppers, calibration_timeout) != CAN_STEPPERS_CALIBRATION_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
 
     // 3. Move motor 1,2,4 to 0.0
     int delay_micros = 2000;
-    if (relativeMoveMotor(&m1, -m1.getOffsetPosition(), 1500, false) != CAN_OK) {
+    if (relativeMoveMotor(&m1, -m1.getOffsetPosition(), 1300, false) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
     if (relativeMoveMotor(&m2, -m2.getOffsetPosition(), 3000, false) != CAN_OK) {
@@ -786,17 +795,25 @@ int CanCommunication::autoCalibrationStep2()
     }
     
     // 3.1 Wait for motors to finish moving (at least m4, so we can start m3 calibration)
-    ros::Duration(abs(m4.getOffsetPosition()) * 1500 / 1000000).sleep();
-    
-    // 5. Send calibration cmd m3
-    if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
-        return CAN_STEPPERS_CALIBRATION_FAIL;
+    // For hw version 2, just wait for m1 to be at home position
+    if (hardware_version == 1) {
+        ros::Duration(abs(m4.getOffsetPosition()) * 1500 / 1000000).sleep();
     }
+    else if (hardware_version == 2) {
+        ros::Duration(abs(m1.getOffsetPosition()) * 1300 / 1000000).sleep();
+    }
+    
+    // 5. Send calibration cmd m3 (only for hw version 1)
+    if (hardware_version == 1) {
+        if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
 
-    // 5.1 Wait calibration result
-    std::vector<StepperMotorState*> stepper = { &m3 };
-    if (getCalibrationResults(stepper, calibration_timeout) != CAN_STEPPERS_CALIBRATION_OK) {
-        return CAN_STEPPERS_CALIBRATION_FAIL;
+        // 5.1 Wait calibration result
+        std::vector<StepperMotorState*> stepper = { &m3 };
+        if (getCalibrationResults(stepper, calibration_timeout) != CAN_STEPPERS_CALIBRATION_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
     }
 
     return CAN_STEPPERS_CALIBRATION_OK;

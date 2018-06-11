@@ -75,10 +75,7 @@ class SequenceCodeExecutor:
             self.process.terminate()
     
     def stop_robot_action(self):
-        # 1. Stop calibration if calibration in progress
-        # todo
-
-        # 2. Stop current move command
+        # Stop current move command
         try:
             rospy.wait_for_service('/niryo_one/commander/stop_command', 1)
             stop_cmd = rospy.ServiceProxy('/niryo_one/commander/stop_command', SetBool)
