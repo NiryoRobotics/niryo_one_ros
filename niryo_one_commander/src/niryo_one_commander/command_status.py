@@ -30,6 +30,7 @@ class CommandStatus:
     INVALID_PARAMETERS = 11
     LEARNING_MODE_ON   = 12
     JOYSTICK_ENABLED   = 13
+    HARDWARE_NOT_OK    = 14
 
     # Aborted
     NO_PLAN_AVAILABLE   = 20
