@@ -123,4 +123,28 @@ class MoveGroupArm:
                 return False
             #rospy.loginfo("Sign change counter : " + str(sign_change_counter))
         return True
-    
+
+    def execute(self, plan, wait=False):
+        self.arm.execute(plan, wait=wait)
+
+    def stop(self):
+        self.arm.stop()
+
+    def set_joint_value_target(self, joint_array):
+        self.arm.set_joint_value_target(joint_array)
+
+    def set_position_target(self, x, y, z):
+        self.arm.set_position_target([x, y, z], self.end_effector_link)
+
+    def set_rpy_target(self, roll, pitch, yaw):
+        self.arm.set_rpy_target([roll, pitch, yaw], self.end_effector_link)
+ 
+    def set_pose_target(self, x, y, z, roll, pitch, yaw):
+        self.arm.set_pose_target([x, y, z, roll, pitch, yaw], self.end_effector_link)
+        
+    def set_pose_quat_target(self, pose):
+        self.arm.set_pose_target(pose, self.end_effector_link)
+
+    def set_shift_pose_target(self, axis_number, value):
+        self.arm.shift_pose_target(axis_number, value, self.end_effector_link)
+

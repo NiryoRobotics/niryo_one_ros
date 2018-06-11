@@ -42,7 +42,7 @@ class ArmCommander:
             self.current_goal_id = None
             self.current_goal_result = GoalStatus.LOST
             # send traj and wait 
-            self.move_group_arm.arm.execute(plan, wait=False)
+            self.move_group_arm.execute(plan, wait=False)
             trajectory_time_out = 1.5 * self.get_plan_time(plan)
             # if trajectory_time_out is less than to seconds, the default value will be 2 seconds 
             if trajectory_time_out < TrajectoryTimeOutMin : 
@@ -81,25 +81,43 @@ class ArmCommander:
 
     def stop_current_plan(self):
         rospy.loginfo("Send STOP to arm")
-        self.move_group_arm.arm.stop()
+        self.move_group_arm.stop()
 
     def set_joint_target(self, joint_array):
-        self.move_group_arm.arm.set_joint_value_target(joint_array)
+        try:
+            self.move_group_arm.set_joint_value_target(joint_array)
+        except Exception, e:
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, str(e))
 
     def set_position_target(self, x, y, z):
-        self.move_group_arm.arm.set_position_target([x, y, z], self.move_group_arm.end_effector_link)
+        try:
+            self.move_group_arm.set_position_target(x, y, z)
+        except Exception, e:
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, str(e))
 
     def set_rpy_target(self, roll, pitch, yaw):
-        self.move_group_arm.arm.set_rpy_target([roll, pitch, yaw], self.move_group_arm.end_effector_link)
+        try:
+            self.move_group_arm.set_rpy_target(roll, pitch, yaw)
+        except Exception, e:
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, str(e))
  
     def set_pose_target(self, x, y, z, roll, pitch, yaw):
-        self.move_group_arm.arm.set_pose_target([x, y, z, roll, pitch, yaw], self.move_group_arm.end_effector_link)
+        try:
+            self.move_group_arm.set_pose_target(x, z, z, roll, pitch, yaw)
+        except Exception, e:
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, str(e))
         
-    def set_pose_quat_target(self,pose_msg):
-        self.move_group_arm.arm.set_pose_target(pose_msg)
+    def set_pose_quat_target(self, pose_msg):
+        try:
+            self.move_group_arm.set_pose_quat_target(pose_msg)
+        except Exception, e:
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, str(e))
 
     def set_shift_pose_target(self, axis_number, value):
-        self.move_group_arm.arm.shift_pose_target(axis_number, value, self.move_group_arm.end_effector_link)
+        try:
+            self.move_group_arm.set_shift_pose_target(axis_number, value)
+        except Exception, e:
+            raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, str(e))
 
     def get_plan_time(self, plan):
         if plan:
