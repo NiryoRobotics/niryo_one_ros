@@ -130,8 +130,10 @@ void NiryoOneCommunication::manageCanConnectionLoop()
                 calibration_step1_result = canComm->calibrateMotors(1);
                 if (calibration_step1_result == CAN_STEPPERS_CALIBRATION_OK) {
                     if (dxl_enabled) {
-                        ROS_INFO("Asking Dynamixel motors to go to home position");
-                        dxlComm->moveAllMotorsToHomePosition();
+                        if (canComm->getCalibrationMode() == CAN_STEPPERS_CALIBRATION_MODE_AUTO) {
+                            ROS_INFO("Asking Dynamixel motors to go to home position");
+                            dxlComm->moveAllMotorsToHomePosition();
+                        }
                     }
                     calibration_step2_result = canComm->calibrateMotors(2);
                 }

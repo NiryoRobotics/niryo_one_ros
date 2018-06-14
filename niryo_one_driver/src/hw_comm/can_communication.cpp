@@ -596,6 +596,11 @@ int CanCommunication::calibrateMotors(int calibration_step)
     }
 }
 
+int CanCommunication::getCalibrationMode()
+{
+    return steppers_calibration_mode;
+}
+
 bool CanCommunication::isCalibrationInProgress()
 {
     return calibration_in_progress;

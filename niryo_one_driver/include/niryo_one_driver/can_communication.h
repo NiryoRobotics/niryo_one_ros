@@ -87,6 +87,7 @@ class CanCommunication {
         void setMicroSteps(std::vector<uint8_t> micro_steps_list);
         void setMaxEffort(std::vector<uint8_t> max_effort_list);
         
+        int getCalibrationMode();
         bool isCalibrationInProgress();
         int calibrateMotors(int calibration_step);
         int manualCalibration();
