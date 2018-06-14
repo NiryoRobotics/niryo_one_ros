@@ -319,6 +319,9 @@ class RobotCommander:
         elif response.status == CommandStatus.STOPPED:
             self.current_goal_handle.set_canceled(result)
             rospy.loginfo("Goal has been successfully canceled")
+        elif response.status == CommandStatus.CONTROLLER_PROBLEMS:
+            self.current_goal_handle.set_aborted(result)
+            rospy.loginfo("Controller failed during execution : Goal has been aborted")
         else:
             self.current_goal_handle.set_aborted(result)
             rospy.loginfo("Unknown result, goal has been set as aborted")
