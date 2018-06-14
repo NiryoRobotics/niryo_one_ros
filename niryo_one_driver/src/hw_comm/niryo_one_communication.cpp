@@ -445,38 +445,46 @@ void NiryoOneCommunication::getCurrentPosition(double pos[6])
 
 void NiryoOneCommunication::sendPositionToRobot(const double cmd[6])
 {
-    if (hardware_version == 1) {
-        if (can_enabled) { canComm->setGoalPositionV1(cmd[0], cmd[1], cmd[2], cmd[3]); }
-        if (dxl_enabled) { dxlComm->setGoalPositionV1(cmd[4], cmd[5]); }
-
-        // if disabled (debug purposes)
-        if (!can_enabled) {
-            pos_can_disabled_v1[0] = cmd[0];
-            pos_can_disabled_v1[1] = cmd[1];
-            pos_can_disabled_v1[2] = cmd[2];
-            pos_can_disabled_v1[3] = cmd[3];
-        }
-
-        if (!dxl_enabled) {
-            pos_dxl_disabled_v1[0] = cmd[4];
-            pos_dxl_disabled_v1[1] = cmd[5];
-        }
+    bool is_calibration_in_progress = false;
+    if (can_enabled) {
+        is_calibration_in_progress = canComm->isCalibrationInProgress();
     }
-    else if (hardware_version == 2) {
-        if (can_enabled) { canComm->setGoalPositionV2(cmd[0], cmd[1], cmd[2]); }
-        if (dxl_enabled) { dxlComm->setGoalPositionV2(cmd[3], cmd[4], cmd[5]); }
-        
-        // if disabled (debug purposes)
-        if (!can_enabled) {
-            pos_can_disabled_v2[0] = cmd[0];
-            pos_can_disabled_v2[1] = cmd[1];
-            pos_can_disabled_v2[2] = cmd[2];
-        }
 
-        if (!dxl_enabled) {
-            pos_dxl_disabled_v2[0] = cmd[3];
-            pos_dxl_disabled_v2[1] = cmd[4];
-            pos_dxl_disabled_v2[2] = cmd[5];
+    // don't send position command when calibrating motors
+    if (!is_calibration_in_progress) {
+        if (hardware_version == 1) {
+            if (can_enabled) { canComm->setGoalPositionV1(cmd[0], cmd[1], cmd[2], cmd[3]); }
+            if (dxl_enabled) { dxlComm->setGoalPositionV1(cmd[4], cmd[5]); }
+
+            // if disabled (debug purposes)
+            if (!can_enabled) {
+                pos_can_disabled_v1[0] = cmd[0];
+                pos_can_disabled_v1[1] = cmd[1];
+                pos_can_disabled_v1[2] = cmd[2];
+                pos_can_disabled_v1[3] = cmd[3];
+            }
+
+            if (!dxl_enabled) {
+                pos_dxl_disabled_v1[0] = cmd[4];
+                pos_dxl_disabled_v1[1] = cmd[5];
+            }
+        }
+        else if (hardware_version == 2) {
+            if (can_enabled) { canComm->setGoalPositionV2(cmd[0], cmd[1], cmd[2]); }
+            if (dxl_enabled) { dxlComm->setGoalPositionV2(cmd[3], cmd[4], cmd[5]); }
+            
+            // if disabled (debug purposes)
+            if (!can_enabled) {
+                pos_can_disabled_v2[0] = cmd[0];
+                pos_can_disabled_v2[1] = cmd[1];
+                pos_can_disabled_v2[2] = cmd[2];
+            }
+
+            if (!dxl_enabled) {
+                pos_dxl_disabled_v2[0] = cmd[3];
+                pos_dxl_disabled_v2[1] = cmd[4];
+                pos_dxl_disabled_v2[2] = cmd[5];
+            }
         }
     }
 }
