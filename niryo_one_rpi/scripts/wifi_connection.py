@@ -61,12 +61,17 @@ class WifiConnectionManager:
         app.run(host='0.0.0.0')
 
     def get_robot_unique_identifier(self):
-        with open('/var/lib/dbus/machine-id', 'r') as f:
-            machine_id = f.readline().rstrip()
-            # Build something readable and not too long
-            identifier = str(machine_id[2:5]) + '-' + str(machine_id[5:8]) + '-' + str(machine_id[8:11])
-            return identifier
-        return ''
+        identifier = ''
+        with open('/proc/cpuinfo', 'r') as f:
+            rpi_serial = ''
+            for line in f:
+                if line[0:6] == 'Serial':
+                    rpi_serial = line[10:26]
+                    break
+            if rpi_serial != '':
+                # Build something readable and not too long
+                identifier = str(rpi_serial[8:10]) + '-' + str(rpi_serial[10:13]) + '-' + str(rpi_serial[13:16])
+        return identifier
 
     def __init__(self):
         rospy.loginfo("Starting wifi manager...")
