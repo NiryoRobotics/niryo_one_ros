@@ -246,14 +246,6 @@ class RobotCommander:
             goal_handle.set_rejected(result)
             return
 
-        # Check if learning mode ON
-        if self.learning_mode_on:
-            if not self.activate_learning_mode(False):
-                result = self.create_result(CommandStatus.LEARNING_MODE_ON,
-                     "Learning mode could not be deactivated")
-                goal_handle.set_rejected(result)
-                return
-
         # Check if joystick enabled
         if self.joystick_enabled:
             result = self.create_result(CommandStatus.JOYSTICK_ENABLED, 
@@ -271,13 +263,21 @@ class RobotCommander:
       
         # validate parameters -> set_rejected (msg : validation or commander error)
         try:
-            rospy.loginfo("Robot Acton Sever - checking paramter Validity")
+            rospy.loginfo("Robot Action Server - Checking parameters Validity")
             self.validate_params(goal_handle.goal.goal.cmd)
         except RobotCommanderException as e:
             result = self.create_result(e.status, e.message)
             goal_handle.set_rejected(result)
             rospy.loginfo("Robot Action Server - Invalid parameters")
             return
+        
+        # Check if learning mode ON
+        if self.learning_mode_on:
+            if not self.activate_learning_mode(False):
+                result = self.create_result(CommandStatus.LEARNING_MODE_ON,
+                     "Learning mode could not be deactivated")
+                goal_handle.set_rejected(result)
+                return
         
         # set accepted
         self.current_goal_handle = goal_handle
