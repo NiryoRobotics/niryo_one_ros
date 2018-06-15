@@ -63,6 +63,17 @@ HR_NEW_CALIBRATION_REQUEST  = 310
 HR_START_AUTO_CALIBRATION   = 311
 HR_START_MANUAL_CALIBRATION = 312
 
+HR_GRIPPER_OPEN_SPEED   = 401
+HR_GRIPPER_CLOSE_SPEED  = 402
+
+HR_SELECT_TOOL_FROM_ID  = 500
+
+HR_OPEN_GRIPPER         = 510
+HR_CLOSE_GRIPPER        = 511
+HR_PULL_AIR_VACUUM_PUMP = 512
+HR_PUSH_AIR_VACUUM_PUMP = 513
+
+
 # Positive number : 0 - 32767
 # Negative number : 32768 - 65535
 def handle_negative_hr(val):
@@ -77,6 +88,7 @@ class HoldingRegisterDataBlock(NiryoOneDataBlock):
         self.execution_thread = threading.Thread()
         self.is_action_client_running = False
         self.cmd_action_client = None
+        self.tool_command_list = rospy.get_param("/niryo_one_tools/command_list") 
         
     # Override
     def setValues(self, address, values):
@@ -104,6 +116,16 @@ class HoldingRegisterDataBlock(NiryoOneDataBlock):
             self.start_auto_calibration()
         elif address == HR_START_MANUAL_CALIBRATION:
             self.start_manual_calibration()
+        elif address == HR_SELECT_TOOL_FROM_ID:
+            self.select_tool(values[0])
+        elif address == HR_OPEN_GRIPPER:
+            self.open_gripper_command(values[0])
+        elif address == HR_CLOSE_GRIPPER:
+            self.close_gripper_command(values[0])
+        elif address == HR_PULL_AIR_VACUUM_PUMP:
+            self.pull_air_vacuum_pump_command(values[0])
+        elif address == HR_PUSH_AIR_VACUUM_PUMP:
+            self.push_air_vacuum_pump_command(values[0])
 
     def request_new_calibration(self):
         self.call_ros_service('/niryo_one/request_new_calibration', SetInt, [1])
@@ -126,19 +148,70 @@ class HoldingRegisterDataBlock(NiryoOneDataBlock):
         if self.is_action_client_running:
             self.cmd_action_client.cancel_goal()
 
+    def select_tool(self, tool_id):
+        self.call_ros_service('/niryo_one/change_tool', SetInt, [int(tool_id)])
+
+    def open_gripper_command(self, tool_id):
+        speed = self.getValuesOffset(HR_GRIPPER_OPEN_SPEED, 1)[0]
+        if (speed < 1) or (speed > 5):
+            speed = 3
+        self.open_gripper(tool_id, speed)
+
+    def close_gripper_command(self, tool_id):
+        speed = self.getValuesOffset(HR_GRIPPER_CLOSE_SPEED, 1)[0]
+        if (speed < 1) or (speed > 5):
+            speed = 3
+        self.close_gripper(tool_id, speed)
+
+    def pull_air_vacuum_pump_command(self, tool_id):
+        self.pull_air_vacuum_pump(tool_id)
+
+    def push_air_vacuum_pump_command(self, tool_id):
+        self.push_air_vacuum_pump(tool_id)
+
     def move_joints_command(self):
-        joints_raw_values = self.getValuesOffset(0, 6)
+        joints_raw_values = self.getValuesOffset(HR_JOINTS, 6)
         joints = []
         for j in joints_raw_values:
            joints.append(handle_negative_hr(j) / 1000.0)
         self.move_joints(joints)
 
     def move_pose_command(self):
-        pose_raw_values = self.getValuesOffset(10, 6)
+        pose_raw_values = self.getValuesOffset(HR_POSITION_X, 6)
         pose = []
         for p in pose_raw_values:
             pose.append(handle_negative_hr(p) / 1000.0)
         self.move_pose(pose)
+
+    def open_gripper(self, gripper_id, speed):
+        goal = RobotMoveGoal()
+        goal.cmd.cmd_type = MoveCommandType.TOOL
+        goal.cmd.tool_cmd.tool_id = int(gripper_id)
+        goal.cmd.tool_cmd.cmd_type = self.tool_command_list['open_gripper']
+        goal.cmd.tool_cmd.gripper_open_speed = speed
+        self.start_execution_thread(goal)
+
+    def close_gripper(self, gripper_id, speed):
+        goal = RobotMoveGoal()
+        goal.cmd.cmd_type = MoveCommandType.TOOL
+        goal.cmd.tool_cmd.tool_id = int(gripper_id)
+        goal.cmd.tool_cmd.cmd_type = self.tool_command_list['close_gripper']
+        goal.cmd.tool_cmd.gripper_close_speed = speed
+        self.start_execution_thread(goal)
+
+    def pull_air_vacuum_pump(self, vacuum_pump_id):
+        goal = RobotMoveGoal()
+        goal.cmd.cmd_type = MoveCommandType.TOOL
+        goal.cmd.tool_cmd.tool_id = int(vacuum_pump_id)
+        goal.cmd.tool_cmd.cmd_type = self.tool_command_list['pull_air_vacuum_pump']
+        self.start_execution_thread(goal)
+
+    def push_air_vacuum_pump(self, vacuum_pump_id):
+        goal = RobotMoveGoal()
+        goal.cmd.cmd_type = MoveCommandType.TOOL
+        goal.cmd.tool_cmd.tool_id = int(vacuum_pump_id)
+        goal.cmd.tool_cmd.cmd_type = self.tool_command_list['push_air_vacuum_pump']
+        self.start_execution_thread(goal)
 
     def move_pose(self, pose):
         goal = RobotMoveGoal()
