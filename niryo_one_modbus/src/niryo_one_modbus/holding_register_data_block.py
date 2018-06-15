@@ -59,6 +59,10 @@ HR_LAST_ROBOT_CMD_RESULT = 151
 HR_LEARNING_MODE         = 300
 HR_JOYSTICK_ENABLED      = 301
 
+HR_NEW_CALIBRATION_REQUEST  = 310
+HR_START_AUTO_CALIBRATION   = 311
+HR_START_MANUAL_CALIBRATION = 312
+
 # Positive number : 0 - 32767
 # Negative number : 32768 - 65535
 def handle_negative_hr(val):
@@ -94,6 +98,21 @@ class HoldingRegisterDataBlock(NiryoOneDataBlock):
             self.move_pose_command()
         elif address == HR_STOP_COMMAND:
             self.stop_current_command()
+        elif address == HR_NEW_CALIBRATION_REQUEST:
+            self.request_new_calibration()
+        elif address == HR_START_AUTO_CALIBRATION:
+            self.start_auto_calibration()
+        elif address == HR_START_MANUAL_CALIBRATION:
+            self.start_manual_calibration()
+
+    def request_new_calibration(self):
+        self.call_ros_service('/niryo_one/request_new_calibration', SetInt, [1])
+    
+    def start_auto_calibration(self):
+        self.call_ros_service('/niryo_one/calibrate_motors', SetInt, [1])
+
+    def start_manual_calibration(self):
+        self.call_ros_service('/niryo_one/calibrate_motors', SetInt, [2])
 
     def activate_learning_mode(self, activate):
         activate = int(activate >= 1)
