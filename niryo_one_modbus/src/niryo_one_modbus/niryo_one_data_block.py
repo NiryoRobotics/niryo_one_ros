@@ -32,8 +32,8 @@ class NiryoOneDataBlock(ModbusSparseDataBlock):
     def setValuesOffset(self, address, values):
         self.setValues(address + 1, values)
 
-    def getValuesOffset(self, address, values):
-        return self.getValues(address + 1, values)
+    def getValuesOffset(self, address, count=1):
+        return self.getValues(address + 1, count)
 
     def call_ros_service(self, service_name, service_msg_type, args):
         # Connect to service
@@ -49,3 +49,4 @@ class NiryoOneDataBlock(ModbusSparseDataBlock):
             return response
         except rospy.ServiceException, e:
             return
+

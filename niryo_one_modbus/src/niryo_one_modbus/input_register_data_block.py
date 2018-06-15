@@ -58,7 +58,7 @@ IR_RPI_VERSION_N1       = 406
 IR_RPI_VERSION_N2       = 407
 IR_RPI_VERSION_N3       = 408
 
-# Positive numbers : 0 - 32767
+# Positive number : 0 - 32767
 # Negative number : 32768 - 65535
 def handle_negative(val):
     if val < 0:
