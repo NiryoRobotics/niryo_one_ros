@@ -9,6 +9,7 @@ This enables you to make Niryo One communicate with a PLC, or another computer i
 All 4 Modbus datastores are implemented : _Coil_, _Discrete Input_, _Holding Register_, _Input Register_. Each datastore has a different set of functionalities. Note that **each datastore contains a completely different set of data**.
 
 _Discrete Input_ and _Input register_ are READ-ONLY tables. For Niryo One those have been used to keep the robot state.
+
 _Coil_ and _Holding Register_ are READ/WRITE tables. For Niryo One those have been used to give user commands to the robot. Hence, those 2 tables do not contain the robot state, but the last given command.
 
 Address tables start at 0.
@@ -65,10 +66,39 @@ Accepted Modbus functions :
 
 |Address| Description |
 |-------|-------------|
+| 0-5 | Joints (mrad) |
+| 10-12 | Position x,y,z (mm) |
+| 13-15 | Orientation roll, pitch, yaw (mrad) |
+| 100 | Send Joint Move command with stored joints |
+| 101 | Send Pose Move command with stored position and orientation |
+| 110 | Stop current command execution |
+| 150 | Is executing command flag |
+| 151 | Last command result* |
 | 200-299 | Can be used to store your own variables |
 | 300 | Learning Mode (On = 1, Off = 0) |
 | 301 | Joystick Enabled (On = 1, Off = 0) |
+| 310 | Request new calibration |
+| 311 | Start auto calibration |
+| 312 | Start manual calibration |
+| 401 | Gripper open speed (1-5) |
+| 402 | Gripper close speed (1-5) |
+| 500 | Select tool from given id **|
+| 510 | Open gripper with given id |
+| 511 | Close gripper with given id |
+| 512 | Pull air vacuum pump from given id |
+| 513 | Push air vacuum pump from given id |
 
+\*The "Last command result" gives you more information about the last executed command :
+* 0 : no result yet
+* 1 : success
+* 2 : command was rejected (invalid params, ...)
+* 3 : command was aborted
+* 4 : command was canceled
+* 5 : command had an unexpected error
+* 6 : command timeout
+* 7 : internal error
+
+\*\* Select tool from id : you can find the tools ids [here](https://github.com/NiryoRobotics/niryo_one_ros/blob/master/niryo_one_tools/config/end_effectors.yaml). Send id "0" to detach current tool.
 
 ## Input Register
 
@@ -82,12 +112,8 @@ Accepted Modbus functions :
 |Address| Description |
 |-------|-------------|
 | 0-5 | Joints 1-6 (mrad) |
-| 10 | Position x |
-| 11 | Position y |
-| 12 | Position z |
-| 13 | Orientation x |
-| 14 | Orientation y |
-| 15 | Orientation z |
+| 10-12 | Position x,y,z (mm) |
+| 13-15 | Orientation roll, pitch, yaw (mrad) |
 | 200 | Selected tool ID (0 for no tool) |
 | 300 | Learning Mode activated |
 | 301 | Joystick enabled |
@@ -100,6 +126,7 @@ Accepted Modbus functions :
 | 406 | Niryo One RPI image version n.1 |
 | 407 | Niryo One RPI image version n.2 |
 | 408 | Niryo One RPI image version n.3 |
+| 409 | Hardware version (1 or 2) |
 
 ## Connect to the Modbus/TCP server with Python, as a client :
 
@@ -109,12 +136,25 @@ You can test the Modbus/TCP server, for example from a remote computer on the sa
 #!/usr/bin/env python
 from pymodbus.client.sync import ModbusTcpClient # you need to "pip install pymodbus" 
 
-address = 'insert the Modbus/TCP server IP address here'
-client = ModbusTcpClient(address, port=5020)
-client.connect()
+# Positive number : 0 - 32767
+# Negative number : 32768 - 65535
+def number_to_raw_data(val):
+    if val < 0:
+        val = (1 << 15) - val
+    return val
 
-# Your code here
-# Check out the pymodbus documentation : http://pymodbus.readthedocs.io/en/latest/index.html
+def raw_data_to_number(val):
+    if (val >> 15) == 1:
+        val = - (val & 0x7FFF)
+    return val
 
-client.close()
+if __name__ == '__main__':
+    address = 'insert the Modbus/TCP server IP address here'
+    client = ModbusTcpClient(address, port=5020)
+    client.connect()
+
+    # Your code here
+    # Check out the pymodbus documentation : http://pymodbus.readthedocs.io/en/latest/index.html
+
+    client.close()
 ```
