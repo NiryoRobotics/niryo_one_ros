@@ -103,7 +103,7 @@ class ArmCommander:
  
     def set_pose_target(self, x, y, z, roll, pitch, yaw):
         try:
-            self.move_group_arm.set_pose_target(x, z, z, roll, pitch, yaw)
+            self.move_group_arm.set_pose_target(x, y, z, roll, pitch, yaw)
         except Exception, e:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, str(e))
         
