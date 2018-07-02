@@ -141,6 +141,7 @@ void NiryoOneCommunication::manageCanConnectionLoop()
                 if ((calibration_step1_result == CAN_STEPPERS_CALIBRATION_OK) 
                         && (calibration_step2_result == CAN_STEPPERS_CALIBRATION_OK)) {
                     motors_ok = true;
+                    new_calibration_requested = false;
                     activateLearningMode(true);
                 }
                 else { // if calibration is not ok, wait and retry 
