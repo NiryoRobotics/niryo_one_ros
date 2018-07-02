@@ -683,7 +683,7 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
             for (int i = 0 ; i < motors_ids.size() ; i++) {
                 if (motors_ids.at(i) == motor_id) {
                     if (len == 2) {
-                        // 2. Check control byte
+                        // 3. Check control byte
                         int control_byte = rxBuf[0];
 
                         if (control_byte == CAN_DATA_CALIBRATION_RESULT) { // only check this frame
@@ -699,6 +699,29 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
                             }
                             else if (result == CAN_STEPPERS_CALIBRATION_OK) {
                                 ROS_INFO("Motor %d calibration OK", motor_id);
+                                calibration_results.at(i) = true;
+                            }
+                        }
+                    }
+                    else if (len == 4) { // new firmware version -> get result + absolute sensor steps at offset position
+                        // 3. Check control byte
+                        int control_byte = rxBuf[0];
+                        
+                        if (control_byte == CAN_DATA_CALIBRATION_RESULT) { // only check this frame
+                            int result = rxBuf[1];
+                            
+                            if (result == CAN_STEPPERS_CALIBRATION_TIMEOUT) {
+                                ROS_ERROR("Motor %d had calibration timeout", motor_id);
+                                return result;
+                            }
+                            else if (result == CAN_STEPPERS_CALIBRATION_BAD_PARAM) {
+                                ROS_ERROR("Bad params given to motor %d", motor_id);
+                                return result;
+                            }
+                            else if (result == CAN_STEPPERS_CALIBRATION_OK) {
+                                ROS_INFO("Motor %d - Calibration OK", motor_id);
+                                int steps_at_offset_pos = (rxBuf[2] << 8) + rxBuf[3];
+                                ROS_INFO("Motor %d - Absolute steps at offset position : %d", motor_id, steps_at_offset_pos);
                                 calibration_results.at(i) = true;
                             }
                         }
