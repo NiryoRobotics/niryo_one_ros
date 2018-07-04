@@ -38,34 +38,26 @@
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
     <group_state name="resting" group="arm">
         <joint name="joint_1" value="0" />
-        <joint name="joint_2" value="0.942478" />
-        <joint name="joint_3" value="0" /> <!-- -2.85 -->
+        <joint name="joint_2" value="0.64" />
+        <joint name="joint_3" value="-1.39" />
         <joint name="joint_4" value="0" />
         <joint name="joint_5" value="0" />
         <joint name="joint_6" value="0" />
     </group_state>
     <group_state name="straight_up" group="arm">
         <joint name="joint_1" value="0" />
-        <joint name="joint_2" value="0.35" />
-        <joint name="joint_3" value="0.88" /> <!-- -0.65 -->
+        <joint name="joint_2" value="0" />
+        <joint name="joint_3" value="1.57" />
         <joint name="joint_4" value="0" />
         <joint name="joint_5" value="0" />
         <joint name="joint_6" value="0" />
     </group_state>
     <group_state name="straight_forward" group="arm">
         <joint name="joint_1" value="0" />
-        <joint name="joint_2" value="-0.9237" />
-        <joint name="joint_3" value="0.88" /> <!-- -0.65 -->
+        <joint name="joint_2" value="0" />
+        <joint name="joint_3" value="0" />
         <joint name="joint_4" value="0" />
         <joint name="joint_5" value="0" />
-        <joint name="joint_6" value="0" />
-    </group_state>
-    <group_state name="front_display" group="arm">
-        <joint name="joint_1" value="0" />
-        <joint name="joint_2" value="-0.3412" />
-        <joint name="joint_3" value="-0.4181" /> <!-- -1.9481 -->
-        <joint name="joint_4" value="0" />
-        <joint name="joint_5" value="0.7077" />
         <joint name="joint_6" value="0" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->

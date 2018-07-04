@@ -34,9 +34,6 @@
     <xacro:property name="distance_wrist_hand_y" value="0" />
     <xacro:property name="distance_hand_tool" value="0.00" />
 	
-	<xacro:property name="thickness_arm_axis" value="0.052" />
-	<xacro:property name="thickness_forearm_axis" value="0.048" />
-	
 	<xacro:property name="PI" value="3.14159265359" />
 
 	<xacro:property name="limit_low_shoulder_rotation" value="-3.05433" />

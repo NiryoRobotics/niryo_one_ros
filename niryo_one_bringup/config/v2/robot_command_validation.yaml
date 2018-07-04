@@ -3,29 +3,26 @@
 # Validation for a RobotMoveCommand
 # (taken from urdf)
 # 
-# For now, same as V1
-# Work in Progress : will be updated soon with V2 values
-#
 
 joint_limits:
     j1:
         min: -3.05433
         max: 3.05433
     j2:
-        min: -1.5707
-        max: 0.628319
+        min: -1.91986
+        max: 0.640187
     j3:
-        min: -1.401
-        max: 0.994838
+        min: -1.397485
+        max: 1.570796
     j4:
-        min: -2.61799
-        max: 2.61799
+        min: -3.05433
+        max: 3.05433
     j5:
-        min: -2.26893
-        max: 2.26893
+        min: -2.0944
+        max: 2.53073
     j6:
-        min: -2.57
-        max: 2.57
+        min: -2.57436
+        max: 2.57436
 
 position_limits:
     x:
@@ -35,8 +32,8 @@ position_limits:
         min: -0.50
         max: 0.50
     z:
-        min: 0.00
-        max: 0.60
+        min: -0.15
+        max: 0.65
 
 rpy_limits:
     roll:
