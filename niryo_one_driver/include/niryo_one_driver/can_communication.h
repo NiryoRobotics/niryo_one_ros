@@ -101,6 +101,7 @@ class CanCommunication {
         
         int scanAndCheck();
 
+        bool canProcessManualCalibration(std::string &result_message);
         void validateMotorsCalibrationFromUserInput(int mode);
         void setCalibrationFlag(bool flag);
 

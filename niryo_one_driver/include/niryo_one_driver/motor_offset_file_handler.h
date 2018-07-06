@@ -25,9 +25,6 @@
 #include <string>
 #include <unistd.h>
 
-// TODO : remplacer offset par middle
-// avant d'envoyer, compute le middle en fct de offset et valeur lue
-
 bool get_motors_calibration_offsets(std::vector<int> &motor_id_list,  std::vector<int> &steps_list);
 
 bool set_motors_calibration_offsets(std::vector<int> &motor_id_list,  std::vector<int> &steps_list);

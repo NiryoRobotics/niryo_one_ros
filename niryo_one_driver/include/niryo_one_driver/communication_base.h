@@ -53,7 +53,7 @@ class CommunicationBase {
         virtual void activateLearningMode(bool activate) = 0;
         virtual bool setLeds(std::vector<int> &leds, std::string &message) = 0;
 
-        virtual int allowMotorsCalibrationToStart(int mode) = 0;
+        virtual int allowMotorsCalibrationToStart(int mode, std::string &result_message) = 0;
         virtual void requestNewCalibration() = 0;
         virtual bool isCalibrationInProgress() = 0;
 
