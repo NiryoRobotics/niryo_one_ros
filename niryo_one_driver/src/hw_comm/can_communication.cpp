@@ -638,7 +638,8 @@ int CanCommunication::sendCalibrationCommandForOneMotor(StepperMotorState* motor
     return CAN_OK;
 }
 
-int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout)
+int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout,
+        std::vector<int> &sensor_offset_ids, std::vector<int> &sensor_offset_steps)
 {
     std::vector<int> motors_ids;
     std::vector<bool> calibration_results;
@@ -722,6 +723,8 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
                                 ROS_INFO("Motor %d - Calibration OK", motor_id);
                                 int steps_at_offset_pos = (rxBuf[2] << 8) + rxBuf[3];
                                 ROS_INFO("Motor %d - Absolute steps at offset position : %d", motor_id, steps_at_offset_pos);
+                                sensor_offset_ids.push_back(motor_id);
+                                sensor_offset_steps.push_back(steps_at_offset_pos);
                                 calibration_results.at(i) = true;
                             }
                         }
@@ -781,6 +784,8 @@ int CanCommunication::autoCalibrationStep2()
 {
     int calibration_timeout = 30; // seconds
     int result;
+    std::vector<int> sensor_offset_ids;
+    std::vector<int> sensor_offset_steps; // absolute steps at offset position
 
     // 2. Send calibration cmd 1 + 2 + 4 (+3 if hw version == 2)
     if (sendCalibrationCommandForOneMotor(&m1, 800, 1, calibration_timeout) != CAN_OK) {
@@ -806,7 +811,7 @@ int CanCommunication::autoCalibrationStep2()
     if (hardware_version == 2) {
         steppers.push_back(&m3);
     }
-    if (getCalibrationResults(steppers, calibration_timeout) != CAN_STEPPERS_CALIBRATION_OK) {
+    if (getCalibrationResults(steppers, calibration_timeout, sensor_offset_ids, sensor_offset_steps) != CAN_STEPPERS_CALIBRATION_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
 
@@ -839,10 +844,13 @@ int CanCommunication::autoCalibrationStep2()
 
         // 5.1 Wait calibration result
         std::vector<StepperMotorState*> stepper = { &m3 };
-        if (getCalibrationResults(stepper, calibration_timeout) != CAN_STEPPERS_CALIBRATION_OK) {
+        if (getCalibrationResults(stepper, calibration_timeout, sensor_offset_ids, sensor_offset_steps) != CAN_STEPPERS_CALIBRATION_OK) {
             return CAN_STEPPERS_CALIBRATION_FAIL;
         }
     }
+
+    // 6. Write sensor_offset_steps to file
+    set_motors_calibration_offsets(sensor_offset_ids, sensor_offset_steps);
 
     return CAN_STEPPERS_CALIBRATION_OK;
 }
