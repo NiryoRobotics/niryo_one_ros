@@ -57,7 +57,7 @@ class FakeCommunication : public CommunicationBase {
         void activateLearningMode(bool activate);
         bool setLeds(std::vector<int> &leds, std::string &message);
         
-        int allowMotorsCalibrationToStart(int mode);
+        int allowMotorsCalibrationToStart(int mode, std::string &result_message);
         void requestNewCalibration();
         bool isCalibrationInProgress();
         

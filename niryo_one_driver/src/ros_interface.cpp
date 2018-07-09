@@ -47,10 +47,11 @@ RosInterface::RosInterface(CommunicationBase* niryo_one_comm, RpiDiagnostics* rp
 bool RosInterface::callbackCalibrateMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res) 
 {
     int calibration_mode = req.value; 
-    int result = comm->allowMotorsCalibrationToStart(calibration_mode);
+    std::string result_message = "";
+    int result = comm->allowMotorsCalibrationToStart(calibration_mode, result_message);
 
-    res.status = 200;
-    res.message = "Calibration is starting";
+    res.status = result;
+    res.message = result_message;
 
     // special case here 
     // we set flag learning_mode_on, but we don't activate from here

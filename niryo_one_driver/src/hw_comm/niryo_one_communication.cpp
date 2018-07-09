@@ -299,18 +299,22 @@ void NiryoOneCommunication::synchronizeMotors(bool begin_traj)
     }
 }
 
-int NiryoOneCommunication::allowMotorsCalibrationToStart(int mode)
+int NiryoOneCommunication::allowMotorsCalibrationToStart(int mode, std::string &result_message)
 {
-    int result = CAN_STEPPERS_CALIBRATION_OK; // todo
-
     if (can_enabled) {
+        if (mode == CAN_STEPPERS_CALIBRATION_MODE_MANUAL) {
+            if (!canComm->canProcessManualCalibration(result_message)) {
+                return 400;
+            }
+        }
         canComm->validateMotorsCalibrationFromUserInput(mode);
     }
     if (dxl_enabled) {
         // todo check dxl in bounds
     }
     
-    return result;
+    result_message = "Calibration is starting";
+    return 200;
 }
 
 void NiryoOneCommunication::requestNewCalibration()

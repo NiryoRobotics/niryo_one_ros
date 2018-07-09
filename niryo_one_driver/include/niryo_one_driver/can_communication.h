@@ -28,6 +28,7 @@
 
 #include "niryo_one_driver/stepper_motor_state.h"
 #include "niryo_one_driver/niryo_one_can_driver.h"
+#include "niryo_one_driver/motor_offset_file_handler.h"
 
 #define TIME_TO_WAIT_IF_BUSY 0.0005
 
@@ -95,10 +96,12 @@ class CanCommunication {
         int autoCalibrationStep2();
         int sendCalibrationCommandForOneMotor(StepperMotorState* motor, int delay_between_steps,
                 int calibration_direction, int calibration_timeout);
-        int getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout);
+        int getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout,
+                std::vector<int> &sensor_offset_ids, std::vector<int> &sensor_offset_steps);
         
         int scanAndCheck();
 
+        bool canProcessManualCalibration(std::string &result_message);
         void validateMotorsCalibrationFromUserInput(int mode);
         void setCalibrationFlag(bool flag);
 
