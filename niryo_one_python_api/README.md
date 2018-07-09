@@ -32,9 +32,13 @@ except NiryoOneException as e:
 
 ### Documentation - Class methods
 
-##### auto\_calibrate
+##### calibrate\_auto
 
-Calibrate robot motors. If calibration is not needed, this method will do nothing.
+Calibrate robot motors automatically (by moving axis). If calibration is not needed, this method will do nothing.
+
+#### calibrate\_manual
+
+Calibrate robot motors manually (the robot just needs to be in 'home' position and to have been auto calibrated at least once). If calibration is not needed, this method will do nothing.
 
 ##### activate\_learning\_mode
 

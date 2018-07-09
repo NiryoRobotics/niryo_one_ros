@@ -94,14 +94,26 @@ Blockly.Blocks['niryo_one_shift_pose'] = {
     }
 };
 
-Blockly.Blocks['niryo_one_auto_calibrate'] = {
+Blockly.Blocks['niryo_one_calibrate_auto'] = {
     init: function () {
         this.appendDummyInput()
-            .appendField("Calibrate motors");
+            .appendField("Calibrate motors (auto)");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour("#3D4D9A");
         this.setTooltip("Will auto calibrate motors. If already calibrated, will do nothing.");
+        this.setHelpUrl("");
+    }
+};
+
+Blockly.Blocks['niryo_one_calibrate_manual'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField("Calibrate motors (manual)");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#3D4D9A");
+        this.setTooltip("Will manually calibrate motors (robot needs to be in home position). If already calibrated, will do nothing.");
         this.setHelpUrl("");
     }
 };
@@ -432,8 +444,13 @@ Blockly.Python['niryo_one_shift_pose'] = function (block) {
   return code;
 };
 
-Blockly.Python['niryo_one_auto_calibrate'] = function (block) {
-  var code = 'n.auto_calibrate()\n';
+Blockly.Python['niryo_one_calibrate_auto'] = function (block) {
+  var code = 'n.calibrate_auto()\n';
+  return code;
+};
+
+Blockly.Python['niryo_one_calibrate_manual'] = function (block) {
+  var code = 'n.calibrate_manual()\n';
   return code;
 };
 
