@@ -123,9 +123,6 @@ class LEDManager:
             
     
     def callback_hardware_status(self, msg):
-        if self.state == LED_STATE_HOTSPOT:
-            return
-
         if not msg.connection_up:
             self.set_led(LED_RED, dxl_leds=True) # blink red
             rospy.sleep(0.05)
