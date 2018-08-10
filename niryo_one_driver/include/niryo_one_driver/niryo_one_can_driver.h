@@ -67,7 +67,7 @@ class NiryoCanDriver
         INT8U sendPositionCommand(int id, int cmd);
         INT8U sendRelativeMoveCommand(int id, int steps, int delay);
         INT8U sendTorqueOnCommand(int id, int torque_on);
-        INT8U sendPositionOffsetCommand(int id, int cmd);
+        INT8U sendPositionOffsetCommand(int id, int cmd, int absolute_steps_at_offset_position);
         INT8U sendCalibrationCommand(int i, int offset, int delay, int direction, int timeout);
         INT8U sendSynchronizePositionCommand(int id, bool begin_traj);
         INT8U sendMicroStepsCommand(int id, int micro_steps);
