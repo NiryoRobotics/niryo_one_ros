@@ -56,6 +56,25 @@ The main differences between this launch file and the launch file executed on Ra
 
 Note that Niryo One ROS packages have been developed with **ROS kinetic, on Ubuntu 16.04**. Other ROS versions and OS distributions are not supported.
 
+---
+
+(Optional) After you install ROS packages and execute catkin_make you still have some installation steps if you want to use Blockly ("Niryo Blocks" on Niryo One Studio).
+
+Make sure that you have a recent nodejs version (not the default installed one)
+```
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+Install node modules in the blockly_code_generator directory (where you can find package.json) and create an executable.
+```
+cd ~/catkin_ws/src/niryo_one_user_interface/blockly_code_generator
+npm install
+sudo npm link
+```
+
+That's it, you have now all the Niryo One functionalities ready to be used.
+
 ## Niryo One ROS Stack overview
 
 Here's a global overview of the Niryo One ROS Stack :
