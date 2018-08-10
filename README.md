@@ -2,9 +2,9 @@
 
 (Niryo One : [https://niryo.com](https://niryo.com/?utm_source=github))
 
-![niryo one rviz simulation](https://niryo.com/wp-content/uploads/2017/12/ros_rviz_niryo_one.png)
+![niryo one rviz simulation](https://niryo.com/wp-content/uploads/2018/08/ros_rviz_niryo_one_colors.png)
 
-This repository contains all ROS packages used on Niryo One (Raspberry Pi 3 - Xubuntu for ARM).
+This repository contains all ROS packages used on Niryo One (Raspberry Pi 3B - Xubuntu for ARM).
 
 ## How to use Niryo One with a graphical interface ?
 
@@ -21,6 +21,10 @@ First install ROS kinetic "Desktop-Full" (tutorial [here](http://wiki.ros.org/ki
 You'll need to install some additional ROS packages :
 ```
 sudo apt-get install ros-kinetic-robot-state-publisher ros-kinetic-moveit ros-kinetic-manipulation-msgs ros-kinetic-rosbridge-suite ros-kinetic-joy ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-tf2-web-republisher
+```
+You'll also need to install an additional Python module :
+```
+sudo -H pip install jsonpickle
 ```
 Create a catkin workspace and clone Niryo One ROS stack :
 ```
@@ -48,7 +52,7 @@ You can also launch the complete Niryo One ROS Stack instead, which you can cont
 roslaunch niryo_one_bringup desktop_rviz_simulation.launch
 ```
 
-The main differences between this launch file and the launch file executed on Raspberry Pi 3 (rpi\_setup.launch) is that the hardware functionalities are disabled, and you get a 3D simulation view with Rviz.
+The main differences between this launch file and the launch file executed on Raspberry Pi 3B (rpi\_setup.launch) is that the hardware functionalities are disabled, and you get a 3D simulation view with Rviz.
 
 Note that Niryo One ROS packages have been developed with **ROS kinetic, on Ubuntu 16.04**. Other ROS versions and OS distributions are not supported.
 
@@ -62,13 +66,13 @@ Here's a global overview of the Niryo One ROS Stack :
 
 ## Developer Documentation
 
-_The documentation is not complete yet and will be updated over time._
-
+* [Get started with the Niryo One Stack](https://niryo.com/docs/niryo-one/developer-tutorials/get-started-with-the-niryo-one-ros-stack/). This will help you understand the architecture and where to start as a developer.
 * [C++ example to move the robot](https://github.com/smaassen/niryo_one_tester) by Steve Maassen
 * [Python API](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_python_api)
+* [Remotely control Niry One (ROS multi-machines)](https://niryo.com/docs/niryo-one/developer-tutorials/remotely-control-niryo-one-ros-multi-machines/)
 
 ## Any question ?
 
-If you have a question and you don't find the answer here or on our [FAQ](https://niryo.com/niryo-one-faq/?utm_source=github) page, please send us an email at support@niryo.com.
+If you have a question and you don't find the answer here or on our [documentation](https://niryo.com/docs/niryo-one/), please send us an email at support@niryo.com.
 
 Thank you !
