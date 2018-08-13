@@ -56,6 +56,9 @@ GPIO_2A = 26
 GPIO_2B = 19
 GPIO_2C = 6
 
+SW_1 = 12
+SW_2 = 13
+
 # Status
 OK    = 200
 ERROR = 400
