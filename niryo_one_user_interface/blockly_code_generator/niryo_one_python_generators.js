@@ -275,6 +275,17 @@ Blockly.Blocks['niryo_one_gpio_select'] = {
     }
 };
 
+Blockly.Blocks['niryo_one_sw_select'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField(new Blockly.FieldDropdown([["SW1", "SW_1"], ["SW2", "SW_2"]]), "SW_SELECT");
+        this.setOutput(true, "niryo_one_sw_select");
+        this.setColour("#3D4D9A");
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
 Blockly.Blocks['niryo_one_activate_electromagnet'] = {
     init: function () {
         this.appendValueInput("ACTIVATE_ELECTROMAGNET_ID")
@@ -302,24 +313,6 @@ Blockly.Blocks['niryo_one_deactivate_electromagnet'] = {
             .setCheck("niryo_one_gpio_select")
             .setAlign(Blockly.ALIGN_RIGHT)
             .appendField("with pin");
-        this.setInputsInline(true);
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
-        this.setColour("#3D4D9A");
-        this.setTooltip("");
-        this.setHelpUrl("");
-    }
-};
-
-Blockly.Blocks['niryo_one_pin_mode'] = {
-    init: function () {
-        this.appendValueInput("SET_PIN_MODE_PIN")
-            .setCheck("niryo_one_gpio_select")
-            .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField("Set Pin");
-        this.appendDummyInput()
-            .appendField("to mode")
-            .appendField(new Blockly.FieldDropdown([["INPUT", "PIN_MODE_INPUT"], ["OUTPUT", "PIN_MODE_OUTPUT"]]), "PIN_MODE_SELECT");
         this.setInputsInline(true);
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
@@ -385,6 +378,22 @@ Blockly.Blocks['niryo_one_gpio_state'] = {
             .appendField("state")
             .appendField(new Blockly.FieldDropdown([["HIGH", "PIN_HIGH"], ["LOW", "PIN_LOW"]]), "GPIO_STATE_SELECT");
         this.setOutput(true, "niryo_one_gpio_state");
+        this.setColour("#3D4D9A");
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
+Blockly.Blocks['niryo_one_set_12v_switch'] = {
+    init: function () {
+        this.appendValueInput("SET_12V_SWITCH")
+            .setCheck("niryo_one_sw_select")
+            .appendField("Set 12V Switch");
+        this.appendDummyInput()
+            .appendField("to state")
+            .appendField(new Blockly.FieldDropdown([["HIGH", "PIN_HIGH"], ["LOW", "PIN_LOW"]]), "SET_12V_SWITCH_SELECT");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
         this.setColour("#3D4D9A");
         this.setTooltip("");
         this.setHelpUrl("");
@@ -526,6 +535,12 @@ Blockly.Python['niryo_one_gpio_select'] = function (block) {
   return [code, Blockly.Python.ORDER_NONE];
 };
 
+Blockly.Python['niryo_one_sw_select'] = function(block) {
+  var dropdown_sw_select = block.getFieldValue('SW_SELECT');
+  var code = dropdown_sw_select;
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
 Blockly.Python['niryo_one_activate_electromagnet'] = function (block) {
   var value_electromagnet_id = Blockly.Python.valueToCode(block, 'ACTIVATE_ELECTROMAGNET_ID', Blockly.Python.ORDER_ATOMIC) || '(TOOL_NONE)';
   var value_electromagnet_pin = Blockly.Python.valueToCode(block, 'ACTIVATE_ELECTROMAGNET_PIN', Blockly.Python.ORDER_ATOMIC) || '(0)';
@@ -572,6 +587,13 @@ Blockly.Python['niryo_one_gpio_state'] = function (block) {
   return [code, Blockly.Python.ORDER_NONE];
 };
 
+Blockly.Python['niryo_one_set_12v_switch'] = function(block) {
+  var value_pin = Blockly.Python.valueToCode(block, 'SET_12V_SWITCH', Blockly.Python.ORDER_ATOMIC) || '(0)';
+  var dropdown_set_12v_switch_select = block.getFieldValue('SET_12V_SWITCH_SELECT');
+  value_pin = value_pin.replace('(', '').replace(')', '');
+  var code = 'n.digital_write(' + value_pin + ', ' + dropdown_set_12v_switch_select + ')\n';
+  return code;
+};
 
 Blockly.Python['niryo_one_comment'] = function(block) {
   var text_comment_text = block.getFieldValue('COMMENT_TEXT');
