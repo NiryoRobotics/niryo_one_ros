@@ -19,7 +19,7 @@ stepper_2_direction: -1.0
 stepper_3_direction: 1.0
 
 stepper_1_max_effort: 90
-stepper_2_max_effort: 140
+stepper_2_max_effort: 130
 stepper_3_max_effort: 120
 
 
