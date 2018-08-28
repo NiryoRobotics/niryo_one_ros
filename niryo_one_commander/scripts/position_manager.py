@@ -65,7 +65,7 @@ class PositionManager:
         cmd_type = req.cmd_type
         position_name = req.position_name 
         position_msg = req.position 
-	rpy = Position.RPY(position_msg.rpy.roll, position_msg.rpy.pitch,  position_msg.rpy.yaw)
+        rpy = Position.RPY(position_msg.rpy.roll, position_msg.rpy.pitch,  position_msg.rpy.yaw)
         point = Position.Point(position_msg.point.x, position_msg.point.y, position_msg.point.z)
         quaternion = Position.Quaternion(position_msg.quaternion.x, position_msg.quaternion.y, position_msg.quaternion.z,
 		  position_msg.quaternion.w )
