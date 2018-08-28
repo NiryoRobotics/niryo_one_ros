@@ -24,47 +24,47 @@
      </gazebo>
 
   <gazebo reference="base_link">
-          <material>>Gazebo/Black</material>
+          <!-- <material>>Gazebo/Black</material> -->
           <turnGravityOff>true</turnGravityOff>
      </gazebo>
     
   <gazebo reference="shoulder_link">
-          <material>Gazebo/Black</material>
+          <!-- <material>Gazebo/Black</material> -->
 
           <turnGravityOff>true</turnGravityOff>
 
      </gazebo>
     
   <gazebo reference="arm_link">
-          <material>Gazebo/Blue</material>
+          <!-- <material>Gazebo/Blue</material> -->
           <turnGravityOff>true</turnGravityOff>
      </gazebo>
 
   <gazebo reference="elbow_link">
-          <material>Gazebo/Black</material>
+          <!-- <material>Gazebo/Black</material> -->
           <turnGravityOff>true</turnGravityOff>
      </gazebo>
 
   <gazebo reference="forearm_link">
-          <material>Gazebo/Blue</material>
+          <!-- <material>Gazebo/Blue</material> -->
 
           <turnGravityOff>true</turnGravityOff>
      </gazebo>
 
   <gazebo reference="wrist_link">
-          <material>Gazebo/Black</material>
+          <!-- <material>Gazebo/Black</material> -->
 
           <turnGravityOff>true</turnGravityOff>
      </gazebo>
 
   <gazebo reference="hand_link">
-          <material>Gazebo/Blue</material>
+          <!-- <material>Gazebo/Blue</material> -->
 
           <turnGravityOff>true</turnGravityOff>
      </gazebo>
       
-     <gazebo reference="gripper_link">
-          <material>Gazebo/Black</material>
+     <gazebo reference="tool_link">
+          <!-- <material>Gazebo/Black</material> -->
           <turnGravityOff>true</turnGravityOff>
      </gazebo>
 
