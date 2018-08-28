@@ -32,7 +32,7 @@
 class FakeCommunication : public CommunicationBase {
 
     public:
-        FakeCommunication();
+        FakeCommunication(int hardware_version);
         int init();
 
         void manageHardwareConnection();
@@ -57,7 +57,7 @@ class FakeCommunication : public CommunicationBase {
         void activateLearningMode(bool activate);
         bool setLeds(std::vector<int> &leds, std::string &message);
         
-        int allowMotorsCalibrationToStart(int mode);
+        int allowMotorsCalibrationToStart(int mode, std::string &result_message);
         void requestNewCalibration();
         bool isCalibrationInProgress();
         
@@ -74,6 +74,8 @@ class FakeCommunication : public CommunicationBase {
         void synchronizeMotors(bool begin_traj);
 
     private:
+
+        int hardware_version;
         
         double echo_pos[6]; // just store cmd in this array, and echo position
 

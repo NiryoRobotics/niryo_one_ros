@@ -106,6 +106,8 @@ class DxlCommunication {
         int scanAndCheck();
         int detectVersion();
 
+        void moveAllMotorsToHomePosition();
+
         // Dxl Tools
         void setTool(uint8_t id, std::string name);
         int pingAndSetTool(uint8_t id, std::string name);

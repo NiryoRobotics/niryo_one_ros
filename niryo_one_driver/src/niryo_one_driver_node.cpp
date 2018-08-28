@@ -118,7 +118,7 @@ class NiryoOneDriver {
         ROS_INFO("Starting niryo_one driver thread (frequency : %lf)", ros_control_frequency);
 
         if (fake_communication) {
-            comm.reset(new FakeCommunication());
+            comm.reset(new FakeCommunication(hardware_version));
         }
         else {
             comm.reset(new NiryoOneCommunication(hardware_version));

@@ -85,7 +85,7 @@ class BlocklyCodeGenerator:
         # 2. Create socket
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.settimeout(4)
+            self.socket.settimeout(6)
         except socket.error, msg:
             return { 'status': 400, 'message': msg }
 

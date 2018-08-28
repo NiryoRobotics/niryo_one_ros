@@ -32,6 +32,7 @@
     <xacro:property name="distance_forearm_wrist_z" value="0.180" />
     <xacro:property name="distance_wrist_hand_x" value="0.018" />
     <xacro:property name="distance_wrist_hand_y" value="0" />
+<<<<<<< HEAD
     <!-- not yet implemented, for now -->
     <xacro:property name="distance_hand_gripper" value="0.00" />
      
@@ -39,6 +40,11 @@
     <xacro:property name="thickness_forearm_axis" value="0.048" />
      
     <xacro:property name="PI" value="3.14159265359" />
+=======
+    <xacro:property name="distance_hand_tool" value="0.00" />
+	
+	<xacro:property name="PI" value="3.14159265359" />
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
 
     <xacro:property name="limit_low_shoulder_rotation" value="-3.05433" />
     <xacro:property name="limit_up_shoulder_rotation" value="3.05433" />
@@ -81,6 +87,7 @@
     </link>      -->
 
     <link name="base_link">
+<<<<<<< HEAD
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
@@ -89,11 +96,21 @@
             <material name="">
                <color rgba="0.2 0.6 1 1" />
             </material>
+=======
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+                <mesh filename="package://niryo_one_description/meshes/v1/collada/base_link.dae" />
+			</geometry>
+			<material name="">
+				<color rgba="0.2 0.6 1 1" />
+			</material>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
         </visual>
         <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://niryo_one_description/meshes/stl/base_link.stl" />
+                <mesh filename="package://niryo_one_description/meshes/v1/stl/base_link.stl" />
             </geometry>
         </collision>
         <inertial>
@@ -107,6 +124,7 @@
             </inertial>     
     </link>     
     <link name="shoulder_link">
+<<<<<<< HEAD
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
@@ -116,10 +134,21 @@
                 <color rgba="0.8 0.8 0.8 1" />
             </material>
         </visual>
+=======
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+                <mesh filename="package://niryo_one_description/meshes/v1/collada/shoulder_link.dae" />
+			</geometry>
+			<material name="">
+				<color rgba="0.8 0.8 0.8 1" />
+			</material>
+		</visual>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://niryo_one_description/meshes/stl/shoulder_link.stl" />
+                <mesh filename="package://niryo_one_description/meshes/v1/stl/shoulder_link.stl" />
             </geometry>
         </collision>
         <inertial>
@@ -133,6 +162,7 @@
     </link>     
 
     <link name="arm_link">
+<<<<<<< HEAD
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
@@ -142,10 +172,21 @@
                 <color rgba="0.2 0.6 1 1" />
             </material>
           </visual>
+=======
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+                <mesh filename="package://niryo_one_description/meshes/v1/collada/arm_link.dae" />
+			</geometry>
+			<material name="">
+				<color rgba="0.2 0.6 1 1" />
+			</material>
+		</visual>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
         <collision>
                <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://niryo_one_description/meshes/stl/arm_link.stl" />
+                <mesh filename="package://niryo_one_description/meshes/v1/stl/arm_link.stl" />
             </geometry>
         </collision>
           <inertial>
@@ -159,6 +200,7 @@
      </link>     
      
     <link name="elbow_link">
+<<<<<<< HEAD
           <visual>
                <origin xyz="0 0 0" rpy="0 0 0" />
                <geometry>
@@ -169,10 +211,22 @@
                     <color rgba="0.8 0.8 0.8 1" />
                </material>
           </visual>
+=======
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+                <!--	<box size="0.1 0.1 0.048"/> -->
+                <mesh filename="package://niryo_one_description/meshes/v1/collada/elbow_link.dae" /> 
+			</geometry>
+			<material name="">
+				<color rgba="0.8 0.8 0.8 1" />
+			</material>
+		</visual>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
         <collision>
                <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://niryo_one_description/meshes/stl/elbow_link.stl" />
+                <mesh filename="package://niryo_one_description/meshes/v1/stl/elbow_link.stl" />
             </geometry>
         </collision>
           <inertial>
@@ -187,6 +241,7 @@
      </link>
 
     <link name="forearm_link">
+<<<<<<< HEAD
           <visual>
                <origin xyz="0 0 0" rpy="0 0 0" />
                <geometry>
@@ -196,10 +251,21 @@
                     <color rgba="0.2 0.6 1 1" />
                </material>     
           </visual>
+=======
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+                <mesh filename="package://niryo_one_description/meshes/v1/collada/forearm_link.dae" />
+			</geometry>
+			<material name="">
+				<color rgba="0.2 0.6 1 1" />
+			</material>
+		</visual>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
         <collision>
                <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://niryo_one_description/meshes/stl/forearm_link.stl" />
+                <mesh filename="package://niryo_one_description/meshes/v1/stl/forearm_link.stl" />
             </geometry>
         </collision>
           <inertial>
@@ -214,6 +280,7 @@
      </link>
 
     <link name="wrist_link">
+<<<<<<< HEAD
           <visual>
                <origin xyz="0 0 0" rpy="0 0 0" />
                <geometry>
@@ -223,10 +290,21 @@
                     <color rgba="0.8 0.8 0.8 1" />
                </material>     
           </visual>
+=======
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+                <mesh filename="package://niryo_one_description/meshes/v1/collada/wrist_link.dae" />
+			</geometry>
+			<material name="">
+				<color rgba="0.8 0.8 0.8 1" />
+			</material>
+		</visual>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
         <collision>
                <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://niryo_one_description/meshes/stl/wrist_link.stl" />
+                <mesh filename="package://niryo_one_description/meshes/v1/stl/wrist_link.stl" />
             </geometry>
         </collision>
           <inertial>
@@ -240,6 +318,7 @@
      </link>
      
     <link name="hand_link">
+<<<<<<< HEAD
           <visual>
                <origin xyz="0 0 0" rpy="0 0 0" />
                <geometry>
@@ -249,12 +328,24 @@
                     <color rgba="0.6 0 0 1" />
                </material>
           </visual>
+=======
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+                <mesh filename="package://niryo_one_description/meshes/v1/collada/hand_link.dae" />
+			</geometry>
+			<material name="">
+				<color rgba="0.6 0 0 1" />
+			</material>
+		</visual>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
         <collision>
                <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://niryo_one_description/meshes/stl/hand_link.stl" />
+                <mesh filename="package://niryo_one_description/meshes/v1/stl/hand_link.stl" />
             </geometry>
         </collision>
+<<<<<<< HEAD
           <inertial>
                 <origin xyz="0 0 0" rpy="0 0 0"/>
                 <mass value="0.1"/>
@@ -269,6 +360,12 @@
 
      </link>
     
+=======
+	</link>
+	
+    <link name="tool_link">
+	</link>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
 
 
 
@@ -336,6 +433,7 @@
      
 	</joint>
 
+<<<<<<< HEAD
     <joint name="hand_gripper_joint" type="fixed">
         <parent link="hand_link" />
         <child link="gripper_link" />
@@ -347,5 +445,12 @@
             <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
             </plugin>
     </gazebo>
+=======
+	<joint name="hand_tool_joint" type="fixed">
+        <parent link="hand_link" />
+        <child link="tool_link" />
+        <origin xyz="0 0 ${distance_hand_tool}" rpy="${-PI/2} ${-PI/2} 0" />
+	</joint>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
 
 </robot>

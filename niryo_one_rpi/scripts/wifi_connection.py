@@ -60,13 +60,26 @@ class WifiConnectionManager:
     def run_flask_server(self):
         app.run(host='0.0.0.0')
 
+    def get_robot_unique_identifier(self):
+        identifier = ''
+        with open('/proc/cpuinfo', 'r') as f:
+            rpi_serial = ''
+            for line in f:
+                if line[0:6] == 'Serial':
+                    rpi_serial = line[10:26]
+                    break
+            if rpi_serial != '':
+                # Build something readable and not too long
+                identifier = str(rpi_serial[8:10]) + '-' + str(rpi_serial[10:13]) + '-' + str(rpi_serial[13:16])
+        return identifier
+
     def __init__(self):
         rospy.loginfo("Starting wifi manager...")
         
         self.hotspot_ssid = rospy.get_param("~hotspot_ssid")
-        # add MAC address to ssid to make it unique and recognizable
+        # add robot unique identifier to ssid to make it unique and recognizable
         self.hotspot_ssid += " "
-        self.hotspot_ssid += str(niryo_one_wifi.get_mac_address()) 
+        self.hotspot_ssid += str(self.get_robot_unique_identifier()) 
         self.hotspot_password = rospy.get_param("~hotspot_password")
         self.filename_robot_name = rospy.get_param("~filename_robot_name")
 

@@ -527,6 +527,55 @@ void CanCommunication::setTorqueOn(bool on)
     }
 }
 
+bool CanCommunication::canProcessManualCalibration(std::string &result_message)
+{
+    // 1. Check if motors firmware version is ok
+    for (int i = 0; i < motors.size(); i++) {
+        if (motors.at(i)->isEnabled()) {
+            std::string firmware_version = motors.at(i)->getFirmwareVersion();
+            if (firmware_version.length() == 0) {
+                result_message = "No firmware version available for motor " + std::to_string(motors.at(i)->getId()) 
+                    + ". Make sure all motors are connected";
+                ROS_WARN("Can't process manual calibration : %s", result_message.c_str());
+                return false;
+            }
+            if (std::stoi(firmware_version.substr(0,1)) < 2) {
+                result_message = "You need to upgrade stepper firmware for motor " + std::to_string(motors.at(i)->getId());
+                ROS_WARN("Can't process manual calibration : %s", result_message.c_str());
+                return false;
+            }
+        }
+    }
+    
+    // 2. Check if motor offset values have been previously saved (with auto calibration)
+    std::vector<int> motor_id_list;
+    std::vector<int> steps_list;
+    if (!get_motors_calibration_offsets(motor_id_list, steps_list)) {
+        result_message = "You need to make one auto calibration before using the manual calibration";
+        ROS_WARN("Can't process manual calibration : %s", result_message.c_str());
+        return false;
+    }
+
+    // 3. Check if all connected motors have a motor offset value
+    for (int i = 0; i < motors.size(); i++) {
+        if (motors.at(i)->isEnabled()) {
+            for (int j = 0; j < motor_id_list.size(); j++) {
+                if (motor_id_list.at(j) == motors.at(i)->getId()) {
+                    break;
+                }
+                if (j == motor_id_list.size() - 1) {
+                    result_message = "Motor " + std::to_string(motors.at(i)->getId()) + " does not have a saved offset value, "
+                        + "you need to do one auto calibration";
+                    ROS_WARN("Can't process manual calibration : %s", result_message.c_str());
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 /*
  * User input to clear the calibration flag
  * - also choose a calibration mode (manual|auto)
@@ -552,8 +601,9 @@ void CanCommunication::setCalibrationFlag(bool flag)
  * to home position before using this mode
  * 2. If mode is automatic, it will send a calibration command to all motors, and wait until it receives a confirmation
  * from all motors (success, timeout, bad params)
+ *  Also, the auto calibration is done with multiple steps, 
  */
-int CanCommunication::calibrateMotors()
+int CanCommunication::calibrateMotors(int calibration_step)
 {
     if (!is_can_connection_ok) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
@@ -564,26 +614,40 @@ int CanCommunication::calibrateMotors()
         return CAN_STEPPERS_CALIBRATION_WAITING_USER_INPUT;
     }
 
-    ROS_INFO("START Calibrating stepper motors");
+    ROS_INFO("START Calibrating stepper motors, step number %d", calibration_step);
     stopHardwareControlLoop();
     ros::Duration(0.1).sleep();
 
     // If user wants to do a manual calibration, just send offset to current position
     if (steppers_calibration_mode == CAN_STEPPERS_CALIBRATION_MODE_MANUAL) {
+        if (calibration_step > 1) {
+            return CAN_STEPPERS_CALIBRATION_OK; // do manual calibration only once
+        }
         calibration_in_progress = true;
         int result = manualCalibration();
         calibration_in_progress = false;
         return result;
     }
     else if (steppers_calibration_mode == CAN_STEPPERS_CALIBRATION_MODE_AUTO) {
-        calibration_in_progress = true;
-        int result = autoCalibration();
-        calibration_in_progress = false;
-        return result;
+        if (calibration_step == 1) {
+            calibration_in_progress = true;
+            int result = autoCalibrationStep1();
+            return result;
+        }
+        else if (calibration_step == 2) {
+            int result = autoCalibrationStep2();
+            calibration_in_progress = false;
+            return result;
+        }
     }
     else {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
+}
+
+int CanCommunication::getCalibrationMode()
+{
+    return steppers_calibration_mode;
 }
 
 bool CanCommunication::isCalibrationInProgress()
@@ -596,14 +660,42 @@ bool CanCommunication::isCalibrationInProgress()
  */
 int CanCommunication::manualCalibration()
 {
-    ROS_INFO("Manual calibration : just send offset to steppers");
-    for (int i = 0 ; i < motors.size() ; i++) {
+    std::vector<int> motor_id_list;
+    std::vector<int> steps_list;
+    if (!get_motors_calibration_offsets(motor_id_list, steps_list)) {
+        return CAN_STEPPERS_CALIBRATION_FAIL;
+    }
+
+    for (int i = 0; i < motors.size(); i++) {
         if (motors.at(i)->isEnabled()) {
-            if (can->sendPositionOffsetCommand(motors.at(i)->getId(), motors.at(i)->getHomePosition()) != CAN_OK) {
+            // compute step offset to send
+            int offset_to_send = 0;
+            int sensor_offset_steps = 0;
+            int absolute_steps_at_offset_position = 0;
+            int offset_steps = motors.at(i)->getOffsetPosition();
+            for (int j = 0; j < motor_id_list.size(); j++) {
+                if (motors.at(i)->getId() == motor_id_list.at(j)) {
+                    sensor_offset_steps = steps_list.at(j);
+                    break;
+                }
+            }
+            if (motors.at(i)->getId() == 1 || motors.at(i)->getId() == 2 || motors.at(i)->getId() == 4) { // position 0.0
+                offset_to_send = (sensor_offset_steps - offset_steps) % 1600;
+                if (offset_to_send < 0) { offset_to_send += 1600; }
+                absolute_steps_at_offset_position = offset_to_send;
+            }
+            else if (motors.at(i)->getId() == 3) { // max position
+                offset_to_send = sensor_offset_steps - offset_steps;
+                absolute_steps_at_offset_position = sensor_offset_steps;
+            }
+
+            ROS_INFO("Motor %d - sending offset : %d", motors.at(i)->getId(), offset_to_send);
+            if (can->sendPositionOffsetCommand(motors.at(i)->getId(), offset_to_send, absolute_steps_at_offset_position) != CAN_OK) {
                 return CAN_STEPPERS_CALIBRATION_FAIL;
             }
         }
     }
+
     return CAN_STEPPERS_CALIBRATION_OK;
 }
 
@@ -623,7 +715,8 @@ int CanCommunication::sendCalibrationCommandForOneMotor(StepperMotorState* motor
     return CAN_OK;
 }
 
-int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout)
+int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout,
+        std::vector<int> &sensor_offset_ids, std::vector<int> &sensor_offset_steps)
 {
     std::vector<int> motors_ids;
     std::vector<bool> calibration_results;
@@ -668,7 +761,7 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
             for (int i = 0 ; i < motors_ids.size() ; i++) {
                 if (motors_ids.at(i) == motor_id) {
                     if (len == 2) {
-                        // 2. Check control byte
+                        // 3. Check control byte
                         int control_byte = rxBuf[0];
 
                         if (control_byte == CAN_DATA_CALIBRATION_RESULT) { // only check this frame
@@ -684,6 +777,31 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
                             }
                             else if (result == CAN_STEPPERS_CALIBRATION_OK) {
                                 ROS_INFO("Motor %d calibration OK", motor_id);
+                                calibration_results.at(i) = true;
+                            }
+                        }
+                    }
+                    else if (len == 4) { // new firmware version -> get result + absolute sensor steps at offset position
+                        // 3. Check control byte
+                        int control_byte = rxBuf[0];
+                        
+                        if (control_byte == CAN_DATA_CALIBRATION_RESULT) { // only check this frame
+                            int result = rxBuf[1];
+                            
+                            if (result == CAN_STEPPERS_CALIBRATION_TIMEOUT) {
+                                ROS_ERROR("Motor %d had calibration timeout", motor_id);
+                                return result;
+                            }
+                            else if (result == CAN_STEPPERS_CALIBRATION_BAD_PARAM) {
+                                ROS_ERROR("Bad params given to motor %d", motor_id);
+                                return result;
+                            }
+                            else if (result == CAN_STEPPERS_CALIBRATION_OK) {
+                                ROS_INFO("Motor %d - Calibration OK", motor_id);
+                                int steps_at_offset_pos = (rxBuf[2] << 8) + rxBuf[3];
+                                ROS_INFO("Motor %d - Absolute steps at offset position : %d", motor_id, steps_at_offset_pos);
+                                sensor_offset_ids.push_back(motor_id);
+                                sensor_offset_steps.push_back(steps_at_offset_pos);
                                 calibration_results.at(i) = true;
                             }
                         }
@@ -721,7 +839,7 @@ int CanCommunication::relativeMoveMotor(StepperMotorState* motor, int steps, int
     return CAN_OK;
 }
 
-int CanCommunication::autoCalibration()
+int CanCommunication::autoCalibrationStep1()
 {
     int calibration_timeout = 30; // seconds
     int result;
@@ -735,8 +853,18 @@ int CanCommunication::autoCalibration()
     if (relativeMoveMotor(&m3, rad_pos_to_steps(0.5, m3.getGearRatio(), m3.getDirection()), 1500, true) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL; 
     }
+   
+    return CAN_STEPPERS_CALIBRATION_OK;
+}
 
-    // 2. Send calibration cmd 1 + 2 + 4
+int CanCommunication::autoCalibrationStep2()
+{
+    int calibration_timeout = 30; // seconds
+    int result;
+    std::vector<int> sensor_offset_ids;
+    std::vector<int> sensor_offset_steps; // absolute steps at offset position
+
+    // 2. Send calibration cmd 1 + 2 + 4 (+3 if hw version == 2)
     if (sendCalibrationCommandForOneMotor(&m1, 800, 1, calibration_timeout) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
@@ -748,16 +876,25 @@ int CanCommunication::autoCalibration()
     if (sendCalibrationCommandForOneMotor(&m4, 800, 1, calibration_timeout) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
+    
+    if (hardware_version == 2) {
+        if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
+    }
 
     // 2.1 Wait calibration result
     std::vector<StepperMotorState*> steppers = { &m1, &m2, &m4 };
-    if (getCalibrationResults(steppers, calibration_timeout) != CAN_STEPPERS_CALIBRATION_OK) {
+    if (hardware_version == 2) {
+        steppers.push_back(&m3);
+    }
+    if (getCalibrationResults(steppers, calibration_timeout, sensor_offset_ids, sensor_offset_steps) != CAN_STEPPERS_CALIBRATION_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
 
     // 3. Move motor 1,2,4 to 0.0
     int delay_micros = 2000;
-    if (relativeMoveMotor(&m1, -m1.getOffsetPosition(), 1500, false) != CAN_OK) {
+    if (relativeMoveMotor(&m1, -m1.getOffsetPosition(), 1300, false) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
     if (relativeMoveMotor(&m2, -m2.getOffsetPosition(), 3000, false) != CAN_OK) {
@@ -768,18 +905,29 @@ int CanCommunication::autoCalibration()
     }
     
     // 3.1 Wait for motors to finish moving (at least m4, so we can start m3 calibration)
-    ros::Duration(abs(m4.getOffsetPosition()) * 1500 / 1000000).sleep();
+    // For hw version 2, just wait for m1 to be at home position
+    if (hardware_version == 1) {
+        ros::Duration(abs(m4.getOffsetPosition()) * 1500 / 1000000).sleep();
+    }
+    else if (hardware_version == 2) {
+        ros::Duration(abs(m1.getOffsetPosition()) * 1300 / 1000000).sleep();
+    }
     
-    // 5. Send calibration cmd m3
-    if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
-        return CAN_STEPPERS_CALIBRATION_FAIL;
+    // 5. Send calibration cmd m3 (only for hw version 1)
+    if (hardware_version == 1) {
+        if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
+
+        // 5.1 Wait calibration result
+        std::vector<StepperMotorState*> stepper = { &m3 };
+        if (getCalibrationResults(stepper, calibration_timeout, sensor_offset_ids, sensor_offset_steps) != CAN_STEPPERS_CALIBRATION_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
     }
 
-    // 5.1 Wait calibration result
-    std::vector<StepperMotorState*> stepper = { &m3 };
-    if (getCalibrationResults(stepper, calibration_timeout) != CAN_STEPPERS_CALIBRATION_OK) {
-        return CAN_STEPPERS_CALIBRATION_FAIL;
-    }
+    // 6. Write sensor_offset_steps to file
+    set_motors_calibration_offsets(sensor_offset_ids, sensor_offset_steps);
 
     return CAN_STEPPERS_CALIBRATION_OK;
 }

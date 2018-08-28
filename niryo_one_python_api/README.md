@@ -30,7 +30,58 @@ except NiryoOneException as e:
     # Handle errors here
 ```
 
-### Documentation - Class methods
+You can find some examples [here](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_python_api/examples).
+
+## Documentation
+
+### Constants
+
+You can use those predefined constants (instead of numbers) in the Python API methods. Please read the examples to see how to use them.
+
+##### Tools IDs
+
+* TOOL\_NONE
+* TOOL\_GRIPPER\_1\_ID
+* TOOL\_GRIPPER\_2\_ID
+* TOOL\_GRIPPER\_3\_ID
+* TOOL\_ELECTROMAGNET\_1\_ID
+* TOOL\_VACUUM\_PUMP\_1\_ID
+    
+##### Digital pins
+
+* PIN\_MODE\_OUTPUT
+* PIN\_MODE\_INPUT
+* PIN\_HIGH
+* PIN\_LOW
+
+* GPIO\_1A
+* GPIO\_1B
+* GPIO\_1C
+* GPIO\_2A
+* GPIO\_2B
+* GPIO\_2C
+    
+* SW\_1
+* SW\_2
+  
+##### For shift\_pose function
+
+* AXIS\_X
+* AXIS\_Y
+* AXIS\_Z
+* ROT\_ROLL
+* ROT\_PITCH
+* ROT\_YAW
+
+### Class methods
+
+##### calibrate\_auto
+
+Calibrate robot motors automatically (by moving axis). If calibration is not needed, this method will do nothing.
+
+#### calibrate\_manual
+
+Calibrate robot motors manually (the robot just needs to be in 'home' position and to have been auto calibrated at least once). If calibration is not needed, this method will do nothing.
 
 ##### activate\_learning\_mode
 
@@ -149,6 +200,10 @@ Params:
 * pin (GPIO number)
 
 Deactivate electromagnet on digital I/O <pin> (place object). This will set the pin state to LOW.
+
+##### get\_saved\_position\_list
+
+Get all saved positions on the robot
 
 ##### wait
 

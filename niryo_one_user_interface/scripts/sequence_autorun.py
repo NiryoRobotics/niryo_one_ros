@@ -40,6 +40,7 @@ from niryo_one_msgs.msg import RobotMoveGoal
 from niryo_one_user_interface.sequences.sequence import Sequence
 from niryo_one_user_interface.sequences.sequence_action_type import SequenceActionType
 from niryo_one_commander.command_type import CommandType as MoveCommandType
+from niryo_one_commander.command_status import CommandStatus
 
 class SequenceAutorunMode:
     LOOP = 0
@@ -103,10 +104,18 @@ class SequenceAutorun:
         goal.sequence_id = seq_id
         goal.sequence = Sequence()
         self.sequence_action_client.send_goal(goal)
+        # Will wait until goal is successfull, aborted, or canceled
+        self.is_sequence_running = True
         self.sequence_action_client.wait_for_result()
+        result = self.sequence_action_client.get_result()
+        self.is_sequence_running = False
+        return result.status
     
-    # todo : after service with saved positions is developed, call the service
-    # and remove hard-coded values here
+    def cancel_sequence_goal(self):
+        if self.is_sequence_running:
+            rospy.logwarn("Cancel current sequence from sequence autorun")
+            self.sequence_action_client.cancel_goal()
+
     def send_robot_to_sleep_position(self):
         client = actionlib.SimpleActionClient('/niryo_one/commander/robot_action', RobotMoveAction)
         if not client.wait_for_server(rospy.Duration(1.0)):
@@ -116,6 +125,8 @@ class SequenceAutorun:
         goal.cmd.joints = [0,0,-1.4,0,0,0]
         client.send_goal(goal)
         client.wait_for_result()
+        result = client.get_result()
+        return result.status
 
     # This thread is always alive when the node is alive
     # When activated, will launch each previously stored sequence
@@ -137,31 +148,31 @@ class SequenceAutorun:
                 if self.calibration_needed:
                     self.send_calibration_command()
                     continue
-                # 3. Check learning mode - deactivate if needed
-                if self.learning_mode_on:
-                    self.activate_learning_mode(False)
-                    continue
-                # 4. Increment sequence index
+                # 3. Increment sequence index
                 if len(self.sequence_ids) == 0:
                     continue # No sequence to launch
                 self.sequence_execution_index += 1
                 if self.sequence_execution_index >= len(self.sequence_ids):
                     self.sequence_execution_index = 0
-                # 5. Launch sequence
-                self.execute_sequence(self.sequence_ids[self.sequence_execution_index])
-                # 6. Execute specific mode action
+                # 4. Launch sequence
+                result_status = self.execute_sequence(self.sequence_ids[self.sequence_execution_index])
+                if result_status != CommandStatus.SUCCESS: # deactivate autorun if sequence failed
+                    self.activated = False
+                    continue
+                # 5. Execute specific mode action
                 if self.mode == SequenceAutorunMode.LOOP: # nothing to do, keep going with next sequence
                     pass
                 elif self.mode == SequenceAutorunMode.ONE_SHOT: # stop after 1 sequence, wait for user input to continue
-                    self.activated = False
-                    self.flag_activate_learning_mode = True
+                    if not self.cancel_sequence:
+                        result_status = self.send_robot_to_sleep_position()
+                        if result_status == CommandStatus.SUCCESS:
+                            self.activate_learning_mode(True)
+                        self.activated = False
             else:
-                # if user deactivates sequence autorun, also go to sleep position
-                # and activate learning mode after the sequence is finished
-                if self.flag_activate_learning_mode:
-                    self.send_robot_to_sleep_position()
-                    if self.activate_learning_mode(True):
-                        self.flag_activate_learning_mode = False
+                # if sequence has been canceled, also activate learning mode
+                if self.cancel_sequence:
+                    self.activate_learning_mode(True)
+                    self.cancel_sequence = False
 
     def __init__(self):
         self.sequence_autorun_status_file = rospy.get_param("~sequence_autorun_status_file")
@@ -170,7 +181,9 @@ class SequenceAutorun:
         self.enabled, self.mode, self.sequence_ids = self.read_sequence_autorun_status()
         self.activated = False
         self.sequence_execution_index = -1
-        self.flag_activate_learning_mode = False
+        self.flag_send_robot_to_home_position = False
+        self.cancel_sequence = False
+        self.is_sequence_running = False
 
         self.calibration_needed = None
         self.calibration_in_progress = None
@@ -206,6 +219,10 @@ class SequenceAutorun:
         self.calibration_in_progress = msg.calibration_in_progress
     
     def sub_learning_mode(self, msg):
+        if (not self.learning_mode_on) and msg.data:
+            self.activated = False
+            self.cancel_sequence = True
+            self.cancel_sequence_goal()
         self.learning_mode_on = msg.data
 
     def create_response(self, status, message):
@@ -224,9 +241,11 @@ class SequenceAutorun:
             return self.create_response(400, 'Sequence Autorun is not enabled')
         self.activated = not self.activated 
         if self.activated:
+            self.cancel_sequence = False
             return self.create_response(200, 'Sequence Autorun has been activated')
         else:
-            self.flag_activate_learning_mode = True
+            self.cancel_sequence = True
+            self.cancel_sequence_goal()
             return self.create_response(200, 'Sequence Autorun has been deactivated')
         
     def publish_sequence_autorun_status(self, event):

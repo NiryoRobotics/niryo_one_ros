@@ -32,12 +32,18 @@ GPIO_2_A = 26
 GPIO_2_B = 19
 GPIO_2_C = 6
 
+SW_1 = 12
+SW_2 = 13
+
 GPIO_1_A_NAME = '1A'
 GPIO_1_B_NAME = '1B'
 GPIO_1_C_NAME = '1C'
 GPIO_2_A_NAME = '2A'
 GPIO_2_B_NAME = '2B'
 GPIO_2_C_NAME = '2C'
+
+SW_1_NAME = 'SW1'
+SW_2_NAME = 'SW2'
 
 class DigitalPin:
 
@@ -92,7 +98,8 @@ class DigitalIOPanel:
 
         self.publish_io_state_frequency = rospy.get_param("~publish_io_state_frequency")
         self.digitalIOs = [DigitalPin(lock, GPIO_1_A, GPIO_1_A_NAME), DigitalPin(lock, GPIO_1_B, GPIO_1_B_NAME), DigitalPin(lock, GPIO_1_C, GPIO_1_C_NAME),
-                DigitalPin(lock, GPIO_2_A, GPIO_2_A_NAME), DigitalPin(lock, GPIO_2_B, GPIO_2_B_NAME), DigitalPin(lock, GPIO_2_C, GPIO_2_C_NAME)]
+                DigitalPin(lock, GPIO_2_A, GPIO_2_A_NAME), DigitalPin(lock, GPIO_2_B, GPIO_2_B_NAME), DigitalPin(lock, GPIO_2_C, GPIO_2_C_NAME),
+                DigitalPin(lock, SW_1, SW_1_NAME, mode=GPIO.OUT), DigitalPin(lock, SW_2, SW_2_NAME, mode=GPIO.OUT)]
 
         self.digital_io_publisher = rospy.Publisher('niryo_one/rpi/digital_io_state', DigitalIOState, queue_size=1)
         rospy.Timer(rospy.Duration(1.0/self.publish_io_state_frequency), self.publish_io_state)
@@ -137,6 +144,8 @@ class DigitalIOPanel:
     def callback_set_io_mode(self, req):
         for io in self.digitalIOs:
             if io.pin == req.pin:
+                if io.name.startswith('SW'):
+                    return self.create_response(400, "Can't change mode for switch pin, mode is fixed to OUTPUT")
                 # Set mode
                 if req.value == 0:
                     io.set_mode(GPIO.OUT)
@@ -172,42 +181,4 @@ if __name__ == '__main__':
     rospy.init_node('digital_io_panel')
     DigitalIOPanel()
     rospy.spin()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

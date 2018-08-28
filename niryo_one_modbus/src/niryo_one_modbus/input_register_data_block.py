@@ -57,8 +57,9 @@ IR_RPI_ROS_LOG_SIZE     = 405
 IR_RPI_VERSION_N1       = 406
 IR_RPI_VERSION_N2       = 407
 IR_RPI_VERSION_N3       = 408
+IR_HARDWARE_VERSION     = 409
 
-# Positive numbers : 0 - 32767
+# Positive number : 0 - 32767
 # Negative number : 32768 - 65535
 def handle_negative(val):
     if val < 0:
@@ -124,6 +125,7 @@ class InputRegisterDataBlock(NiryoOneDataBlock):
         self.setValuesOffset(IR_CALIBR_NEEDED, [int(msg.calibration_needed)])
         self.setValuesOffset(IR_CALIBR_IN_PROGRESS, [int(msg.calibration_in_progress)])
         self.setValuesOffset(IR_RPI_TEMPERATURE, [int(msg.rpi_temperature)])
+        self.setValuesOffset(IR_HARDWARE_VERSION, [int(msg.hardware_version)])
 
     def sub_ros_log_status(self, msg):
         self.setValuesOffset(IR_RPI_AVAILABLE_SPACE, [int(msg.available_disk_size)])

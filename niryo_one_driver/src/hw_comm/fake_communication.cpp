@@ -19,22 +19,36 @@
 
 #include "niryo_one_driver/fake_communication.h"
 
-FakeCommunication::FakeCommunication()
+FakeCommunication::FakeCommunication(int hardware_version)
 {
     ROS_INFO("Starting Fake Communication... It will just echo cmd into current position");
-   
-    double pos_0, pos_1, pos_2, pos_3;
-    ros::param::get("~stepper_1_home_position", pos_0);
-    ros::param::get("~stepper_2_home_position", pos_1);
-    ros::param::get("~stepper_3_home_position", pos_2);
-    ros::param::get("~stepper_4_home_position", pos_3);
 
-    echo_pos[0] = pos_0;
-    echo_pos[1] = pos_1;
-    echo_pos[2] = pos_2;
-    echo_pos[3] = pos_3;
-    echo_pos[4] = 0.0;
-    echo_pos[5] = 0.0;
+    this->hardware_version = hardware_version;
+
+    double pos_0, pos_1, pos_2;
+    ros::param::get("/niryo_one/motors/stepper_1_home_position", pos_0);
+    ros::param::get("/niryo_one/motors/stepper_2_home_position", pos_1);
+    ros::param::get("/niryo_one/motors/stepper_3_home_position", pos_2);
+   
+    if (hardware_version == 1) {
+        double pos_3;
+        ros::param::get("/niryo_one/motors/stepper_4_home_position", pos_3);
+
+        echo_pos[0] = pos_0;
+        echo_pos[1] = pos_1;
+        echo_pos[2] = pos_2;
+        echo_pos[3] = pos_3;
+        echo_pos[4] = 0.0;
+        echo_pos[5] = 0.0;
+    }
+    else if (hardware_version == 2) {
+        echo_pos[0] = pos_0;
+        echo_pos[1] = pos_1;
+        echo_pos[2] = pos_2;
+        echo_pos[3] = 0.0;
+        echo_pos[4] = 0.0;
+        echo_pos[5] = 0.0;
+    }
 }
 
 int FakeCommunication::init()
@@ -72,7 +86,7 @@ bool FakeCommunication::isConnectionOk()
     return true;
 }
 
-int FakeCommunication::allowMotorsCalibrationToStart(int mode)
+int FakeCommunication::allowMotorsCalibrationToStart(int mode, std::string &result_message)
 {
     ROS_INFO("Motor calibration with mode : %d", mode);
     return 1;

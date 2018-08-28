@@ -24,7 +24,7 @@ import subprocess
 
 from niryo_one_msgs.srv import SetInt
 
-def send_hotspot_command(self):
+def send_hotspot_command():
     rospy.loginfo("HOTSPOT")
     send_led_state(5)
     rospy.wait_for_service('/niryo_one/wifi/set_hotspot')
@@ -35,7 +35,7 @@ def send_hotspot_command(self):
         rospy.logwarn("Could not call set_hotspot service")
 
 
-def send_trigger_sequence_autorun(self):
+def send_trigger_sequence_autorun():
     rospy.loginfo("Trigger sequence autorun from button")
     try:
         rospy.wait_for_service('/niryo_one/sequences/trigger_sequence_autorun', 0.1)

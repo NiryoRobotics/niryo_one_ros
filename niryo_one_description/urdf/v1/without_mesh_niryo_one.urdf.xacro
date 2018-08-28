@@ -32,6 +32,7 @@
     <xacro:property name="distance_forearm_wrist_z" value="0.180" /> 
     <xacro:property name="distance_wrist_hand_x" value="0.018" /> 
     <xacro:property name="distance_wrist_hand_y" value="0" />
+<<<<<<< HEAD
     <!-- not yet implemented, tools are handled separately -->
     <xacro:property name="distance_hand_gripper" value="0.00" />
      
@@ -42,6 +43,14 @@
 
     <xacro:property name="limit_low_shoulder_rotation" value="-3.05433" />
     <xacro:property name="limit_up_shoulder_rotation" value="3.05433" />
+=======
+    <xacro:property name="distance_hand_tool" value="0.00" />
+	
+	<xacro:property name="PI" value="3.14159265359" />
+
+	<xacro:property name="limit_low_shoulder_rotation" value="-3.05433" />
+	<xacro:property name="limit_up_shoulder_rotation" value="3.05433" />
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
     <xacro:property name="limit_low_arm_rotation" value="${-PI/2}" />
     <xacro:property name="limit_up_arm_rotation" value="0.628319" />
     <xacro:property name="limit_low_elbow_rotation" value="-1.401" />
@@ -77,10 +86,17 @@
     </link>
      
     <link name="hand_link">
+<<<<<<< HEAD
     </link>
      
     <link name="gripper_link">
     </link>
+=======
+	</link>
+	
+    <link name="tool_link">
+	</link>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
 
 
      <!--Joints -->
@@ -139,10 +155,18 @@
           <axis xyz="0 0 1" />
     </joint>
 
+<<<<<<< HEAD
     <joint name="hand_gripper_joint" type="fixed">
         <parent link="hand_link" />
         <child link="gripper_link" />
         <origin xyz="0 0 ${distance_hand_gripper}" rpy="${-PI/2} ${-PI/2} 0" />
     </joint>
+=======
+	<joint name="hand_tool_joint" type="fixed">
+        <parent link="hand_link" />
+        <child link="tool_link" />
+        <origin xyz="0 0 ${distance_hand_tool}" rpy="${-PI/2} ${-PI/2} 0" />
+	</joint>
+>>>>>>> f9562b7a28424a0d9a25d0dd6343b672fabdfdae
 
 </robot>

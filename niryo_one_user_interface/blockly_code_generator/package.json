@@ -9,6 +9,6 @@
   "license": "GPLv3",
   "dependencies": {
     "commander": "^2.11.0",
-    "node-blockly": "^1.0.30"
+    "node-blockly": "^1.0.35"
   }
 }

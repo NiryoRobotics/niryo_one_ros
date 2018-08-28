@@ -27,7 +27,7 @@ from robot_commander import RobotCommander
 class NiryoOneCommanderNode(): 
 
     def __init__(self): 
-        # Publish robot state (position, orientation, gripper)
+        # Publish robot state (position, orientation, tool)
         self.niryo_one_robot_state_publisher = NiryoRobotStatePublisher()
 
         # Position Manager  

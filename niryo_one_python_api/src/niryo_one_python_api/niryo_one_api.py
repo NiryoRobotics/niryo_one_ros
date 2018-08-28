@@ -26,10 +26,12 @@ from std_msgs.msg import String
 
 from niryo_one_msgs.msg import RobotMoveAction
 from niryo_one_msgs.msg import RobotMoveGoal
+from niryo_one_msgs.msg import HardwareStatus
 
 from niryo_one_msgs.srv import SetInt
 from niryo_one_msgs.srv import GetDigitalIO
 from niryo_one_msgs.srv import SetDigitalIO
+from niryo_one_msgs.srv import GetPositionList
 
 from niryo_one_commander.command_type import CommandType as MoveCommandType
 
@@ -53,6 +55,9 @@ GPIO_1C = 16
 GPIO_2A = 26
 GPIO_2B = 19
 GPIO_2C = 6
+
+SW_1 = 12
+SW_2 = 13
 
 # Status
 OK    = 200
@@ -135,7 +140,7 @@ class NiryoOne:
             if not client.wait_for_result(timeout=rospy.Duration(self.action_execute_timeout)):
                 client.cancel_goal()
                 client.stop_tracking_goal()
-                raise NiryoOneException('Action Server timeout' + str(action_name))
+                raise NiryoOneException('Action Server timeout : ' + str(action_name))
 
             goal_state = client.get_state()
             response = client.get_result()
@@ -155,6 +160,40 @@ class NiryoOne:
         #    
         # Interface
         #
+
+        def calibrate_auto(self):
+            result = self.call_service('niryo_one/calibrate_motors',
+                    SetInt, [1])
+            if result.status != 200:
+                raise NiryoOneException(result.message)
+            # Wait until calibration is finished
+            rospy.sleep(1)
+            calibration_finished = False
+            while not calibration_finished:
+                try:
+                    hw_status = rospy.wait_for_message('niryo_one/hardware_status', 
+                            HardwareStatus, timeout=5)
+                    if not hw_status.calibration_in_progress:
+                        calibration_finished = True
+                except rospy.ROSException as e:
+                    raise NiryoOneException(str(e))
+
+        def calibrate_manual(self):
+            result = self.call_service('niryo_one/calibrate_motors',
+                    SetInt, [2])
+            if result.status != 200:
+                raise NiryoOneException(result.message)
+            # Wait until calibration is finished
+            rospy.sleep(1)
+            calibration_finished = False
+            while not calibration_finished:
+                try:
+                    hw_status = rospy.wait_for_message('niryo_one/hardware_status', 
+                            HardwareStatus, timeout=5)
+                    if not hw_status.calibration_in_progress:
+                        calibration_finished = True
+                except rospy.ROSException as e:
+                    raise NiryoOneException(str(e))
        
         def activate_learning_mode(self, activate):
             result = self.call_service('niryo_one/activate_learning_mode', 
@@ -264,6 +303,11 @@ class NiryoOne:
             goal.cmd.tool_cmd.cmd_type = self.tool_command_list['deactivate_digital_io']
             goal.cmd.tool_cmd.gpio = pin
             return self.execute_action('niryo_one/commander/robot_action', RobotMoveAction, goal)
+
+        def get_saved_position_list(self):
+            result = self.call_service('niryo_one/position/get_position_list', 
+                    GetPositionList, [])
+            return result.positions
 
         def wait(self, time_sleep):
             rospy.sleep(time_sleep)

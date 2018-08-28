@@ -31,6 +31,7 @@ from position_manager import PositionManager
 # Messages
 from std_msgs.msg import Empty
 from niryo_one_msgs.msg import RobotMoveCommand
+from niryo_one_msgs.msg import HardwareStatus
 from std_msgs.msg import Bool
 
 # Services
@@ -38,6 +39,7 @@ from std_srvs.srv import SetBool
 from niryo_one_msgs.srv import RobotMove
 from niryo_one_msgs.srv import ManagePosition 
 from niryo_one_msgs.srv import GetInt
+from niryo_one_msgs.srv import SetInt
 # Action msgs
 from niryo_one_msgs.msg import RobotMoveAction
 from niryo_one_msgs.msg import RobotMoveGoal
@@ -83,6 +85,15 @@ class RobotCommander:
         msg = Empty() 
         self.reset_controller_pub.publish(msg)
 
+    def activate_learning_mode(self, activate):
+        try:
+            rospy.wait_for_service('/niryo_one/activate_learning_mode', 1)
+            srv = rospy.ServiceProxy('/niryo_one/activate_learning_mode', SetInt)
+            resp = srv(int(activate))
+            return (resp.status == 200)
+        except (rospy.ServiceException, rospy.ROSException), e:
+            return False
+
     def __init__(self, position_manager, trajectory_manager):
         self.trajectory_manager = trajectory_manager
         self.pos_manager=position_manager
@@ -105,6 +116,7 @@ class RobotCommander:
         self.current_goal_handle = None
         self.learning_mode_on = False 
         self.joystick_enabled = False
+        self.hardware_status = None
         self.is_active_server = rospy.Service(
                 'niryo_one/commander/is_active', GetInt, self.callback_is_active)
 
@@ -112,6 +124,8 @@ class RobotCommander:
                 '/niryo_one/learning_mode', Bool, self.callback_learning_mode)
         self.joystick_enabled_subscriber = rospy.Subscriber('/niryo_one/joystick_interface/is_enabled', 
                 Bool, self.callback_joystick_enabled)
+        self.hardware_status_subscriber = rospy.Subscriber(
+                '/niryo_one/hardware_status', HardwareStatus, self.callback_hardware_status)
         
         self.validation = rospy.get_param("/niryo_one/robot_command_validation")
         self.parameters_validation = ParametersValidation(self.validation)
@@ -124,6 +138,7 @@ class RobotCommander:
     def set_saved_trajectory(self, cmd):
         traj = self.trajectory_manager.get_trajectory(cmd.saved_trajectory_id) 
         return self.set_plan_and_execute(traj.trajectory_plan)
+
     def execute_command(self, cmd):
         cmd_type = cmd.cmd_type
         status = CommandStatus.ROS_ERROR
@@ -192,6 +207,9 @@ class RobotCommander:
     def callback_joystick_enabled(self, msg):
         self.joystick_enabled = msg.data
 
+    def callback_hardware_status(self, msg):
+        self.hardware_status = msg
+
     def callback_is_active(self, req):
         if self.current_goal_handle is not None:
             return 1
@@ -200,10 +218,31 @@ class RobotCommander:
     def on_goal(self, goal_handle):
         rospy.loginfo("Robot Action Server - Received goal. Check if exists")
 
-        # Check if learning mode ON
-        if self.learning_mode_on:
-            result = self.create_result(CommandStatus.LEARNING_MODE_ON,
-                 "You need to deactivate learning mode to execute a new command")
+        # Check if hw status has been received at least once
+        if self.hardware_status is None:
+            result = self.create_result(CommandStatus.HARDWARE_NOT_OK,
+                    "Hardware Status still not received, please restart the robot")
+            goal_handle.set_rejected(result)
+            return
+
+        # Check if motor connection problem
+        if not self.hardware_status.connection_up:
+            result = self.create_result(CommandStatus.HARDWARE_NOT_OK,
+                    "Motor connection problem, you can't send a command now")
+            goal_handle.set_rejected(result)
+            return
+
+        # Check if calibration is needed
+        if self.hardware_status.calibration_needed == 1:
+            result = self.create_result(CommandStatus.HARDWARE_NOT_OK,
+                    "You need to calibrate the robot before sending a command")
+            goal_handle.set_rejected(result)
+            return
+
+        # Check if calibration is in progress
+        if self.hardware_status.calibration_in_progress:
+            result = self.create_result(CommandStatus.HARDWARE_NOT_OK,
+                    "Calibration in progress, wait until it ends to send a command")
             goal_handle.set_rejected(result)
             return
 
@@ -224,13 +263,21 @@ class RobotCommander:
       
         # validate parameters -> set_rejected (msg : validation or commander error)
         try:
-            rospy.loginfo("Robot Acton Sever - checking paramter Validity")
+            rospy.loginfo("Robot Action Server - Checking parameters Validity")
             self.validate_params(goal_handle.goal.goal.cmd)
         except RobotCommanderException as e:
             result = self.create_result(e.status, e.message)
             goal_handle.set_rejected(result)
             rospy.loginfo("Robot Action Server - Invalid parameters")
             return
+        
+        # Check if learning mode ON
+        if self.learning_mode_on:
+            if not self.activate_learning_mode(False):
+                result = self.create_result(CommandStatus.LEARNING_MODE_ON,
+                     "Learning mode could not be deactivated")
+                goal_handle.set_rejected(result)
+                return
         
         # set accepted
         self.current_goal_handle = goal_handle
@@ -253,14 +300,15 @@ class RobotCommander:
     def execute_command_action(self):
         cmd = self.current_goal_handle.goal.goal.cmd 
         rospy.loginfo("passing to executing command")
-        result = self.create_result(CommandStatus.ROS_ERROR, "error with executing commad")
+        result = self.create_result(CommandStatus.ROS_ERROR, "error with executing command")
         response = None
         try: 
             (status, message) = self.execute_command(cmd)
             response = self.create_result(status, message)
             result = response 
-        except RobotCommanderException :
-            rospy.loginfo ("error with executing command ") 
+        except RobotCommanderException as e :
+            result = self.create_result(e.status, e.message)
+            rospy.loginfo ("An exception was thrown during command execution") 
 
         if not response:
             self.current_goal_handle.set_aborted(result)
@@ -271,6 +319,9 @@ class RobotCommander:
         elif response.status == CommandStatus.STOPPED:
             self.current_goal_handle.set_canceled(result)
             rospy.loginfo("Goal has been successfully canceled")
+        elif response.status == CommandStatus.CONTROLLER_PROBLEMS:
+            self.current_goal_handle.set_aborted(result)
+            rospy.loginfo("Controller failed during execution : Goal has been aborted")
         else:
             self.current_goal_handle.set_aborted(result)
             rospy.loginfo("Unknown result, goal has been set as aborted")

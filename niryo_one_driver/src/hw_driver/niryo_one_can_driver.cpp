@@ -94,11 +94,12 @@ INT8U NiryoCanDriver::sendTorqueOnCommand(int id, int torque_on)
     return mcp_can->sendMsgBuf(id, 0, 2, data);
 }
 
-INT8U NiryoCanDriver::sendPositionOffsetCommand(int id, int cmd) 
+INT8U NiryoCanDriver::sendPositionOffsetCommand(int id, int cmd, int absolute_steps_at_offset_position) 
 {
-    uint8_t data[4] = { CAN_CMD_OFFSET , (uint8_t) ((cmd >> 16) & 0xFF),
-        (uint8_t) ((cmd >> 8) & 0xFF), (uint8_t) (cmd & 0XFF) };
-    return mcp_can->sendMsgBuf(id, 0, 4, data);
+    uint8_t data[6] = { CAN_CMD_OFFSET , (uint8_t) ((cmd >> 16) & 0xFF),
+        (uint8_t) ((cmd >> 8) & 0xFF), (uint8_t) (cmd & 0XFF),
+        (uint8_t) ((absolute_steps_at_offset_position >> 8) & 0xFF), (uint8_t) (absolute_steps_at_offset_position & 0xFF)};
+    return mcp_can->sendMsgBuf(id, 0, 6, data);
 }
 
 INT8U NiryoCanDriver::sendCalibrationCommand(int id, int offset, int delay, int direction, int timeout)
