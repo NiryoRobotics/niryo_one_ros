@@ -20,53 +20,52 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="niryo_one">
 
   <gazebo reference="ground_link">
-		<material>Gazebo/Black</material>
-		<turnGravityOff>true</turnGravityOff>
-	</gazebo>
+        <turnGravityOff>true</turnGravityOff>
+     </gazebo>
 
   <gazebo reference="base_link">
-		<material>>Gazebo/Black</material>
-		<turnGravityOff>true</turnGravityOff>
-	</gazebo>
+          <material>>Gazebo/Black</material>
+          <turnGravityOff>true</turnGravityOff>
+     </gazebo>
     
   <gazebo reference="shoulder_link">
-		<material>Gazebo/Black</material>
+          <material>Gazebo/Black</material>
 
-		<turnGravityOff>true</turnGravityOff>
+          <turnGravityOff>true</turnGravityOff>
 
-	</gazebo>
+     </gazebo>
     
   <gazebo reference="arm_link">
-		<material>Gazebo/Blue</material>
-		<turnGravityOff>true</turnGravityOff>
-	</gazebo>
+          <material>Gazebo/Blue</material>
+          <turnGravityOff>true</turnGravityOff>
+     </gazebo>
 
   <gazebo reference="elbow_link">
-		<material>Gazebo/Black</material>
-		<turnGravityOff>true</turnGravityOff>
-	</gazebo>
+          <material>Gazebo/Black</material>
+          <turnGravityOff>true</turnGravityOff>
+     </gazebo>
 
   <gazebo reference="forearm_link">
-		<material>Gazebo/Blue</material>
+          <material>Gazebo/Blue</material>
 
-		<turnGravityOff>true</turnGravityOff>
-	</gazebo>
+          <turnGravityOff>true</turnGravityOff>
+     </gazebo>
 
   <gazebo reference="wrist_link">
-		<material>Gazebo/Black</material>
+          <material>Gazebo/Black</material>
 
-		<turnGravityOff>true</turnGravityOff>
-	</gazebo>
+          <turnGravityOff>true</turnGravityOff>
+     </gazebo>
 
   <gazebo reference="hand_link">
-		<material>Gazebo/Blue</material>
+          <material>Gazebo/Blue</material>
 
-		<turnGravityOff>true</turnGravityOff>
-	</gazebo>
-	 
-	<gazebo reference="gripper_link">
-		<material>Gazebo/Black</material>
-		<turnGravityOff>true</turnGravityOff>
-	</gazebo>
+          <turnGravityOff>true</turnGravityOff>
+     </gazebo>
+      
+     <gazebo reference="gripper_link">
+          <material>Gazebo/Black</material>
+          <turnGravityOff>true</turnGravityOff>
+     </gazebo>
 
 </robot>

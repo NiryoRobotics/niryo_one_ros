@@ -18,42 +18,42 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="niryo_one">
-	<!--transmission-->
+     <!--transmission-->
 
-	<transmission name="base_shoulder_transmission">
+     <transmission name="base_shoulder_transmission">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="joint_1">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </joint>
       <actuator name="base_shoulder_stepper">
         <mechanicalReduction>6.0625</mechanicalReduction>
-		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+          <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </actuator>
     </transmission>
-	
-	<transmission name="shoulder_arm_transmission">
+     
+     <transmission name="shoulder_arm_transmission">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="joint_2">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </joint>
       <actuator name="shoulder_arm_stepper">
         <mechanicalReduction>8.3125</mechanicalReduction>
-		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+          <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </actuator>
     </transmission>
 
-	<transmission name="arm_elbow_transmission">
+     <transmission name="arm_elbow_transmission">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="joint_3">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </joint>
       <actuator name="arm_elbow_stepper">
         <mechanicalReduction>7.875</mechanicalReduction>
-		<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+          <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
       </actuator>
     </transmission>
 
-	<transmission name="elbow_forarm_transmission">
+     <transmission name="elbow_forarm_transmission">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="joint_4">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -63,7 +63,7 @@
       </actuator>
     </transmission>
 
-	<transmission name="forarm_wirst_transmission">
+     <transmission name="forarm_wirst_transmission">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="joint_5">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -72,8 +72,8 @@
         <mechanicalReduction>1</mechanicalReduction>
       </actuator>
     </transmission>
-	
-	<transmission name="wirst_gripper_transmission">
+     
+     <transmission name="wirst_gripper_transmission">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="joint_6">
         <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
@@ -83,5 +83,5 @@
       </actuator>
     </transmission>
 
-	
+     
 </robot>
