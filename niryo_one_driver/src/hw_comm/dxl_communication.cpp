@@ -633,15 +633,9 @@ void DxlCommunication::hardwareControlWrite()
                 xl320_led_list.push_back(tool.getLedCommand());
             }
 
-            std::vector<uint32_t> xl430_led_list;
-            for (int i = 0; i < xl430_motor_list.size(); i++) {
-                xl430_led_list.push_back(xl430_motor_list.at(i)->getLedCommand());
-            }
-
             int xl320_result = xl320->syncWriteLed(xl320_id_list, xl320_led_list);
-            int xl430_result = xl430->syncWriteLed(xl430_id_list, xl430_led_list);
 
-            if (xl320_result != COMM_SUCCESS || xl430_result != COMM_SUCCESS) {
+            if (xl320_result != COMM_SUCCESS) {
                 ROS_WARN("Failed to write LED");
             }
             else {
