@@ -1074,12 +1074,17 @@ int DxlCommunication::scanAndCheck()
     
     if (missing_motor_ids.size() > 0) {
         debug_error_message = "Missing Dynamixel motor(s) on the robot : ";
-        for (int i = 0; i < missing_motor_ids.size(); i++) {
-            debug_error_message += std::to_string(missing_motor_ids.at(i));
-            if (i != missing_motor_ids.size() - 1) {
+        for (int i = 0; i < motors.size(); i++) {
+            if (std::find(missing_motor_ids.begin(), missing_motor_ids.end(), motors.at(i)->getId()) != missing_motor_ids.end()) {
+                debug_error_message += motors.at(i)->getName();
                 debug_error_message += ", ";
             }
         }
+
+        if (std::find(missing_motor_ids.begin(), missing_motor_ids.end(), tool.getId()) != missing_motor_ids.end()) {
+            debug_error_message += tool.getName();
+        }
+
         ROS_ERROR("%s", debug_error_message.c_str());
         return DXL_SCAN_MISSING_MOTOR;
     }

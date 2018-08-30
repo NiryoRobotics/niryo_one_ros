@@ -465,7 +465,7 @@ void CanCommunication::hardwareControlCheckConnection()
                     if (motors.at(i)->getHwFailCounter() >= max_fail_counter) {
                         is_can_connection_ok = false;
                         debug_error_message = "Connection problem with CAN bus. Motor ";
-                        debug_error_message += std::to_string(motors.at(i)->getId());
+                        debug_error_message += motors.at(i)->getName();
                         debug_error_message += " is not connected";
                         return;
                     }
@@ -1129,10 +1129,10 @@ int CanCommunication::scanAndCheck()
         if (ros::Time::now().toSec() - time_begin_scan > timeout) {
             ROS_ERROR("CAN SCAN Timeout");
             debug_error_message = "CAN bus scan failed : motors ";
-            if (!m1_ok) { debug_error_message += std::to_string(m1.getId()); debug_error_message += ", "; }
-            if (!m2_ok) { debug_error_message += std::to_string(m2.getId()); debug_error_message += ", "; }
-            if (!m3_ok) { debug_error_message += std::to_string(m3.getId()); debug_error_message += ", "; }
-            if (!m4_ok) { debug_error_message += std::to_string(m4.getId()); debug_error_message += ", "; }
+            if (!m1_ok) { debug_error_message += m1.getName(); debug_error_message += ", "; }
+            if (!m2_ok) { debug_error_message += m2.getName(); debug_error_message += ", "; }
+            if (!m3_ok) { debug_error_message += m3.getName(); debug_error_message += ", "; }
+            if (!m4_ok) { debug_error_message += m4.getName(); debug_error_message += ", "; }
             debug_error_message += "are not connected";
             is_can_connection_ok = false;
             hw_is_busy = false;
