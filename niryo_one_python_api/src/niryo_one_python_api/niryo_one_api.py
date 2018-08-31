@@ -250,6 +250,12 @@ class NiryoOne:
             goal.cmd.shift.value = value
             return self.execute_action('niryo_one/commander/robot_action', RobotMoveAction, goal)
 
+        def set_arm_max_velocity(self, percentage):
+            result = self.call_service('/niryo_one/commander/set_max_velocity_scaling_factor',
+                    SetInt, [percentage])
+            if result.status != 200:
+                raise NiryoOneException(result.message)
+
         def open_gripper(self, gripper_id, speed):
             goal = RobotMoveGoal()
             goal.cmd.cmd_type = MoveCommandType.TOOL

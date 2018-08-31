@@ -53,14 +53,12 @@ You can use those predefined constants (instead of numbers) in the Python API me
 * PIN\_MODE\_INPUT
 * PIN\_HIGH
 * PIN\_LOW
-
 * GPIO\_1A
 * GPIO\_1B
 * GPIO\_1C
 * GPIO\_2A
 * GPIO\_2B
 * GPIO\_2C
-    
 * SW\_1
 * SW\_2
   
@@ -116,6 +114,13 @@ Params:
 * value (m)
 
 Move the arm by shifting the current pose on <axis> by <value>.
+
+##### set\_arm\_max\_velocity
+
+Params:
+* percentage (1-100)
+
+Set the arm max velocity scaling factor.
 
 ##### pin\_mode
 
