@@ -897,8 +897,10 @@ int CanCommunication::autoCalibrationStep2()
     if (relativeMoveMotor(&m1, -m1.getOffsetPosition(), 1300, false) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
-    if (relativeMoveMotor(&m2, -m2.getOffsetPosition(), 3000, false) != CAN_OK) {
-        return CAN_STEPPERS_CALIBRATION_FAIL;
+    if (hardware_version == 1) {
+        if (relativeMoveMotor(&m2, -m2.getOffsetPosition(), 3000, false) != CAN_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
     }
     if (relativeMoveMotor(&m4, -m4.getOffsetPosition(), 1500, false) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
@@ -911,6 +913,15 @@ int CanCommunication::autoCalibrationStep2()
     }
     else if (hardware_version == 2) {
         ros::Duration(abs(m1.getOffsetPosition()) * 1300 / 1000000).sleep();
+    }
+    
+    // 3.2 Move axis 2 to home position after axis 1
+    // --> in case a gripper is attached, so it won't collide with the base while moving
+    if (hardware_version == 2) {
+        if (relativeMoveMotor(&m2, -m2.getOffsetPosition(), 3000, false) != CAN_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
+        ros::Duration(abs(m2.getOffsetPosition()) * 3000 / 1000000 + 0.5).sleep();
     }
     
     // 5. Send calibration cmd m3 (only for hw version 1)
