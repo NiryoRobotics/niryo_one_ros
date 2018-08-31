@@ -94,6 +94,22 @@ Blockly.Blocks['niryo_one_shift_pose'] = {
     }
 };
 
+Blockly.Blocks['niryo_one_set_arm_max_speed'] = {
+    init: function () {
+        this.appendValueInput("SET_ARM_MAX_SPEED")
+            .setCheck("Number")
+            .appendField("Set Arm max. speed to");
+        this.appendDummyInput()
+            .appendField("%");
+        this.setInputsInline(true);
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#3D4D9A");
+        this.setTooltip("");
+        this.setHelpUrl("");
+    }
+};
+
 Blockly.Blocks['niryo_one_calibrate_auto'] = {
     init: function () {
         this.appendDummyInput()
@@ -450,6 +466,12 @@ Blockly.Python['niryo_one_shift_pose'] = function (block) {
 
   var code = 'n.shift_pose(' + dropdown_shift_pose_axis + ', ' +
     number_shift_pose_value + ')\n';
+  return code;
+};
+
+Blockly.Python['niryo_one_set_arm_max_speed'] = function(block) {
+  var value_set_arm_max_speed = Blockly.Python.valueToCode(block, 'SET_ARM_MAX_SPEED', Blockly.Python.ORDER_ATOMIC) || '0';
+  var code = 'n.set_arm_max_velocity(' + value_set_arm_max_speed + ')\n';
   return code;
 };
 
