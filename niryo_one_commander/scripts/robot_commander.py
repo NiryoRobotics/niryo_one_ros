@@ -33,6 +33,7 @@ from std_msgs.msg import Empty
 from niryo_one_msgs.msg import RobotMoveCommand
 from niryo_one_msgs.msg import HardwareStatus
 from std_msgs.msg import Bool
+from std_msgs.msg import Int32
 
 # Services
 from std_srvs.srv import SetBool
@@ -94,6 +95,22 @@ class RobotCommander:
         except (rospy.ServiceException, rospy.ROSException), e:
             return False
 
+    def publish_arm_max_velocity_scaling_factor(self, event):
+        msg = Int32()
+        msg.data = self.max_velocity_scaling_factor
+        self.max_velocity_scaling_factor_pub.publish(msg)
+    
+    def callback_set_max_velocity_scaling_factor(self, req):
+        if req.value <= 0 or req.value > 100:
+            return {'status': 400, 'message': 'Value must be between 1 and 100'}
+        try:
+            self.arm_commander.set_max_velocity_scaling_factor(req.value/100.0)
+        except RobotCommanderException as e:
+            return {'status': 400, 'message': e.message} 
+        self.max_velocity_scaling_factor = req.value
+        self.publish_arm_max_velocity_scaling_factor(None)
+        return {'status': 200, 'message': 'Success'}
+
     def __init__(self, position_manager, trajectory_manager):
         self.trajectory_manager = trajectory_manager
         self.pos_manager=position_manager
@@ -129,6 +146,15 @@ class RobotCommander:
         
         self.validation = rospy.get_param("/niryo_one/robot_command_validation")
         self.parameters_validation = ParametersValidation(self.validation)
+        
+        # arm velocity
+        self.max_velocity_scaling_factor = 100
+        self.max_velocity_scaling_factor_pub = rospy.Publisher(
+                '/niryo_one/max_velocity_scaling_factor', Int32, queue_size=10)
+        self.timer = rospy.Timer(rospy.Duration(1.0), self.publish_arm_max_velocity_scaling_factor)
+        self.max_velocity_scaling_factor_server = rospy.Service(
+                '/niryo_one/commander/set_max_velocity_scaling_factor', SetInt, 
+                self.callback_set_max_velocity_scaling_factor)
 
     def set_saved_position(self, cmd):
         rospy.loginfo("set saved position")
