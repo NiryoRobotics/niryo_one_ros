@@ -66,7 +66,8 @@ class RosInterface {
         int hardware_version;
         bool learning_mode_on;
         int calibration_needed;
-
+        bool last_connection_up_flag;
+        
         std::string rpi_image_version;
         std::string ros_niryo_one_version;
     

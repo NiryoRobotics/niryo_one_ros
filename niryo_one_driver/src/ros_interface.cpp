@@ -27,6 +27,7 @@ RosInterface::RosInterface(CommunicationBase* niryo_one_comm, RpiDiagnostics* rp
     this->learning_mode_on = learning_mode_on;
     this->flag_reset_controllers = flag_reset_controllers;
     this->hardware_version = hardware_version;
+    last_connection_up_flag = true;
     
     ros::param::get("/niryo_one/info/image_version", rpi_image_version);
     ros::param::get("/niryo_one/info/ros_version", ros_niryo_one_version);
@@ -217,6 +218,17 @@ void RosInterface::publishHardwareStatus()
 
         comm->getHardwareStatus(&connection_up, error_message, &calibration_needed, 
                 &calibration_in_progress, motor_names, motor_types, temperatures, voltages, hw_errors);
+
+        if (connection_up && !last_connection_up_flag) {
+            learning_mode_on = true;
+            comm->activateLearningMode(learning_mode_on);
+            
+            // publish one time
+            std_msgs::Bool msg;
+            msg.data = learning_mode_on;
+            learning_mode_publisher.publish(msg);
+        }
+        last_connection_up_flag = connection_up;
 
         niryo_one_msgs::HardwareStatus msg;
         msg.header.stamp = ros::Time::now();
