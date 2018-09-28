@@ -803,6 +803,12 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
                                 sensor_offset_ids.push_back(motor_id);
                                 sensor_offset_steps.push_back(steps_at_offset_pos);
                                 calibration_results.at(i) = true;
+                                
+                                // keep torque ON for axis 2 
+                                // (if torsion spring is too strong the axis might move too much for the following calibration steps)
+                                if (motor_id == m2.getId()) {
+                                    can->sendTorqueOnCommand(m2.getId(), true);
+                                }
                             }
                         }
                     }
