@@ -1135,10 +1135,11 @@ int CanCommunication::scanAndCheck()
                 m4_ok = true;
             }
             else { // detect unallowed motor
-                ROS_ERROR("Scan And Check : Received can frame with wrong id : %d", motor_id);
+                ROS_ERROR("Scan CAN bus : Received can frame with wrong id : %d", motor_id);
                 hw_is_busy = false;
                 debug_error_message = "Unallowed connected motor : ";
                 debug_error_message += std::to_string(motor_id);
+                ROS_ERROR("%s", debug_error_message.c_str());
                 return CAN_SCAN_NOT_ALLOWED;
             }
         }
@@ -1153,6 +1154,7 @@ int CanCommunication::scanAndCheck()
             debug_error_message += "are not connected";
             is_can_connection_ok = false;
             hw_is_busy = false;
+            ROS_ERROR("%s", debug_error_message.c_str());
             return CAN_SCAN_TIMEOUT;
         }
     }
