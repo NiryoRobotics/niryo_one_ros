@@ -54,6 +54,7 @@ add_service_files(
   ManageTrajectory.srv
   GetTrajectoryList.srv  
   ChangeHardwareVersion.srv
+  SendCustomDxlValue.srv
 )
 
 add_action_files(

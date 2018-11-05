@@ -103,6 +103,19 @@ int XL320Driver::setAlarmShutdown(uint8_t id, uint32_t alarm_shutdown)
     return packetHandler->write1ByteTxOnly(portHandler, id, XL320_ADDR_ALARM_SHUTDOWN, (uint8_t)alarm_shutdown);
 }
 
+int XL320Driver::customWrite(uint8_t id, uint32_t value, uint8_t reg_address, uint8_t byte_number)
+{
+    if (byte_number == 1) {
+        return packetHandler->write1ByteTxOnly(portHandler, id, reg_address, (uint8_t) value);
+    }
+    else if (byte_number == 2) {
+        return packetHandler->write2ByteTxOnly(portHandler, id, reg_address, (uint16_t) value);
+    }
+    else {
+        return -1;
+    }
+}
+
 /*
  *  -----------------   SYNC WRITE   --------------------
  */

@@ -181,6 +181,23 @@ bool RosInterface::callbackChangeHardwareVersion(niryo_one_msgs::ChangeHardwareV
     return true;
 }
 
+bool RosInterface::callbackSendCustomDxlValue(niryo_one_msgs::SendCustomDxlValue::Request &req,
+        niryo_one_msgs::SendCustomDxlValue::Response &res)
+{
+    // pre-check motor type
+    if (req.motor_type != 1 && req.motor_type != 2) {
+        res.status = 400;
+        res.message = "Invalid motor type: should be 1 (XL-320) or 2 (XL-430)";
+        return true;
+    }
+
+    comm->addCustomDxlCommand(req.motor_type, req.id, req.value, req.reg_address, req.byte_number);
+    
+    res.status = 200;
+    res.message = "OK";
+    return true;
+}
+
 void RosInterface::startServiceServers()
 {
     calibrate_motors_server = nh_.advertiseService("niryo_one/calibrate_motors", &RosInterface::callbackCalibrateMotors, this);
@@ -196,6 +213,7 @@ void RosInterface::startServiceServers()
     push_air_vacuum_pump_server = nh_.advertiseService("niryo_one/tools/push_air_vacuum_pump", &RosInterface::callbackPushAirVacuumPump, this);
 
     change_hardware_version_server = nh_.advertiseService("niryo_one/change_hardware_version", &RosInterface::callbackChangeHardwareVersion, this);
+    send_custom_dxl_value_server = nh_.advertiseService("niryo_one/send_custom_dxl_value", &RosInterface::callbackSendCustomDxlValue, this);
 }
 
 void RosInterface::publishHardwareStatus()

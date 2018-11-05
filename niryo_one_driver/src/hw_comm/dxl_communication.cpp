@@ -172,6 +172,12 @@ int DxlCommunication::init(int hardware_version)
     return setupCommunication();
 }
 
+void DxlCommunication::addCustomDxlCommand(int motor_type, uint8_t id, uint32_t value,
+        uint32_t reg_address, uint32_t byte_number)
+{
+    custom_command_queue.push(DxlCustomCommand(motor_type, id, value, reg_address, byte_number));
+}
+
 int DxlCommunication::setupCommunication()
 {
     ROS_INFO("Dxl : set port name (%s), baudrate(%d)", device_name.c_str(), uart_baudrate);
@@ -507,6 +513,35 @@ void DxlCommunication::hardwareControlWrite()
     if (ros::Time::now().toSec() - time_hw_data_last_write > 1.0/hw_data_write_frequency) {
     
         time_hw_data_last_write += 1.0/hw_data_write_frequency;
+
+        // Send custom command if any
+        if (custom_command_queue.size() > 0) {
+            DxlCustomCommand cmd = custom_command_queue.front();
+            
+            ROS_INFO("Sending custom command to Dynamixel:\n"
+                    "Motor type: %d, ID: %d, Value: %d, Address: %d, Size: %d",
+                    cmd.motor_type, (int)cmd.id, (int)cmd.value, 
+                    (int)cmd.reg_address, (int)cmd.byte_number);
+
+            if (cmd.motor_type == MOTOR_TYPE_XL320) {
+                int result = xl320->customWrite(cmd.id, cmd.value, cmd.reg_address, cmd.byte_number);
+                if (result != COMM_SUCCESS) {
+                    ROS_WARN("Failed to write custom command: %d", result);
+                }
+            }
+            else if (cmd.motor_type == MOTOR_TYPE_XL430) {
+                int result = xl430->customWrite(cmd.id, cmd.value, cmd.reg_address, cmd.byte_number);
+                if (result != COMM_SUCCESS) {
+                    ROS_WARN("Failed to write custom command: %d", result);
+                }
+            }
+            else {
+                ROS_ERROR("Wrong motor type, should be 1 (XL-320) or 2 (XL-430).");
+            }
+
+            // Remove from queue if successfully sent
+            custom_command_queue.pop();
+        }
 
         // write torque enable (for all motors, including tool)
         if (write_torque_on_enable)
@@ -1050,11 +1085,8 @@ int DxlCommunication::scanAndCheck()
         if (result == COMM_RX_TIMEOUT) { // -3001
             debug_error_message = "No Dynamixel motor found. Make sure that motors are correctly connected and powered on.";
         }
-        else if (result == COMM_RX_CORRUPT) { // -3002
-            debug_error_message = "One Dynamixel motor is not correctly configured. Please debug motors one by one.";
-        }
-        else {
-            debug_error_message = "No Dynamixel motor found. Make sure that motors are correctly connected and powered on.";
+        else { // -3002 or other
+            debug_error_message = "Failed to scan Dynamixel bus.";
         }
         ROS_WARN("Broadcast ping failed , result : %d (-3001: timeout, -3002: corrupted packet)", result);
         return result;
@@ -1150,11 +1182,8 @@ int DxlCommunication::detectVersion()
         if (result == COMM_RX_TIMEOUT) { // -3001
             debug_error_message = "No Dynamixel motor found. Make sure that motors are correctly connected and powered on.";
         }
-        else if (result == COMM_RX_CORRUPT) { // -3002
-            debug_error_message = "One Dynamixel motor is not correctly configured. Please debug motors one by one.";
-        }
-        else {
-            debug_error_message = "No Dynamixel motor found. Make sure that motors are correctly connected and powered on.";
+        else { // -3002 or other
+            debug_error_message = "Failed to scan Dynamixel bus.";
         }
         ROS_WARN("Broadcast ping failed , result : %d (-3001: timeout, -3002: corrupted packet)", result);
         return -1;

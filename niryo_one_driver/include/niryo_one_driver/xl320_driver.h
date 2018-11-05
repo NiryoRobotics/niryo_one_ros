@@ -110,6 +110,9 @@ class XL320Driver : public DxlDriver {
         int syncReadTemperature    (std::vector<uint8_t> &id_list, std::vector<uint32_t> &temperature_list);
         int syncReadVoltage        (std::vector<uint8_t> &id_list, std::vector<uint32_t> &voltage_list);
         int syncReadHwErrorStatus  (std::vector<uint8_t> &id_list, std::vector<uint32_t> &hw_error_list);
+
+        // custom write
+        int customWrite(uint8_t id, uint32_t value, uint8_t reg_address, uint8_t byte_number);
 };
 
 #endif

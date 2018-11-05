@@ -60,7 +60,7 @@ class ArmCommander:
                     self.set_position_hold_mode()
                     return CommandStatus.CONTROLLER_PROBLEMS, "Command has been aborted"
                 else: # what else could happen ? 
-                    return CommandStatus.ROS_ERROR, "Unknown error, try to restart, or contact the support to know more"
+                    return CommandStatus.ROS_ERROR, "Error, try to restart."
             else:
                 # todo cancel goal
                 plan = None

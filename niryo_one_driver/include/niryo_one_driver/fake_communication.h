@@ -72,6 +72,9 @@ class FakeCommunication : public CommunicationBase {
         
         // steppers
         void synchronizeMotors(bool begin_traj);
+        
+        void addCustomDxlCommand(int motor_type, uint8_t id, uint32_t value,
+                uint32_t reg_address, uint32_t byte_number);
 
     private:
 

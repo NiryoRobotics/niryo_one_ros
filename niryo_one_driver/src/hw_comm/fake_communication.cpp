@@ -116,6 +116,12 @@ void FakeCommunication::getCurrentPosition(double pos[6])
     }
 }
         
+void FakeCommunication::addCustomDxlCommand(int motor_type, uint8_t id, uint32_t value,
+        uint32_t reg_address, uint32_t byte_number)
+{
+    ROS_INFO("Add custom Dxl command");
+}
+        
 void FakeCommunication::getHardwareStatus(bool *is_connection_ok, std::string &error_message, 
         int *calibration_needed, bool *calibration_in_progress,
         std::vector<std::string> &motor_names, std::vector<std::string> &motor_types,
