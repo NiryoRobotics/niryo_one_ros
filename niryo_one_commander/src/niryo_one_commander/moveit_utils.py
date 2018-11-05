@@ -69,9 +69,9 @@ def get_rpy_from_quaternion(rot):
      # force angle between -PI/PI
     for i, angle in enumerate(rpy):
         if angle > PI:
-            rpy[i] = angle % PI
+            rpy[i] = angle % (2 * PI) - 2 * PI
         elif angle < -PI:
-            rpy[i] = angle % -PI 
+            rpy[i] = angle % (2 * PI) 
     return rpy
 
 if __name__ == '__main__':
