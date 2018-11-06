@@ -1,6 +1,6 @@
 # Niryo One Driver
 
-This packages provides an interface to _ros\_control_ and handles the hardware control of motors.
+This package provides an interface to _ros\_control_ and handles the hardware control of motors.
 
 Here's a global overview of this package :
 

@@ -1,33 +1,26 @@
 <?xml version="1.0"?>
-<package format="2">
+<package>
   <name>niryo_one_debug</name>
   <version>2.0.0</version>
   <description>Niryo One debug tools</description>
   <author>Edouard Renard</author>
   <maintainer email="e.renard@niryo.com">Edouard Renard</maintainer>
   <license>GPLv3</license>
-
+  
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>dynamixel_sdk</build_depend>
-  <build_depend>mcp_can_rpi</build_depend>
-  <build_depend>niryo_one_msgs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
-  
-  <build_export_depend>dynamixel_sdk</build_export_depend>
-  <build_export_depend>mcp_can_rpi</build_export_depend>
-  <build_export_depend>niryo_one_msgs</build_export_depend>
-  <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-  
-  <exec_depend>dynamixel_sdk</exec_depend>
-  <exec_depend>mcp_can_rpi</exec_depend>
-  <exec_depend>niryo_one_msgs</exec_depend>
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
+  <build_depend>niryo_one_msgs</build_depend>
+  <build_depend>dynamixel_sdk</build_depend>
+  <build_depend>mcp_can_rpi</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>niryo_one_msgs</run_depend>
+  <run_depend>dynamixel_sdk</run_depend>
+  <run_depend>mcp_can_rpi</run_depend>
 
   <export>
   </export>

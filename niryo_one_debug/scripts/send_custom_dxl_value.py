@@ -13,8 +13,8 @@ if __name__ == '__main__':
     
     parser.add_argument('--type', type=int, required=True, help='Motor type (1 for XL-320, 2 for XL-430)')
     parser.add_argument('--id', type=int, required=True, help='Motor ID')
-    parser.add_argument('--value', type=int, required=True, help='Value to send to the motor')
     parser.add_argument('--address', type=int, required=True, help='Register address')
+    parser.add_argument('--value', type=int, required=True, help='Value to send to the motor')
     parser.add_argument('--size', type=int, required=True, help='Size(bytes) of the value to send (1,2 or 4)')
 
     args = parser.parse_args()
