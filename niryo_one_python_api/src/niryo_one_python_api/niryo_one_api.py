@@ -28,6 +28,12 @@ from niryo_one_msgs.msg import RobotMoveAction
 from niryo_one_msgs.msg import RobotMoveGoal
 from niryo_one_msgs.msg import HardwareStatus
 
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Bool
+from niryo_one_msgs.msg import HardwareStatus
+from niryo_one_msgs.msg import RobotState
+from niryo_one_msgs.msg import DigitalIOState
+
 from niryo_one_msgs.srv import SetInt
 from niryo_one_msgs.srv import GetDigitalIO
 from niryo_one_msgs.srv import SetDigitalIO
@@ -93,13 +99,44 @@ class NiryoOne:
             self.action_connection_timeout = rospy.get_param("/niryo_one/python_api/action_connection_timeout")
             self.action_execute_timeout = rospy.get_param("/niryo_one/python_api/action_execute_timeout")
             self.action_preempt_timeout = rospy.get_param("/niryo_one/python_api/action_preempt_timeout")
-          
             self.tool_command_list = rospy.get_param("/niryo_one_tools/command_list") 
+
+            # Subscribers
+            self.joint_states_sub = rospy.Subscriber('/joint_states', JointState, self.sub_joint_states)
+            self.robot_state_sub  = rospy.Subscriber('/niryo_one/robot_state', RobotState, self.sub_robot_state)
+            self.hardware_status_sub  = rospy.Subscriber('/niryo_one/hardware_status', HardwareStatus, self.sub_hardware_status)
+            self.learning_mode_sub  = rospy.Subscriber('/niryo_one/learning_mode', Bool, self.sub_learning_mode)
+            self.digital_io_state_sub = rospy.Subscriber('/niryo_one/rpi/digital_io_state', DigitalIOState, self.sub_digital_io_state)
 
             # Highlight publisher (to highlight blocks in Blockly interface)
             self.highlight_block_publisher = rospy.Publisher('/niryo_one/blockly/highlight_block', String, queue_size=10)
+
+            self.joints = None
+            self.pose = None
+            self.hw_status = None
+            self.learning_mode_on = None
+            self.digital_io_state = None
             
             rospy.sleep(0.1)
+
+        #
+        # Subscribers callbacks
+        #
+
+        def sub_joint_states(self, joint_states):
+            self.joints = list(joint_states.position)
+
+        def sub_hardware_status(self, hw_status):
+            self.hw_status = hw_status
+
+        def sub_robot_state(self, pose):
+            self.pose = pose
+        
+        def sub_learning_mode(self, learning_mode):
+            self.learning_mode_on = learning_mode.data
+        
+        def sub_digital_io_state(self, digital_io_state):
+            self.digital_io_state = digital_io_state
 
         #
         # Service client
@@ -317,7 +354,47 @@ class NiryoOne:
 
         def wait(self, time_sleep):
             rospy.sleep(time_sleep)
+
+        def get_joints(self):
+            timeout = rospy.get_time() + 2.0
+            while self.joints is None:
+                rospy.sleep(0.05)
+                if rospy.get_time() > timeout:
+                    raise NiryoOneException('Timeout: could not get joints (/joint_states topic)')
+            return self.joints
     
+        def get_arm_pose(self):
+            timeout = rospy.get_time() + 2.0
+            while self.pose is None:
+                rospy.sleep(0.05)
+                if rospy.get_time() > timeout:
+                    raise NiryoOneException('Timeout: could not get pose (/niryo_one/robot_state topic)')
+            return self.pose
+        
+        def get_hardware_status(self):
+            timeout = rospy.get_time() + 2.0
+            while self.hw_status is None:
+                rospy.sleep(0.05)
+                if rospy.get_time() > timeout:
+                    raise NiryoOneException('Timeout: could not get hardware status (/niryo_one/hardware_status topic)')
+            return self.hw_status
+
+        def get_learning_mode(self):
+            timeout = rospy.get_time() + 2.0
+            while self.learning_mode_on is None:
+                rospy.sleep(0.05)
+                if rospy.get_time() > timeout:
+                    raise NiryoOneException('Timeout: could not get learning mode (/niryo_one/learning_mode topic)')
+            return self.learning_mode_on
+
+        def get_digital_io_state(self):
+            timeout = rospy.get_time() + 2.0
+            while self.digital_io_state is None:
+                rospy.sleep(0.05)
+                if rospy.get_time() > timeout:
+                    raise NiryoOneException('Timeout: could not get digital io state (/niryo_one/rpi/digital_io_state topic)')
+            return self.digital_io_state
+
         # Will highlight a block on a Blockly interface
         # This is just graphical, no real functionality here
         def highlight_block(self, block_id):
