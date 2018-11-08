@@ -165,6 +165,7 @@ class CanCommunication {
         int steppers_calibration_mode;
         bool write_synchronize_begin_traj;
         bool calibration_in_progress;
+        int calibration_timeout;
 
         int relativeMoveMotor(StepperMotorState* motor, int steps, int delay, bool wait);
 

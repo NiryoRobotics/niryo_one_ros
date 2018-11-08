@@ -59,6 +59,10 @@ int CanCommunication::init(int hardware_version)
     
     resetHardwareControlLoopRates();
 
+    // set calibration timeout
+    ros::param::get("~calibration_timeout", calibration_timeout);
+    ROS_INFO("NiryoStepper calibration timeout: %d seconds", calibration_timeout);
+
     // start can driver
     can.reset(new NiryoCanDriver(spi_channel, spi_baudrate, gpio_can_interrupt));
 
@@ -700,14 +704,14 @@ int CanCommunication::manualCalibration()
 }
 
 int CanCommunication::sendCalibrationCommandForOneMotor(StepperMotorState* motor, int delay_between_steps,
-        int calibration_direction, int calibration_timeout)
+        int calibration_direction, int calibr_timeout)
 {
     if (!motor->isEnabled()) {
         return CAN_OK;
     }
     
     if (can->sendCalibrationCommand(motor->getId(), motor->getOffsetPosition(), delay_between_steps,
-                (int)motor->getDirection() * calibration_direction, calibration_timeout) != CAN_OK) {
+                (int)motor->getDirection() * calibration_direction, calibr_timeout) != CAN_OK) {
         ROS_ERROR("Failed to send calibration command for motor : %d", motor->getId());
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
@@ -715,7 +719,7 @@ int CanCommunication::sendCalibrationCommandForOneMotor(StepperMotorState* motor
     return CAN_OK;
 }
 
-int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout,
+int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibr_timeout,
         std::vector<int> &sensor_offset_ids, std::vector<int> &sensor_offset_steps)
 {
     std::vector<int> motors_ids;
@@ -729,7 +733,7 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
     }
 
     double time_begin_calibration = ros::Time::now().toSec();
-    double timeout = time_begin_calibration + (double)calibration_timeout;
+    double timeout = time_begin_calibration + (double)calibr_timeout;
     ROS_INFO("Waiting for motor calibration");
     //ROS_INFO("Waiting for motor %d calibration response...", motor->getId());
     
@@ -809,6 +813,10 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
                                 if (motor_id == m2.getId()) {
                                     can->sendTorqueOnCommand(m2.getId(), true);
                                 }
+                                // keep torque ON for axis 1
+                                if (motor_id == m1.getId()) {
+                                    can->sendTorqueOnCommand(m1.getId(), true);
+                                }
                             }
                         }
                     }
@@ -847,7 +855,6 @@ int CanCommunication::relativeMoveMotor(StepperMotorState* motor, int steps, int
 
 int CanCommunication::autoCalibrationStep1()
 {
-    int calibration_timeout = 30; // seconds
     int result;
 
     // 0. Torque ON for motor 2
@@ -865,7 +872,6 @@ int CanCommunication::autoCalibrationStep1()
 
 int CanCommunication::autoCalibrationStep2()
 {
-    int calibration_timeout = 30; // seconds
     int result;
     std::vector<int> sensor_offset_ids;
     std::vector<int> sensor_offset_steps; // absolute steps at offset position
@@ -884,7 +890,7 @@ int CanCommunication::autoCalibrationStep2()
     }
     
     if (hardware_version == 2) {
-        if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
+        if (sendCalibrationCommandForOneMotor(&m3, 1100, -1, calibration_timeout) != CAN_OK) {
             return CAN_STEPPERS_CALIBRATION_FAIL;
         }
     }
@@ -932,7 +938,7 @@ int CanCommunication::autoCalibrationStep2()
     
     // 5. Send calibration cmd m3 (only for hw version 1)
     if (hardware_version == 1) {
-        if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
+        if (sendCalibrationCommandForOneMotor(&m3, 1100, -1, calibration_timeout) != CAN_OK) {
             return CAN_STEPPERS_CALIBRATION_FAIL;
         }
 

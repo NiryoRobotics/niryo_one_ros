@@ -15,6 +15,8 @@ spi_channel:        0
 spi_baudrate:       1000000
 gpio_can_interrupt: 25
 
+calibration_timeout: 40
+
 #
 #  Read/Write/Check frequencies 
 #  Those params have been chosen to get a good (connection performance + speed / CPU usage) ratio
