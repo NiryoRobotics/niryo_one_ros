@@ -20,7 +20,7 @@ First install ROS kinetic "Desktop-Full" (tutorial [here](http://wiki.ros.org/ki
 
 You'll need to install some additional ROS packages :
 ```
-sudo apt-get install ros-kinetic-robot-state-publisher ros-kinetic-moveit ros-kinetic-manipulation-msgs ros-kinetic-rosbridge-suite ros-kinetic-joy ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-tf2-web-republisher
+sudo apt-get install ros-kinetic-robot-state-publisher ros-kinetic-moveit ros-kinetic-rosbridge-suite ros-kinetic-joy ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-tf2-web-republisher
 ```
 You'll also need to install an additional Python module :
 ```

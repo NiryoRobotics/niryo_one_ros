@@ -859,7 +859,7 @@ void DxlCommunication::setTorqueOn(bool on)
 void DxlCommunication::setLeds(std::vector<int> &leds)
 {
     if (leds.size() < motors.size() + 1) {
-        ROS_WARN("Led array must contain %d values", motors.size() + 1);
+        ROS_WARN("Led array must contain %d values", (int)motors.size() + 1);
         return;
     }
 
@@ -949,7 +949,7 @@ int DxlCommunication::openGripper(uint8_t id, uint16_t open_position, uint16_t o
 
     // calculate open duration
     int dxl_speed = open_speed * XL320_STEPS_FOR_1_SPEED; // position . sec-1
-    int dxl_steps_to_do = abs(open_position - tool.getPositionState()); // position
+    int dxl_steps_to_do = abs((int)open_position - (int)tool.getPositionState()); // position
     double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
    
     ros::Duration(seconds_to_wait + 0.25).sleep();
@@ -982,7 +982,7 @@ int DxlCommunication::closeGripper(uint8_t id, uint16_t close_position, uint16_t
 
     // calculate close duration
     int dxl_speed = close_speed * XL320_STEPS_FOR_1_SPEED; // position . sec-1
-    int dxl_steps_to_do = abs(close_position - tool.getPositionState()); // position
+    int dxl_steps_to_do = abs((int)close_position - (int)tool.getPositionState()); // position
     double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
 
     ros::Duration(seconds_to_wait + 0.25).sleep();
@@ -1015,7 +1015,7 @@ int DxlCommunication::pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, 
 
     // calculate pull air duration
     int dxl_speed = pull_air_velocity * XL320_STEPS_FOR_1_SPEED; // position . sec-1
-    int dxl_steps_to_do = abs(pull_air_position - tool.getPositionState()); // position
+    int dxl_steps_to_do = abs((int)pull_air_position - (int)tool.getPositionState()); // position
     double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
     
     ros::Duration(seconds_to_wait + 0.25).sleep();
@@ -1047,7 +1047,7 @@ int DxlCommunication::pushAirVacuumPump(uint8_t id, uint16_t push_air_position)
 
     // calculate push air duration
     int dxl_speed = push_air_velocity * XL320_STEPS_FOR_1_SPEED; // position . sec-1
-    int dxl_steps_to_do = abs(push_air_position - tool.getPositionState()); // position
+    int dxl_steps_to_do = abs((int)push_air_position - (int)tool.getPositionState()); // position
     double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
     
     ros::Duration(seconds_to_wait + 0.25).sleep();
