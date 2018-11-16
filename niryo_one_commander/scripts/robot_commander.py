@@ -325,7 +325,6 @@ class RobotCommander:
 
     def execute_command_action(self):
         cmd = self.current_goal_handle.goal.goal.cmd 
-        rospy.loginfo("passing to executing command")
         result = self.create_result(CommandStatus.ROS_ERROR, "error with executing command")
         response = None
         try: 

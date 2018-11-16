@@ -55,6 +55,7 @@ add_service_files(
   GetTrajectoryList.srv  
   ChangeHardwareVersion.srv
   SendCustomDxlValue.srv
+  ChangeMotorConfig.srv
 )
 
 add_action_files(
