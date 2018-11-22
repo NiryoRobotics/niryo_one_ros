@@ -45,10 +45,15 @@ def read_robot_name():
     return ''
 
 def write_robot_name(name):
-    with open(FILENAME, 'w') as f:
-        comment =  "# THIS IS A GENERATED FILE\n"
-        comment += "# Here is the name the user gave to this robot\n"
-        comment += "# This name does not affect anything,\n"
-        comment += "# it is only useful for user to easily recognize the robot on desktop/mobile apps\n"
-        f.write(comment)
-        f.write(name)
+    try:
+        with open(FILENAME, 'w') as f:
+            comment =  "# THIS IS A GENERATED FILE\n"
+            comment += "# Here is the name the user gave to this robot\n"
+            comment += "# This name does not affect anything,\n"
+            comment += "# it is only useful for user to easily recognize the robot on desktop/mobile apps\n"
+            f.write(comment)
+            f.write(name)
+            return True
+    except EnvironmentError as e:
+        rospy.logerr(e)
+        return False

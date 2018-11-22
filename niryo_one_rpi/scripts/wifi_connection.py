@@ -23,6 +23,7 @@ from threading import Thread
 from std_msgs.msg import Bool
 
 from niryo_one_msgs.srv import SetInt
+from niryo_one_msgs.srv import SetString
 
 from niryo_one_rpi.wifi.robot_name_handler import *
 from niryo_one_rpi.wifi.broadcast import *
@@ -73,6 +74,17 @@ class WifiConnectionManager:
                 identifier = str(rpi_serial[8:10]) + '-' + str(rpi_serial[10:13]) + '-' + str(rpi_serial[13:16])
         return identifier
 
+    def callback_set_robot_name(self, req):
+        name = req.value
+        rospy.loginfo("Setting robot name to: " + str(name))
+        if len(name) > 32 or len(name) < 3:
+            rospy.loginfo('Invalid name: length must be between 3-32 characters')
+            return self.service_response(400, 'Name length must be between 3-32 characters')
+        if not write_robot_name(name):
+            return self.service_response(400, 'Could not write robot name to file')
+        self.robot_name = read_robot_name()
+        return self.service_response(200, 'Successfully saved robot name')
+
     def __init__(self):
         rospy.loginfo("Starting wifi manager...")
         
@@ -85,6 +97,15 @@ class WifiConnectionManager:
 
         # Set filename for robot name
         set_filename_robot_name(self.filename_robot_name)
+
+        # Get robot name
+        self.robot_name = read_robot_name()
+        if self.robot_name != '':
+            self.hotspot_ssid = self.robot_name
+
+        # Start set robot name service server
+        self.set_robot_name_server = rospy.Service('/niryo_one/wifi/set_robot_name', 
+                SetString, self.callback_set_robot_name)
 
         # Set Niryo One hotspot ssid and password
         set_hotspot_ssid(self.hotspot_ssid)

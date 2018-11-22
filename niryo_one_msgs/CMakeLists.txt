@@ -56,6 +56,7 @@ add_service_files(
   ChangeHardwareVersion.srv
   SendCustomDxlValue.srv
   ChangeMotorConfig.srv
+  SetString.srv
 )
 
 add_action_files(
