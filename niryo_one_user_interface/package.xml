@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>niryo_one_user_interface</name>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
   <description>Handles high level commands from user (joystik, sequences, blockly), and calls appropriates Niryo One utilities</description>
   <author>Edouard Renard</author>
   <maintainer email="e.renard@niryo.com">Edouard Renard</maintainer>
