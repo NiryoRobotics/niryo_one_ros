@@ -20,7 +20,7 @@ First install ROS kinetic "Desktop-Full" (tutorial [here](http://wiki.ros.org/ki
 
 You'll need to install some additional ROS packages :
 ```
-sudo apt-get install ros-kinetic-robot-state-publisher ros-kinetic-moveit ros-kinetic-manipulation-msgs ros-kinetic-rosbridge-suite ros-kinetic-joy ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-tf2-web-republisher
+sudo apt-get install ros-kinetic-robot-state-publisher ros-kinetic-moveit ros-kinetic-rosbridge-suite ros-kinetic-joy ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-tf2-web-republisher
 ```
 You'll also need to install an additional Python module :
 ```
@@ -88,10 +88,10 @@ Here's a global overview of the Niryo One ROS Stack :
 * [Get started with the Niryo One Stack](https://niryo.com/docs/niryo-one/developer-tutorials/get-started-with-the-niryo-one-ros-stack/). This will help you understand the architecture and where to start as a developer.
 * [C++ example to move the robot](https://github.com/smaassen/niryo_one_tester) by Steve Maassen
 * [Python API](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_python_api)
-* [Remotely control Niry One (ROS multi-machines)](https://niryo.com/docs/niryo-one/developer-tutorials/remotely-control-niryo-one-ros-multi-machines/)
+* [Remotely control Niryo One (ROS multi-machines)](https://niryo.com/docs/niryo-one/developer-tutorials/remotely-control-niryo-one-ros-multi-machines/)
 
 ## Any question ?
 
-If you have a question and you don't find the answer here or on our [documentation](https://niryo.com/docs/niryo-one/), please send us an email at support@niryo.com.
+If you have a question and you don't find the answer here or on our [documentation](https://niryo.com/docs/niryo-one/), please [send us a message](https://niryo.com/contact/).
 
 Thank you !

@@ -44,8 +44,8 @@
     <xacro:property name="limit_up_elbow_rotation" value="${PI/2}" />
     <xacro:property name="limit_low_forearm_rotation" value="-3.05433" />
     <xacro:property name="limit_up_forearm_rotation" value="3.05433" />
-    <xacro:property name="limit_low_wrist_rotation" value="-2.0944" />
-    <xacro:property name="limit_up_wrist_rotation" value="2.53073" />
+    <xacro:property name="limit_low_wrist_rotation" value="-1.74533" />
+    <xacro:property name="limit_up_wrist_rotation" value="1.91986" />
     <xacro:property name="limit_low_hand_rotation" value="-2.57436" />
     <xacro:property name="limit_up_hand_rotation" value="2.57436" />
 

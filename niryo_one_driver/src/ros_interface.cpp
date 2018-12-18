@@ -27,6 +27,7 @@ RosInterface::RosInterface(CommunicationBase* niryo_one_comm, RpiDiagnostics* rp
     this->learning_mode_on = learning_mode_on;
     this->flag_reset_controllers = flag_reset_controllers;
     this->hardware_version = hardware_version;
+    last_connection_up_flag = true;
     
     ros::param::get("/niryo_one/info/image_version", rpi_image_version);
     ros::param::get("/niryo_one/info/ros_version", ros_niryo_one_version);
@@ -180,6 +181,23 @@ bool RosInterface::callbackChangeHardwareVersion(niryo_one_msgs::ChangeHardwareV
     return true;
 }
 
+bool RosInterface::callbackSendCustomDxlValue(niryo_one_msgs::SendCustomDxlValue::Request &req,
+        niryo_one_msgs::SendCustomDxlValue::Response &res)
+{
+    // pre-check motor type
+    if (req.motor_type != 1 && req.motor_type != 2) {
+        res.status = 400;
+        res.message = "Invalid motor type: should be 1 (XL-320) or 2 (XL-430)";
+        return true;
+    }
+
+    comm->addCustomDxlCommand(req.motor_type, req.id, req.value, req.reg_address, req.byte_number);
+    
+    res.status = 200;
+    res.message = "OK";
+    return true;
+}
+
 void RosInterface::startServiceServers()
 {
     calibrate_motors_server = nh_.advertiseService("niryo_one/calibrate_motors", &RosInterface::callbackCalibrateMotors, this);
@@ -195,6 +213,7 @@ void RosInterface::startServiceServers()
     push_air_vacuum_pump_server = nh_.advertiseService("niryo_one/tools/push_air_vacuum_pump", &RosInterface::callbackPushAirVacuumPump, this);
 
     change_hardware_version_server = nh_.advertiseService("niryo_one/change_hardware_version", &RosInterface::callbackChangeHardwareVersion, this);
+    send_custom_dxl_value_server = nh_.advertiseService("niryo_one/send_custom_dxl_value", &RosInterface::callbackSendCustomDxlValue, this);
 }
 
 void RosInterface::publishHardwareStatus()
@@ -217,6 +236,17 @@ void RosInterface::publishHardwareStatus()
 
         comm->getHardwareStatus(&connection_up, error_message, &calibration_needed, 
                 &calibration_in_progress, motor_names, motor_types, temperatures, voltages, hw_errors);
+
+        if (connection_up && !last_connection_up_flag) {
+            learning_mode_on = true;
+            comm->activateLearningMode(learning_mode_on);
+            
+            // publish one time
+            std_msgs::Bool msg;
+            msg.data = learning_mode_on;
+            learning_mode_publisher.publish(msg);
+        }
+        last_connection_up_flag = connection_up;
 
         niryo_one_msgs::HardwareStatus msg;
         msg.header.stamp = ros::Time::now();

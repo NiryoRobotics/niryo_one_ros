@@ -40,6 +40,7 @@
 #include "niryo_one_msgs/PushAirVacuumPump.h"
 
 #include "niryo_one_msgs/ChangeHardwareVersion.h"
+#include "niryo_one_msgs/SendCustomDxlValue.h"
 
 #include "niryo_one_msgs/HardwareStatus.h"
 #include "niryo_one_msgs/SoftwareVersion.h"
@@ -66,7 +67,8 @@ class RosInterface {
         int hardware_version;
         bool learning_mode_on;
         int calibration_needed;
-
+        bool last_connection_up_flag;
+        
         std::string rpi_image_version;
         std::string ros_niryo_one_version;
     
@@ -102,6 +104,7 @@ class RosInterface {
         ros::ServiceServer push_air_vacuum_pump_server;
 
         ros::ServiceServer change_hardware_version_server;
+        ros::ServiceServer send_custom_dxl_value_server;
 
         // callbacks
         
@@ -121,6 +124,9 @@ class RosInterface {
 
         bool callbackChangeHardwareVersion(niryo_one_msgs::ChangeHardwareVersion::Request &req,
                 niryo_one_msgs::ChangeHardwareVersion::Response &res);
+
+        bool callbackSendCustomDxlValue(niryo_one_msgs::SendCustomDxlValue::Request &req, 
+                niryo_one_msgs::SendCustomDxlValue::Response &res);
 
 };
 

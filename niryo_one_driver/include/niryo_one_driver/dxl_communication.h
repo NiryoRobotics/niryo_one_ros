@@ -24,6 +24,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <thread>
+#include <queue>
 
 #include "dynamixel_sdk/dynamixel_sdk.h"
 #include "niryo_one_driver/dxl_motor_state.h"
@@ -75,6 +76,7 @@
 // according to xl-320 datasheet : 1 speed ~ 0.111 rpm ~ 1.8944 dxl position per second
 #define XL320_STEPS_FOR_1_SPEED 1.8944 // 0.111 * 1024 / 60
 
+
 class DxlCommunication {
 
     public:
@@ -107,6 +109,8 @@ class DxlCommunication {
         int detectVersion();
 
         void moveAllMotorsToHomePosition();
+        void addCustomDxlCommand(int motor_type, uint8_t id, uint32_t value,
+                uint32_t reg_address, uint32_t byte_number);
 
         // Dxl Tools
         void setTool(uint8_t id, std::string name);
@@ -182,6 +186,8 @@ class DxlCommunication {
         double hw_data_write_frequency;
         double hw_data_read_frequency;
         double hw_status_read_frequency;
+
+        std::queue<DxlCustomCommand> custom_command_queue;
 
         // enable flags
 

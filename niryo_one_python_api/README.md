@@ -53,14 +53,12 @@ You can use those predefined constants (instead of numbers) in the Python API me
 * PIN\_MODE\_INPUT
 * PIN\_HIGH
 * PIN\_LOW
-
 * GPIO\_1A
 * GPIO\_1B
 * GPIO\_1C
 * GPIO\_2A
 * GPIO\_2B
 * GPIO\_2C
-    
 * SW\_1
 * SW\_2
   
@@ -79,7 +77,7 @@ You can use those predefined constants (instead of numbers) in the Python API me
 
 Calibrate robot motors automatically (by moving axis). If calibration is not needed, this method will do nothing.
 
-#### calibrate\_manual
+##### calibrate\_manual
 
 Calibrate robot motors manually (the robot just needs to be in 'home' position and to have been auto calibrated at least once). If calibration is not needed, this method will do nothing.
 
@@ -116,6 +114,13 @@ Params:
 * value (m)
 
 Move the arm by shifting the current pose on <axis> by <value>.
+
+##### set\_arm\_max\_velocity
+
+Params:
+* percentage (1-100)
+
+Set the arm max velocity scaling factor.
 
 ##### pin\_mode
 
@@ -211,3 +216,23 @@ Params:
 * time (seconds)
 
 Blocks and wait for <time> seconds.
+
+##### get\_joints
+
+Returns an array containing the current angles for all 6 axis (in radian).
+
+##### get\_pose
+
+Returns a RobotState object (see in niryo\_one\_msgs package) containing the pose (position in meters + orientation in radian) of the end effector tool.
+
+##### get\_hardware\_status
+
+Returns a HardwareStatus object (see in niryo\_one\_msgs package) containing useful info about the motors state, connection, temperature, etc. (temperature unit: °C)
+
+##### get\_learning\_mode
+
+Returns a boolean that indicates whether learning mode is activated or not.
+
+##### get\_digital\_io\_state
+
+Returns a DigitalIOState object (see in niryo\_one\_msgs package) containing information (mode: input or output + state: high or low) for all the 6\* 5V digital pins + 2\* 12V switches.

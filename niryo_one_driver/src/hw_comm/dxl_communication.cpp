@@ -172,6 +172,12 @@ int DxlCommunication::init(int hardware_version)
     return setupCommunication();
 }
 
+void DxlCommunication::addCustomDxlCommand(int motor_type, uint8_t id, uint32_t value,
+        uint32_t reg_address, uint32_t byte_number)
+{
+    custom_command_queue.push(DxlCustomCommand(motor_type, id, value, reg_address, byte_number));
+}
+
 int DxlCommunication::setupCommunication()
 {
     ROS_INFO("Dxl : set port name (%s), baudrate(%d)", device_name.c_str(), uart_baudrate);
@@ -473,7 +479,7 @@ void DxlCommunication::hardwareControlRead()
     }
    
     if (xl320_hw_fail_counter_read > 25 || xl430_hw_fail_counter_read > 25) {
-        ROS_ERROR("Dxl connection problem");
+        ROS_ERROR("Dxl connection problem - Failed to read from Dxl bus");
         xl320_hw_fail_counter_read = 0;
         xl430_hw_fail_counter_read = 0;
         is_dxl_connection_ok = false;
@@ -507,6 +513,35 @@ void DxlCommunication::hardwareControlWrite()
     if (ros::Time::now().toSec() - time_hw_data_last_write > 1.0/hw_data_write_frequency) {
     
         time_hw_data_last_write += 1.0/hw_data_write_frequency;
+
+        // Send custom command if any
+        if (custom_command_queue.size() > 0) {
+            DxlCustomCommand cmd = custom_command_queue.front();
+            
+            ROS_INFO("Sending custom command to Dynamixel:\n"
+                    "Motor type: %d, ID: %d, Value: %d, Address: %d, Size: %d",
+                    cmd.motor_type, (int)cmd.id, (int)cmd.value, 
+                    (int)cmd.reg_address, (int)cmd.byte_number);
+
+            if (cmd.motor_type == MOTOR_TYPE_XL320) {
+                int result = xl320->customWrite(cmd.id, cmd.value, cmd.reg_address, cmd.byte_number);
+                if (result != COMM_SUCCESS) {
+                    ROS_WARN("Failed to write custom command: %d", result);
+                }
+            }
+            else if (cmd.motor_type == MOTOR_TYPE_XL430) {
+                int result = xl430->customWrite(cmd.id, cmd.value, cmd.reg_address, cmd.byte_number);
+                if (result != COMM_SUCCESS) {
+                    ROS_WARN("Failed to write custom command: %d", result);
+                }
+            }
+            else {
+                ROS_ERROR("Wrong motor type, should be 1 (XL-320) or 2 (XL-430).");
+            }
+
+            // Remove from queue if successfully sent
+            custom_command_queue.pop();
+        }
 
         // write torque enable (for all motors, including tool)
         if (write_torque_on_enable)
@@ -633,15 +668,9 @@ void DxlCommunication::hardwareControlWrite()
                 xl320_led_list.push_back(tool.getLedCommand());
             }
 
-            std::vector<uint32_t> xl430_led_list;
-            for (int i = 0; i < xl430_motor_list.size(); i++) {
-                xl430_led_list.push_back(xl430_motor_list.at(i)->getLedCommand());
-            }
-
             int xl320_result = xl320->syncWriteLed(xl320_id_list, xl320_led_list);
-            int xl430_result = xl430->syncWriteLed(xl430_id_list, xl430_led_list);
 
-            if (xl320_result != COMM_SUCCESS || xl430_result != COMM_SUCCESS) {
+            if (xl320_result != COMM_SUCCESS) {
                 ROS_WARN("Failed to write LED");
             }
             else {
@@ -830,7 +859,7 @@ void DxlCommunication::setTorqueOn(bool on)
 void DxlCommunication::setLeds(std::vector<int> &leds)
 {
     if (leds.size() < motors.size() + 1) {
-        ROS_WARN("Led array must contain %d values", motors.size() + 1);
+        ROS_WARN("Led array must contain %d values", (int)motors.size() + 1);
         return;
     }
 
@@ -893,6 +922,7 @@ int DxlCommunication::pingAndSetTool(uint8_t id, std::string name)
     hw_is_busy = false;
     
     if (ping_result != COMM_SUCCESS) {
+        ROS_WARN("Could not find tool with id: %d", id);
         setTool(0, "No Dxl Tool"); // no tool detected
         return TOOL_STATE_PING_ERROR;
     }
@@ -919,7 +949,7 @@ int DxlCommunication::openGripper(uint8_t id, uint16_t open_position, uint16_t o
 
     // calculate open duration
     int dxl_speed = open_speed * XL320_STEPS_FOR_1_SPEED; // position . sec-1
-    int dxl_steps_to_do = abs(open_position - tool.getPositionState()); // position
+    int dxl_steps_to_do = abs((int)open_position - (int)tool.getPositionState()); // position
     double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
    
     ros::Duration(seconds_to_wait + 0.25).sleep();
@@ -952,7 +982,7 @@ int DxlCommunication::closeGripper(uint8_t id, uint16_t close_position, uint16_t
 
     // calculate close duration
     int dxl_speed = close_speed * XL320_STEPS_FOR_1_SPEED; // position . sec-1
-    int dxl_steps_to_do = abs(close_position - tool.getPositionState()); // position
+    int dxl_steps_to_do = abs((int)close_position - (int)tool.getPositionState()); // position
     double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
 
     ros::Duration(seconds_to_wait + 0.25).sleep();
@@ -985,7 +1015,7 @@ int DxlCommunication::pullAirVacuumPump(uint8_t id, uint16_t pull_air_position, 
 
     // calculate pull air duration
     int dxl_speed = pull_air_velocity * XL320_STEPS_FOR_1_SPEED; // position . sec-1
-    int dxl_steps_to_do = abs(pull_air_position - tool.getPositionState()); // position
+    int dxl_steps_to_do = abs((int)pull_air_position - (int)tool.getPositionState()); // position
     double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
     
     ros::Duration(seconds_to_wait + 0.25).sleep();
@@ -1017,7 +1047,7 @@ int DxlCommunication::pushAirVacuumPump(uint8_t id, uint16_t push_air_position)
 
     // calculate push air duration
     int dxl_speed = push_air_velocity * XL320_STEPS_FOR_1_SPEED; // position . sec-1
-    int dxl_steps_to_do = abs(push_air_position - tool.getPositionState()); // position
+    int dxl_steps_to_do = abs((int)push_air_position - (int)tool.getPositionState()); // position
     double seconds_to_wait = (double) dxl_steps_to_do / (double) dxl_speed; // sec
     
     ros::Duration(seconds_to_wait + 0.25).sleep();
@@ -1040,7 +1070,7 @@ int DxlCommunication::scanAndCheck()
     
     if (counter == 100) {
         debug_error_message = "Failed to scan motors, Dynamixel bus is too busy. Will retry...";
-        ROS_WARN("Failed to scan motors, dxl bus is too busy (counter max : %d)", counter);
+        ROS_WARN("Failed to scan motors, dxl bus is too busy (counter max : %d). Will retry...", counter);
         return COMM_PORT_BUSY;
     }
    
@@ -1052,9 +1082,20 @@ int DxlCommunication::scanAndCheck()
     hw_is_busy = false;
     
     if (result != COMM_SUCCESS) {
-        debug_error_message = "Failed to scan Dynamixel motors. Make sure that motors are correctly connected and powered on.";
-        ROS_WARN("Broadcast ping failed , result : %d", result);
+        if (result == COMM_RX_TIMEOUT) { // -3001
+            debug_error_message = "No Dynamixel motor found. Make sure that motors are correctly connected and powered on.";
+        }
+        else { // -3002 or other
+            debug_error_message = "Failed to scan Dynamixel bus.";
+        }
+        ROS_WARN("Broadcast ping failed , result : %d (-3001: timeout, -3002: corrupted packet)", result);
         return result;
+    }
+
+    // 1.1 Log all IDs found for debug purposes
+    ROS_INFO("Dynamixel broadcast ping - Found IDs:");
+    for (int i = 0; i < id_list.size(); i++) {
+        ROS_INFO("- %d", id_list.at(i));
     }
 
     // 2. Check that ids correspond to niryo_one motors id list
@@ -1074,12 +1115,17 @@ int DxlCommunication::scanAndCheck()
     
     if (missing_motor_ids.size() > 0) {
         debug_error_message = "Missing Dynamixel motor(s) on the robot : ";
-        for (int i = 0; i < missing_motor_ids.size(); i++) {
-            debug_error_message += std::to_string(missing_motor_ids.at(i));
-            if (i != missing_motor_ids.size() - 1) {
+        for (int i = 0; i < motors.size(); i++) {
+            if (std::find(missing_motor_ids.begin(), missing_motor_ids.end(), motors.at(i)->getId()) != missing_motor_ids.end()) {
+                debug_error_message += motors.at(i)->getName();
                 debug_error_message += ", ";
             }
         }
+
+        if (std::find(missing_motor_ids.begin(), missing_motor_ids.end(), tool.getId()) != missing_motor_ids.end()) {
+            debug_error_message += tool.getName();
+        }
+
         ROS_ERROR("%s", debug_error_message.c_str());
         return DXL_SCAN_MISSING_MOTOR;
     }
@@ -1133,16 +1179,27 @@ int DxlCommunication::detectVersion()
     hw_is_busy = false;
     
     if (result != COMM_SUCCESS) {
-        debug_error_message = "Failed to scan Dynamixel motors. Make sure that motors are correctly connected and powered on.";
-        ROS_WARN("Broadcast ping failed , result : %d", result);
+        if (result == COMM_RX_TIMEOUT) { // -3001
+            debug_error_message = "No Dynamixel motor found. Make sure that motors are correctly connected and powered on.";
+        }
+        else { // -3002 or other
+            debug_error_message = "Failed to scan Dynamixel bus.";
+        }
+        ROS_WARN("Broadcast ping failed , result : %d (-3001: timeout, -3002: corrupted packet)", result);
         return -1;
+    }
+
+    // 1.1 Log all IDs found for debug purposes
+    ROS_INFO("Dynamixel broadcast ping - Found IDs:");
+    for (int i = 0; i < id_list.size(); i++) {
+        ROS_INFO("- %d", id_list.at(i));
     }
 
     // Check if motor (MOTOR_4, Model : XL-430) is connected --> V2
     if (std::find(id_list.begin(), id_list.end(), DXL_MOTOR_4_ID) != id_list.end()) {
         // found the motor in the list, now check if model number matches XL-430 motors
         if (xl430->checkModelNumber(DXL_MOTOR_4_ID) == 0) {
-            // we are know sure MOTOR_4 is connected and it is a XL-430 motor
+            // we are now sure MOTOR_4 is connected and it is a XL-430 motor
             return 2; // --> version 2
         }
     }
@@ -1151,7 +1208,7 @@ int DxlCommunication::detectVersion()
     if (std::find(id_list.begin(), id_list.end(), DXL_MOTOR_5_ID) != id_list.end()) {
         // found the motor in the list, now check if model number matches XL-430 motors
         if (xl430->checkModelNumber(DXL_MOTOR_5_ID) == 0) {
-            // we are know sure MOTOR_5 is connected and it is a XL-430 motor
+            // we are now sure MOTOR_5 is connected and it is a XL-430 motor
             return 2; // --> version 2
         }
     }
@@ -1160,7 +1217,7 @@ int DxlCommunication::detectVersion()
     if (std::find(id_list.begin(), id_list.end(), DXL_MOTOR_5_1_ID) != id_list.end()) {
         // found the motor in the list, now check if model number matches XL-320 motors
         if (xl320->checkModelNumber(DXL_MOTOR_5_1_ID) == 0) {
-            // we are know sure MOTOR_5_1 is connected and it is a XL-320 motor
+            // we are now sure MOTOR_5_1 is connected and it is a XL-320 motor
             return 1; // --> version 1
         }
     }
@@ -1169,7 +1226,7 @@ int DxlCommunication::detectVersion()
     if (std::find(id_list.begin(), id_list.end(), DXL_MOTOR_5_2_ID) != id_list.end()) {
         // found the motor in the list, now check if model number matches XL-320 motors
         if (xl320->checkModelNumber(DXL_MOTOR_5_2_ID) == 0) {
-            // we are know sure MOTOR_5_2 is connected and it is a XL-320 motor
+            // we are now sure MOTOR_5_2 is connected and it is a XL-320 motor
             return 1; // --> version 1
         }
     }

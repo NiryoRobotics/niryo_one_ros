@@ -36,6 +36,19 @@
 #define MOTOR_TYPE_XL320 1
 #define MOTOR_TYPE_XL430 2
 
+struct DxlCustomCommand {
+   
+    DxlCustomCommand(int m, uint8_t i, uint32_t v, uint32_t r, uint32_t b)
+        : motor_type(m), id(i), value(v), reg_address(r), byte_number(b) {}
+
+    int motor_type;
+    uint8_t id;
+    uint32_t value;
+    uint32_t reg_address;
+    uint32_t byte_number;
+
+};
+
 class DxlMotorState {
 
     public:

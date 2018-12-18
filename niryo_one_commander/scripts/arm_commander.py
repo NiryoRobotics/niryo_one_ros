@@ -31,8 +31,8 @@ from niryo_one_commander.robot_commander_exception import RobotCommanderExceptio
 from niryo_one_commander.command_status import CommandStatus
 
 TrajectoryTimeOutMin = 2
-class ArmCommander:
 
+class ArmCommander:
 
     def execute_plan(self, plan , wait=False):
         if plan:
@@ -60,7 +60,7 @@ class ArmCommander:
                     self.set_position_hold_mode()
                     return CommandStatus.CONTROLLER_PROBLEMS, "Command has been aborted"
                 else: # what else could happen ? 
-                    return CommandStatus.ROS_ERROR, "Unknown error, try to restart, or contact the support to know more"
+                    return CommandStatus.ROS_ERROR, "Error, try to restart."
             else:
                 # todo cancel goal
                 plan = None
@@ -119,6 +119,12 @@ class ArmCommander:
         except Exception, e:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, str(e))
 
+    def set_max_velocity_scaling_factor(self, percentage):
+        try:
+            self.move_group_arm.set_max_velocity_scaling_factor(percentage)
+        except Exception, e:
+            raise RobotCommanderException(400, str(e))
+
     def get_plan_time(self, plan):
         if plan:
             return plan.joint_trajectory.points[-1].time_from_start.to_sec()
@@ -138,7 +144,6 @@ class ArmCommander:
             self.traj_finished_event.set()
         else:
             rospy.loginfo("Arm commander - Received result, WRONG GOAL ID")
-
 
     def __init__(self,move_group_arm):
         self.move_group_arm = move_group_arm 

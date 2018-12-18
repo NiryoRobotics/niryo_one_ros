@@ -148,3 +148,6 @@ class MoveGroupArm:
     def set_shift_pose_target(self, axis_number, value):
         self.arm.shift_pose_target(axis_number, value, self.end_effector_link)
 
+    def set_max_velocity_scaling_factor(self, percentage):
+        self.arm.set_max_velocity_scaling_factor(percentage)
+

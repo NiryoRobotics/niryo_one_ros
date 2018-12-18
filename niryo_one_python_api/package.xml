@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>niryo_one_python_api</name>
-  <version>1.1.0</version>
+  <version>2.1.0</version>
   <description>Python API to get Niryo One ROS functionalities, without knowing ROS</description>
   <author>Edouard Renard</author>
   <maintainer email="e.renard@niryo.com">Edouard Renard</maintainer>

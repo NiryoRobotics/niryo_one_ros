@@ -59,6 +59,10 @@ int CanCommunication::init(int hardware_version)
     
     resetHardwareControlLoopRates();
 
+    // set calibration timeout
+    ros::param::get("~calibration_timeout", calibration_timeout);
+    ROS_INFO("NiryoStepper calibration timeout: %d seconds", calibration_timeout);
+
     // start can driver
     can.reset(new NiryoCanDriver(spi_channel, spi_baudrate, gpio_can_interrupt));
 
@@ -465,7 +469,7 @@ void CanCommunication::hardwareControlCheckConnection()
                     if (motors.at(i)->getHwFailCounter() >= max_fail_counter) {
                         is_can_connection_ok = false;
                         debug_error_message = "Connection problem with CAN bus. Motor ";
-                        debug_error_message += std::to_string(motors.at(i)->getId());
+                        debug_error_message += motors.at(i)->getName();
                         debug_error_message += " is not connected";
                         return;
                     }
@@ -700,14 +704,14 @@ int CanCommunication::manualCalibration()
 }
 
 int CanCommunication::sendCalibrationCommandForOneMotor(StepperMotorState* motor, int delay_between_steps,
-        int calibration_direction, int calibration_timeout)
+        int calibration_direction, int calibr_timeout)
 {
     if (!motor->isEnabled()) {
         return CAN_OK;
     }
     
     if (can->sendCalibrationCommand(motor->getId(), motor->getOffsetPosition(), delay_between_steps,
-                (int)motor->getDirection() * calibration_direction, calibration_timeout) != CAN_OK) {
+                (int)motor->getDirection() * calibration_direction, calibr_timeout) != CAN_OK) {
         ROS_ERROR("Failed to send calibration command for motor : %d", motor->getId());
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
@@ -715,7 +719,7 @@ int CanCommunication::sendCalibrationCommandForOneMotor(StepperMotorState* motor
     return CAN_OK;
 }
 
-int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibration_timeout,
+int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> steppers, int calibr_timeout,
         std::vector<int> &sensor_offset_ids, std::vector<int> &sensor_offset_steps)
 {
     std::vector<int> motors_ids;
@@ -729,7 +733,7 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
     }
 
     double time_begin_calibration = ros::Time::now().toSec();
-    double timeout = time_begin_calibration + (double)calibration_timeout;
+    double timeout = time_begin_calibration + (double)calibr_timeout;
     ROS_INFO("Waiting for motor calibration");
     //ROS_INFO("Waiting for motor %d calibration response...", motor->getId());
     
@@ -803,6 +807,16 @@ int CanCommunication::getCalibrationResults(std::vector<StepperMotorState*> step
                                 sensor_offset_ids.push_back(motor_id);
                                 sensor_offset_steps.push_back(steps_at_offset_pos);
                                 calibration_results.at(i) = true;
+                                
+                                // keep torque ON for axis 2 
+                                // (if torsion spring is too strong the axis might move too much for the following calibration steps)
+                                if (motor_id == m2.getId()) {
+                                    can->sendTorqueOnCommand(m2.getId(), true);
+                                }
+                                // keep torque ON for axis 1
+                                if (motor_id == m1.getId()) {
+                                    can->sendTorqueOnCommand(m1.getId(), true);
+                                }
                             }
                         }
                     }
@@ -841,7 +855,6 @@ int CanCommunication::relativeMoveMotor(StepperMotorState* motor, int steps, int
 
 int CanCommunication::autoCalibrationStep1()
 {
-    int calibration_timeout = 30; // seconds
     int result;
 
     // 0. Torque ON for motor 2
@@ -859,7 +872,6 @@ int CanCommunication::autoCalibrationStep1()
 
 int CanCommunication::autoCalibrationStep2()
 {
-    int calibration_timeout = 30; // seconds
     int result;
     std::vector<int> sensor_offset_ids;
     std::vector<int> sensor_offset_steps; // absolute steps at offset position
@@ -878,7 +890,7 @@ int CanCommunication::autoCalibrationStep2()
     }
     
     if (hardware_version == 2) {
-        if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
+        if (sendCalibrationCommandForOneMotor(&m3, 1100, -1, calibration_timeout) != CAN_OK) {
             return CAN_STEPPERS_CALIBRATION_FAIL;
         }
     }
@@ -897,8 +909,10 @@ int CanCommunication::autoCalibrationStep2()
     if (relativeMoveMotor(&m1, -m1.getOffsetPosition(), 1300, false) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
     }
-    if (relativeMoveMotor(&m2, -m2.getOffsetPosition(), 3000, false) != CAN_OK) {
-        return CAN_STEPPERS_CALIBRATION_FAIL;
+    if (hardware_version == 1) {
+        if (relativeMoveMotor(&m2, -m2.getOffsetPosition(), 3000, false) != CAN_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
     }
     if (relativeMoveMotor(&m4, -m4.getOffsetPosition(), 1500, false) != CAN_OK) {
         return CAN_STEPPERS_CALIBRATION_FAIL;
@@ -913,9 +927,18 @@ int CanCommunication::autoCalibrationStep2()
         ros::Duration(abs(m1.getOffsetPosition()) * 1300 / 1000000).sleep();
     }
     
+    // 3.2 Move axis 2 to home position after axis 1
+    // --> in case a gripper is attached, so it won't collide with the base while moving
+    if (hardware_version == 2) {
+        if (relativeMoveMotor(&m2, -m2.getOffsetPosition(), 3000, false) != CAN_OK) {
+            return CAN_STEPPERS_CALIBRATION_FAIL;
+        }
+        ros::Duration(abs(m2.getOffsetPosition()) * 3000 / 1000000 + 0.5).sleep();
+    }
+    
     // 5. Send calibration cmd m3 (only for hw version 1)
     if (hardware_version == 1) {
-        if (sendCalibrationCommandForOneMotor(&m3, 1300, -1, calibration_timeout) != CAN_OK) {
+        if (sendCalibrationCommandForOneMotor(&m3, 1100, -1, calibration_timeout) != CAN_OK) {
             return CAN_STEPPERS_CALIBRATION_FAIL;
         }
 
@@ -1118,10 +1141,11 @@ int CanCommunication::scanAndCheck()
                 m4_ok = true;
             }
             else { // detect unallowed motor
-                ROS_ERROR("Scan And Check : Received can frame with wrong id : %d", motor_id);
+                ROS_ERROR("Scan CAN bus : Received can frame with wrong id : %d", motor_id);
                 hw_is_busy = false;
                 debug_error_message = "Unallowed connected motor : ";
                 debug_error_message += std::to_string(motor_id);
+                ROS_ERROR("%s", debug_error_message.c_str());
                 return CAN_SCAN_NOT_ALLOWED;
             }
         }
@@ -1129,13 +1153,14 @@ int CanCommunication::scanAndCheck()
         if (ros::Time::now().toSec() - time_begin_scan > timeout) {
             ROS_ERROR("CAN SCAN Timeout");
             debug_error_message = "CAN bus scan failed : motors ";
-            if (!m1_ok) { debug_error_message += std::to_string(m1.getId()); debug_error_message += ", "; }
-            if (!m2_ok) { debug_error_message += std::to_string(m2.getId()); debug_error_message += ", "; }
-            if (!m3_ok) { debug_error_message += std::to_string(m3.getId()); debug_error_message += ", "; }
-            if (!m4_ok) { debug_error_message += std::to_string(m4.getId()); debug_error_message += ", "; }
+            if (!m1_ok) { debug_error_message += m1.getName(); debug_error_message += ", "; }
+            if (!m2_ok) { debug_error_message += m2.getName(); debug_error_message += ", "; }
+            if (!m3_ok) { debug_error_message += m3.getName(); debug_error_message += ", "; }
+            if (!m4_ok) { debug_error_message += m4.getName(); debug_error_message += ", "; }
             debug_error_message += "are not connected";
             is_can_connection_ok = false;
             hw_is_busy = false;
+            ROS_ERROR("%s", debug_error_message.c_str());
             return CAN_SCAN_TIMEOUT;
         }
     }

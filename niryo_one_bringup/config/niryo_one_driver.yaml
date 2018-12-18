@@ -15,6 +15,8 @@ spi_channel:        0
 spi_baudrate:       1000000
 gpio_can_interrupt: 25
 
+calibration_timeout: 40
+
 #
 #  Read/Write/Check frequencies 
 #  Those params have been chosen to get a good (connection performance + speed / CPU usage) ratio
@@ -23,9 +25,9 @@ gpio_can_interrupt: 25
 ros_control_loop_frequency:              100.0
 
 niryo_one_hw_check_connection_frequency: 2.0
-publish_hw_status_frequency:             1.0
-publish_software_version_frequency:      1.0
-publish_learning_mode_frequency:         1.0
+publish_hw_status_frequency:             2.0
+publish_software_version_frequency:      2.0
+publish_learning_mode_frequency:         2.0
 read_rpi_diagnostics_frequency:          0.25
 
 dxl_hardware_control_loop_frequency:     100.0

@@ -138,6 +138,7 @@ class PositionManager:
             return None
 
     def create_new_position(self, position) :     
+        position.name = position.name.rstrip()
         if self.fh.check_position_name(position.name) == False : 
             return None, "Failed to create new position : position " + str(position.name) + " already exists"
         try:

@@ -122,7 +122,7 @@ class SequenceAutorun:
             return
         goal = RobotMoveGoal()
         goal.cmd.cmd_type = MoveCommandType.JOINTS
-        goal.cmd.joints = [0,0,-1.4,0,0,0]
+        goal.cmd.joints = [0,0,-1.34,0,0,0]
         client.send_goal(goal)
         client.wait_for_result()
         result = client.get_result()

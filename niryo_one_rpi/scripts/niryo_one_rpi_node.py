@@ -34,6 +34,7 @@ from wifi_connection import WifiConnectionManager
 from niryo_one_ros_setup import *
 from niryo_one_modbus.modbus_server import ModbusServer
 from shutdown_manager import ShutdownManager
+from motor_debug import MotorDebug
 
 class NiryoOneRpi:
 
@@ -59,6 +60,7 @@ class NiryoOneRpi:
         self.led_manager = LEDManager()
         self.niryo_one_button = NiryoButton()
         self.digital_io_panel = DigitalIOPanel()
+        self.motor_debug = MotorDebug()
 
         # Start Modbus server
         if self.modbus_server_enabled:
@@ -67,8 +69,6 @@ class NiryoOneRpi:
             self.modbus_server.start()
         
          
-                        
-
 if __name__ == '__main__':
     rospy.init_node('niryo_one_rpi')
     NiryoOneRpi()

@@ -16,7 +16,7 @@
         <param name="launch_ros_processes"  type="boolean" value="true" />
         <param name="process_state_publish_rate" type="double" value="0.33" />
         <param name="wifi_manager_enabled"  type="boolean" value="true" />
-        <param name="hotspot_ssid"          type="string"  value="Niryo_One" /> <!-- MAC address will be added to make it unique -->
+        <param name="hotspot_ssid"          type="string"  value="Niryo_One" />
         <param name="hotspot_password"      type="string"  value="niryoone" />
         <param name="filename_robot_name"   type="string"  value="/home/niryo/niryo_one_saved_values/robot_name_for_user.txt" />
         <rosparam file="$(find niryo_one_bringup)/config/rpi_ros_processes.yaml" />
