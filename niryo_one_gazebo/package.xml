@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <name>niryo_one_gazebo</name>
+  <version>1.1.0</version>
+  <description>gazebo simulation</description>
+  <author>ELGHALI Sarra</author>
+  <maintainer email="s.elghali@niryo.com">Sarra ELGHALI</maintainer>
+  <license>GPLv3</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <run_depend>xacro</run_depend>
+  <build_depend>niryo_one_description</build_depend>
+  <run_depend>niryo_one_description</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <export>
+  </export>
+</package>

@@ -1,0 +1,36 @@
+<launch>
+  <arg name="execute_on_niryo_one_raspberry_pi_image" value="false"/>
+  <arg name="urdf_without_meshes" default="false" />
+   <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/>
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="robot_name" default="conveyor"/>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find niryo_one_gazebo)/worlds/niryo_one.world"/>
+    <arg name="verbose" value="true" />
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>   
+  </include>
+  <arg name="urdf_file_conveyor" default="$(find xacro)/xacro --inorder '$(find niryo_one_description)/urdf/gazebo/conveyor.urdf.xacro'" />
+  <param name="conveyor_description" command="$(arg urdf_file_conveyor)" />
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="niryo_one_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model niryo_one" respawn="false" />	
+  <!-- <node name="conveyor_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model $(arg robot_name) -param conveyor_description"/> -->
+  <!--node name="box_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -param box_description -model box"/-->
+  <include file="$(find niryo_one_bringup)/launch/controllers.launch">
+    <arg name="simulation_mode" value="true" />
+  </include>
+  <include file="$(find niryo_one_bringup)/launch/robot_commander.launch">
+    <arg name="simulation_mode" value="true" />
+  </include>
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+</launch>
