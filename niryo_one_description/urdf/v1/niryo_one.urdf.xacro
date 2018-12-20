@@ -49,7 +49,7 @@
     <xacro:property name="limit_low_hand_rotation" value="-2.57" />
     <xacro:property name="limit_up_hand_rotation" value="2.57" />
 
-    <xacro:include filename="$(find niryo_one_description)/urdf/gazebo/niryo_one.gazebo.xacro" />
+    <xacro:include filename="$(find niryo_one_description)/urdf/gazebo/niryo_one_v1.gazebo.xacro" />
     <xacro:include filename="$(find niryo_one_description)/urdf/gazebo/utils.xacro" />
     <xacro:include filename="$(find niryo_one_description)/urdf/gazebo/niryo_one.transmission.xacro" />
     <!-- Links -->
