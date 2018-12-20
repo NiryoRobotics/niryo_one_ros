@@ -54,6 +54,11 @@ roslaunch niryo_one_bringup desktop_rviz_simulation.launch
 
 The main differences between this launch file and the launch file executed on Raspberry Pi 3B (rpi\_setup.launch) is that the hardware functionalities are disabled, and you get a 3D simulation view with Rviz.
 
+You can also launch the complete Niryo One Gazebo simulation , which you can control from Niryo One Studio.
+```
+roslaunch niryo_one_bringup gazebo_simulation.launch
+```
+
 Note that Niryo One ROS packages have been developed with **ROS kinetic, on Ubuntu 16.04**. Other ROS versions and OS distributions are not supported.
 
 ---

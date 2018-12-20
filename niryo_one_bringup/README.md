@@ -30,6 +30,12 @@ This is the main package for simulation mode. It launches _niryo\_one\_base_, _c
 
 Note that you need to launch this file on your computer, with 3D packages installed. This will not work on the Niryo One RPI3 image.
 
+### gazebo\_simulation
+
+This launch file bringup the simuualtion mode in gazebo. It launches _niryo\_one\_base_, _controllers_, _robot\_commander_, _user\_interface_, _rosbridge_, and gazebo  to see the actual real world physics simulation of Niryo One. The _controllers_ package is launched with a simulation flag, so the hardware-related stuff is not used.
+
+Note that you need to launch this file on your computer, with 3D packages installed. This will not work on the Niryo One RPI3 image
+
 ---
 
 You can find more info about what the packages do in each package's README.
