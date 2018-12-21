@@ -12,8 +12,8 @@
       <real_time_update_rate>1000.0</real_time_update_rate>
       <gravity>0.0 0.0 -9.81</gravity>
     </physics>  
-<!-- 
-    <model name='camera'>
+    
+    <!-- <model name='camera'>
       <static>true</static>
       <pose>-5.5 0.4 0.7 -0.056 0.05 -0.504</pose>
       <link name='link'>
@@ -26,10 +26,10 @@
         </visual>
         <sensor name='my_camera' type='camera'>
           <camera>
-            <!--save enabled="true">
-              <path>/home/sarra/camera_save_tutorial</path>
-            </save> -->
-            <!-- <horizontal_fov>1.047</horizontal_fov>
+            <save enabled="true">
+              <path>/home/camera_save</path>  
+            </save> 
+            <horizontal_fov>1.047</horizontal_fov>
             <image>
               <width>1920</width>
               <height>1080</height>
@@ -43,6 +43,6 @@
           <update_rate>30</update_rate>
         </sensor>
       </link>
-    </model> --> 
+    </model>   -->
   </world> 
 </sdf>
