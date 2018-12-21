@@ -31,7 +31,7 @@ you can change the child tag **path** to the directory in which you want the cam
 
 **width** and **height** set the resolution of the images : This camera will output images with 1920x1080 resolution at 30 frames per second. 
 
-After runnig gazebo simulation launch file, check the saved images. You can conevert those images to a video with [ffmpeg].(https://ffmpeg.org/ffmpeg.html) or others converters.
+After runnig gazebo simulation launch file, check the saved images. You can conevert those images to a video with [ffmpeg](https://ffmpeg.org/ffmpeg.html) or others converters.
 
 ## Add a conveyor Model in Gazebo 
 
