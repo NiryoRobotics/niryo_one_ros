@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+    <!-- the origin of this model is at the middle of the 'top' of the belt -->
+    
+    <model name="conveyor_belt">
+        <static>true</static>
+      
+        <link name="belt">
+            <pose>0 2.5 0 0 0 0</pose>
+            <sensor name='conveyor_belt_contact' type='contact'>
+                <update_rate>10</update_rate>
+                <contact>
+                    <collision>belt_collision</collision>
+                </contact>
+            </sensor>
+            <inertial>
+                <mass>10</mass>
+                <inertia>
+                    <ixx>20.841</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>0.8417</iyy>
+                    <iyz>0</iyz>
+                    <izz>21.66667</izz>
+                </inertia>
+            </inertial>
+            <collision name="belt_collision">
+            <geometry>
+                <box>
+                <size>1 5 0.1</size>
+                </box>
+            </geometry>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.0</mu>
+                        <mu2>0.0</mu2>
+                    </ode>
+                    <torsional>
+                        <coefficient>1000.0</coefficient>
+                        <patch_radius>0.1</patch_radius>
+                    </torsional>
+                </friction>
+            </surface>
+            </collision>
+            <visual name="visual">
+            <geometry>
+                <box>
+                <size>1 5 0.1</size>
+                </box>
+            </geometry>
+            </visual>
+        </link>
+    </model>
+</sdf>

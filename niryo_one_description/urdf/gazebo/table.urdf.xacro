@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<!--
+    niryo_one.urdf.xacro
+    Copyright (C) 2017 Niryo
+    All rights reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="table">
+
+  <property name="table_height" value="0.9" />
+  <property name="table_width" value="1.0" />
+  <property name="table_depth" value="1.0" />
+  <property name="leg_radius" value="0.02" />
+  <property name="table_x" value="0.0" />
+  <property name="table_y" value="0.0" />
+  <property name="table_z" value="0.0" />
+
+  <property name="table_top_thickness" value="0.05"/>
+
+  <property name="M_PI" value="3.1415926535897931" />
+
+  <!-- tabletop height is .55+.01+.025=.585 -->
+  <link name="box_1">
+  <inertial>
+      <mass value="0.5" />
+      <origin xyz="0.4 0 0.875" />
+      <inertia ixx="1" ixy="0"  ixz="0"
+               iyy="1" iyz="0"
+               izz="1" />
+    </inertial> 
+  <visual>
+      <origin xyz="0 0 0" />
+      <geometry>
+        <box size="0.2 0.2 0.2" />
+      </geometry>
+    </visual> 
+    <collision>
+      <origin xyz="0 0 0" />
+      <geometry>
+        <box size="0.2 0.2 0.2" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="table_top_link">
+    <inertial>
+      <mass value="1.0" />
+      <origin xyz="${table_x} ${table_y} ${table_z+table_height-table_top_thickness/2}" />
+      <inertia ixx="1" ixy="0"  ixz="0"
+               iyy="1" iyz="0"
+               izz="1" />
+    </inertial> 
+    <visual>
+      <origin xyz="${table_x} ${table_y} ${table_z+table_height-table_top_thickness/2}" />
+      <geometry>
+        <box size="${table_width} ${table_depth} ${table_top_thickness}" />
+      </geometry>
+    </visual> 
+    <collision>
+      <origin xyz="${table_x} ${table_y} ${table_z+table_height-table_top_thickness/2}" />
+      <geometry>
+        <box size="${table_width} ${table_depth} ${table_top_thickness}" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="table_top_link">
+    <material>Gazebo/Wood</material>
+    <mu1>50.0</mu1>
+    <mu2>50.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+   <joint name="box_table" type="fixed" >
+    <parent link="table_top_link" />
+    <origin xyz="0 0.4 ${table_z+table_height}" rpy="0 0 0" />
+    <child link="box_1" />
+  </joint> 
+
+  <joint name="leg1_joint" type="fixed" >
+    <parent link="table_top_link" />
+    <origin xyz="${table_x+table_width/2} ${table_y+table_depth/2} ${table_z+table_height}" rpy="0 0 0" />
+    <child link="leg1_link" />
+  </joint> 
+  <link name="leg1_link">
+    <inertial>
+      <mass value="1.0" />
+      <origin xyz="0 0 ${-table_height/2}" />
+      <inertia ixx="0.1" ixy="0"  ixz="0"
+               iyy="0.1" iyz="0"
+               izz="0.01" />
+    </inertial> 
+    <visual>
+      <origin xyz="0.0 0.0 ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="${leg_radius}" length="${table_height}" />
+      </geometry>
+    </visual> 
+    <collision>
+      <origin xyz="0.0 0.0 ${-table_height/2}" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <cylinder radius="${leg_radius}" length="${table_height}" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="leg1_link">
+    <material>Gazebo/Red</material>
+    <mu1>1000.0</mu1>
+    <mu2>1000.0</mu2>
+    <kp>10000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <joint name="leg2_joint" type="fixed" >
+    <parent link="table_top_link" />
+    <origin xyz="${table_x-table_width/2} ${table_y+table_depth/2} ${table_z+table_height}" rpy="0 0 0" />
+    <child link="leg2_link" />
+  </joint> 
+  <link name="leg2_link">
+    <inertial>
+      <mass value="1.0" />
+      <origin xyz="0 0 ${-table_height/2}" />
+      <inertia ixx="0.1" ixy="0"  ixz="0"
+               iyy="0.1" iyz="0"
+               izz="0.01" />
+    </inertial> 
+    <visual>
+      <origin xyz="0.0 0.0 ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="${leg_radius}" length="${table_height}" />
+      </geometry>
+    </visual> 
+    <collision>
+      <origin xyz="0.0 0.0 ${-table_height/2}" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <cylinder radius="${leg_radius}" length="${table_height}" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="leg2_link">
+    <material>Gazebo/Red</material>
+    <mu1>1000.0</mu1>
+    <mu2>1000.0</mu2>
+    <kp>10000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <joint name="leg3_joint" type="fixed" >
+    <parent link="table_top_link" />
+    <origin xyz="${table_x+table_width/2} ${table_y-table_depth/2} ${table_z+table_height}" rpy="0 0 0" />
+    <child link="leg3_link" />
+  </joint> 
+  <link name="leg3_link">
+    <inertial>
+      <mass value="1.0" />
+      <origin xyz="0 0 ${-table_height/2}" />
+      <inertia ixx="0.1" ixy="0"  ixz="0"
+               iyy="0.1" iyz="0"
+               izz="0.01" />
+    </inertial> 
+    <visual>
+      <origin xyz="0.0 0.0 ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="${leg_radius}" length="${table_height}" />
+      </geometry>
+    </visual> 
+    <collision>
+      <origin xyz="0.0 0.0 ${-table_height/2}" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <cylinder radius="${leg_radius}" length="${table_height}" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="leg3_link">
+    <material>Gazebo/Red</material>
+    <mu1>1000.0</mu1>
+    <mu2>1000.0</mu2>
+    <kp>10000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <joint name="leg4_joint" type="fixed" >
+    <parent link="table_top_link" />
+    <origin xyz="${table_x-table_width/2} ${table_y-table_depth/2} ${table_z+table_height}" rpy="0 0 0" />
+    <child link="leg4_link" />
+  </joint> 
+  <link name="leg4_link">
+    <inertial>
+      <mass value="1.0" />
+      <origin xyz="0 0 ${-table_height/2}" />
+      <inertia ixx="0.1" ixy="0"  ixz="0"
+               iyy="0.1" iyz="0"
+               izz="0.01" />
+    </inertial> 
+    <visual>
+      <origin xyz="0.0 0.0 ${-table_height/2}" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="${leg_radius}" length="${table_height}" />
+      </geometry>
+    </visual> 
+    <collision>
+      <origin xyz="0.0 0.0 ${-table_height/2}" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <cylinder radius="${leg_radius}" length="${table_height}" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="leg4_link">
+    <material>Gazebo/Red</material>
+    <mu1>1000.0</mu1>
+    <mu2>1000.0</mu2>
+    <kp>10000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo>
+    <static>true</static>
+    <canonicalBody>table_top_link</canonicalBody>
+  </gazebo>
+
+
+
+</robot>

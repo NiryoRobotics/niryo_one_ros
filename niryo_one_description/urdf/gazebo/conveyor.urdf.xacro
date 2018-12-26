@@ -1,0 +1,399 @@
+<?xml version="1.0"?>
+<!--
+    niryo_one.urdf.xacro
+    Copyright (C) 2017 Niryo
+    All rights reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="conveyor">
+
+     <xacro:property name="conveyor_width" value="0.67"/>
+     <xacro:property name="conveyor_length" value="5.0"/>
+     <xacro:property name="conveyor_mass" value="100.0"/>
+     <xacro:property name="conveyor_height" value="0.05"/>
+     <xacro:property name="conveyor_heigh_world" value="0.5"/>
+     <xacro:property name="box_width" value="0.15"/>
+     <xacro:property name="box_length" value="0.15"/>
+     <xacro:property name="box_height" value="0.1"/>
+
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/conveyor</robotNamespace>
+        </plugin>
+    </gazebo>
+
+
+    <link name="world"/>
+
+
+    <link name="conveyor_link_1">
+        <visual>
+            <origin xyz="${conveyor_length/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${conveyor_length} ${conveyor_width} ${conveyor_height}"/>
+            </geometry>
+            <material name="Black">
+                <color rgba="0 0.0 0.0 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="${conveyor_length/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${conveyor_length} ${conveyor_width} ${conveyor_height}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="${conveyor_mass}"/>
+            <inertia ixx="${(conveyor_mass / 12) * (conveyor_width * conveyor_width + conveyor_height * conveyor_height) }" ixy="0.0" ixz="0.0" iyy="${(conveyor_mass / 12) * (conveyor_length * conveyor_length + conveyor_height * conveyor_height) }" iyz="0.0" izz="${(conveyor_mass / 12) * (conveyor_length * conveyor_length + conveyor_width * conveyor_width) }"/>
+        </inertial>
+    </link>
+    <gazebo reference="conveyor_link_1">
+        <material>Gazebo/FlatBlack</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+
+     <link name="conveyor_link_2">
+        <visual>
+            <origin xyz="${conveyor_length/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${conveyor_length} ${conveyor_width} ${conveyor_height}"/>
+            </geometry>
+            <material name="Black">
+                <color rgba="0 0.0 0.0 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="${conveyor_length/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${conveyor_length} ${conveyor_width} ${conveyor_height}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="${conveyor_mass}"/>
+            <inertia ixx="${(conveyor_mass / 12) * (conveyor_width * conveyor_width + conveyor_height * conveyor_height) }" ixy="0.0" ixz="0.0" iyy="${(conveyor_mass / 12) * (conveyor_length * conveyor_length + conveyor_height * conveyor_height) }" iyz="0.0" izz="${(conveyor_mass / 12) * (conveyor_length * conveyor_length + conveyor_width * conveyor_width) }"/>
+        </inertial>
+    </link>
+    
+    <gazebo reference="conveyor_link_2">
+        <material>Gazebo/FlatBlack</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+
+    <link name="box_1">
+        <inertial>
+            <origin xyz="0 0 0" /> 
+            <mass value="1" />
+            <inertia  ixx="1" ixy="0.0"  ixz="0.0"  iyy="1"  iyz="0.0"  izz="1" />
+        </inertial>
+        <visual>
+            <meta>
+                <layer>1</layer>
+            </meta>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+            <surface>
+                <friction>
+                    <ode>
+                        <mu>0.1</mu>
+                        <mu2>0.1</mu2>
+                    </ode>
+                </friction>
+            </surface>
+        </collision>
+    </link>
+    <gazebo reference="box_1">
+        <material>Gazebo/WoodPallet</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+
+        <link name="box_1_2">
+        <inertial>
+            <origin xyz="0 0 0" /> 
+            <mass value="1" />
+            <inertia  ixx="1" ixy="0.0"  ixz="0.0"  iyy="1"  iyz="0.0"  izz="1" />
+        </inertial>
+        <visual>
+            <meta>
+                <layer>1</layer>
+            </meta>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </collision>
+    </link>
+    <gazebo reference="box_1_2">
+        <material>Gazebo/WoodPallet</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+
+
+
+            <link name="box_1_3">
+        <inertial>
+            <origin xyz="0 0 0" /> 
+            <mass value="1" />
+            <inertia  ixx="1" ixy="0.0"  ixz="0.0"  iyy="1"  iyz="0.0"  izz="1" />
+        </inertial>
+        <visual>
+            <meta>
+                <layer>1</layer>
+            </meta>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </collision>
+    </link>
+    <gazebo reference="box_1_3">
+        <material>Gazebo/WoodPallet</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+
+    <link name="box_1_4">
+        <inertial>
+            <origin xyz="0 0 0" /> 
+            <mass value="1" />
+            <inertia  ixx="1" ixy="0.0"  ixz="0.0"  iyy="1"  iyz="0.0"  izz="1" />
+        </inertial>
+        <visual>
+            <meta>
+                <layer>1</layer>
+            </meta>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </collision>
+    </link>
+    <gazebo reference="box_1_4">
+        <material>Gazebo/WoodPallet</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+
+    <link name="box_2_1">
+        <inertial>
+            <origin xyz="${box_length/2} ${box_width/2} 0" /> 
+            <mass value="1" />
+            <inertia  ixx="1" ixy="0.0"  ixz="0.0"  iyy="1"  iyz="0.0"  izz="1" />
+        </inertial>
+        <visual>
+            <origin xyz="${box_length/2} ${box_width/2} 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="${box_length/2} ${box_width/2} 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </collision>
+    </link>
+
+    <gazebo reference="box_2_1">
+        <material>Gazebo/WoodPallet</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+    <link name="box_2_2">
+        <inertial>
+            <origin xyz="${box_length/2} ${box_width/2} 0" /> 
+            <mass value="1" />
+            <inertia  ixx="1" ixy="0.0"  ixz="0.0"  iyy="1"  iyz="0.0"  izz="1" />
+        </inertial>
+        <visual>
+            <origin xyz="${box_length/2} ${box_width/2} 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="${box_length/2} ${box_width/2} 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </collision>
+    </link>
+
+    <gazebo reference="box_2_2">
+        <material>Gazebo/WoodPallet</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+    <link name="box_2_3">
+        <inertial>
+            <origin xyz="${box_length/2} ${box_width/2} 0" /> 
+            <mass value="1" />
+            <inertia  ixx="1" ixy="0.0"  ixz="0.0"  iyy="1"  iyz="0.0"  izz="1" />
+        </inertial>
+        <visual>
+            <origin xyz="${box_length/2} ${box_width/2} 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="${box_length/2} ${box_width/2} 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </collision>
+    </link>
+    <gazebo reference="box_2_3">
+        <material>Gazebo/WoodPallet</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+     <link name="box_2_4">
+        <inertial>
+            <origin xyz="${box_length/2} ${box_width/2} 0" /> 
+            <mass value="1" />
+            <inertia  ixx="1" ixy="0.0"  ixz="0.0"  iyy="1"  iyz="0.0"  izz="1" />
+        </inertial>
+        <visual>
+            <origin xyz="${box_length/2} ${box_width/2} 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="${box_length/2} ${box_width/2} 0"/>
+            <geometry>
+                <box size="${box_length} ${box_width} ${box_height}" />
+            </geometry>
+        </collision>
+    </link>
+    <gazebo reference="box_2_4">
+        <material>Gazebo/WoodPallet</material>
+        <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+    </gazebo>
+ 
+
+    <joint name="world_conveyor_joint" type="fixed">
+        <origin xyz="${-conveyor_length-0.2} 0.15 ${conveyor_heigh_world}" rpy="0.0 0.0 0.0"/>
+        <parent link="world" />
+        <child link="conveyor_link_1" />
+        <axis xyz="${-conveyor_length-0.2} 0.15 ${conveyor_heigh_world}" />
+        <limit effort="10000" lower="${-conveyor_length+conveyor_width/2}" upper="${conveyor_length-conveyor_width/2}" velocity="1000" />
+        <!--<dynamics damping="100.0" />-->
+    </joint>
+    
+
+    <joint name="box_conveyor_joint_1_1" type="prismatic">
+        <origin xyz="${box_length/2} ${box_width/2} ${box_height/2}" rpy="0.0 0.0 0.0"/>
+        <parent link="conveyor_link_1" />
+        <child link="box_1" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000" lower="0" upper="1.4" velocity="5" />
+    </joint>
+
+    <joint name="box_conveyor_joint_1_2" type="prismatic">
+        <origin xyz="${box_length/2+1.5} ${box_width/2} ${box_height/2}" rpy="0.0 0.0 0.0"/>
+        <parent link="conveyor_link_1" />
+        <child link="box_1_2" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000" lower="0" upper="1.4" velocity="5" />
+    </joint>
+    <joint name="box_conveyor_joint_1_3" type="prismatic">
+        <origin xyz="${box_length/2+2.5} ${box_width/2} ${box_height/2}" rpy="0.0 0.0 0.0"/>
+        <parent link="conveyor_link_1" />
+        <child link="box_1_3" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000" lower="0" upper="1.4" velocity="5" />
+    </joint>
+
+      <joint name="box_conveyor_joint_1_4" type="prismatic">
+        <origin xyz="${box_length/2+3.5} ${box_width/2} ${box_height/2}" rpy="0.0 0.0 0.0"/>
+        <parent link="conveyor_link_1" />
+        <child link="box_1_4" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000" lower="0" upper="1.425" velocity="5" />
+    </joint>
+    
+    <joint name="conveyor_joint" type="fixed">
+        <origin xyz="${conveyor_length-conveyor_width/2} ${-conveyor_width/2} 0" rpy="0.0 0.0 -1.57"/>
+        <parent link="conveyor_link_1" />
+        <child link="conveyor_link_2" />
+        <axis xyz="0 1 0" />
+        
+        <!--<dynamics damping="100.0" />-->
+    </joint>
+    
+    <joint name="box_conveyor_joint_2_1" type="prismatic">
+        <origin xyz="0 0 ${box_height/2}" rpy="0.0 0.0 0.0"/>
+        <parent link="conveyor_link_2" />
+        <child link="box_2_1" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000" lower="0" upper="${-conveyor_width/2+1.5}" velocity="5" />
+    </joint>
+    <joint name="box_conveyor_joint_2_2" type="prismatic">
+        <origin xyz="1.5 0 ${box_height/2}" rpy="0.0 0.0 0.0"/>
+        <parent link="conveyor_link_2" />
+        <child link="box_2_2" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000" lower="0" upper="${-conveyor_width/2+1}" velocity="5" />
+    </joint>
+
+    <joint name="box_conveyor_joint_2_3" type="prismatic">
+        <origin xyz="2.5 0 ${box_height/2}" rpy="0.0 0.0 0.0"/>
+        <parent link="conveyor_link_2" />
+        <child link="box_2_3" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000" lower="0" upper="${-conveyor_width/2+1}" velocity="5" />
+    </joint>
+    <joint name="box_conveyor_joint_2_4" type="prismatic">
+        <origin xyz="3.5 0 ${box_height/2}" rpy="0.0 0.0 0.0"/>
+        <parent link="conveyor_link_2" />
+        <child link="box_2_4" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000" lower="0" upper="${-conveyor_width/2+1.5}" velocity="5" />
+    </joint>
+
+
+</robot>

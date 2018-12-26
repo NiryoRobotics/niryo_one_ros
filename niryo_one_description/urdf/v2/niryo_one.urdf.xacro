@@ -49,6 +49,9 @@
     <xacro:property name="limit_low_hand_rotation" value="-2.57436" />
     <xacro:property name="limit_up_hand_rotation" value="2.57436" />
 
+    <xacro:include filename="$(find niryo_one_description)/urdf/gazebo/niryo_one_v2.gazebo.xacro" />
+	<xacro:include filename="$(find niryo_one_description)/urdf/gazebo/utils.xacro" />
+	<xacro:include filename="$(find niryo_one_description)/urdf/gazebo/niryo_one.transmission.xacro" />
 
 	<!-- Links -->
 
@@ -67,6 +70,15 @@
                 <mesh filename="package://niryo_one_description/meshes/v2/stl/base_link.stl" />
             </geometry>
         </collision>
+        <inertial>
+      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<mass value="2"/>
+			<!--to change-->
+      		<inertia
+        		ixx="0.0" ixy="0.0" ixz="0.0"
+        		iyy="0.0" iyz="0.0"
+        		izz="0.0"/>
+    	</inertial>	
 	</link>
 
     <link name="shoulder_link">
@@ -82,6 +94,14 @@
                 <mesh filename="package://niryo_one_description/meshes/v2/stl/shoulder_link.stl" />
             </geometry>
         </collision>
+        <inertial>
+      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<mass value="1"/>
+      		<inertia
+        		ixx="1.0" ixy="0.0" ixz="0.0"
+        		iyy="1.0" iyz="0.0"
+        		izz="1.0"/>
+    	</inertial>	
 	</link>
 
     <link name="arm_link">
@@ -97,6 +117,14 @@
                 <mesh filename="package://niryo_one_description/meshes/v2/stl/arm_link.stl" />
             </geometry>
         </collision>
+        <inertial>
+      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<mass value="0.5"/>
+      		<inertia
+        		ixx="1.0" ixy="0.0" ixz="0.0"
+        		iyy="1.0" iyz="0.0"
+        		izz="1.0"/>
+    	</inertial>	
 	</link>
 	
     <link name="elbow_link">
@@ -112,6 +140,14 @@
                 <mesh filename="package://niryo_one_description/meshes/v2/stl/elbow_link.stl" />
             </geometry>
         </collision>
+        <inertial>
+      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<mass value="0.4"/>
+      		<inertia
+        		ixx="1.0" ixy="0.0" ixz="0.0"
+        		iyy="1.0" iyz="0.0"
+        		izz="1.0"/>
+    	</inertial>	
 	</link>
 
     <link name="forearm_link">
@@ -127,6 +163,14 @@
                 <mesh filename="package://niryo_one_description/meshes/v2/stl/forearm_link.stl" />
             </geometry>
         </collision>
+        <inertial>
+      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<mass value="0.3"/>
+      		<inertia
+        		ixx="1.0" ixy="0.0" ixz="0.0"
+        		iyy="1.0" iyz="0.0"
+        		izz="1.0"/>
+    	</inertial>	
 	</link>
 
     <link name="wrist_link">
@@ -142,6 +186,14 @@
                 <mesh filename="package://niryo_one_description/meshes/v2/stl/wrist_link.stl" />
             </geometry>
         </collision>
+        <inertial>
+      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<mass value="0.2"/>
+      		<inertia
+        		ixx="1.0" ixy="0.0" ixz="0.0"
+        		iyy="1.0" iyz="0.0"
+        		izz="1.0"/>
+    	</inertial>	
 	</link>
 	
     <link name="hand_link">
@@ -157,6 +209,14 @@
                 <mesh filename="package://niryo_one_description/meshes/v2/stl/hand_link.stl" />
             </geometry>
         </collision>
+        <inertial>
+      		<origin xyz="0 0 0" rpy="0 0 0"/>
+      		<mass value="0.1"/>
+      		<inertia
+        		ixx="1.0" ixy="0.0" ixz="0.0"
+        		iyy="1.0" iyz="0.0"
+        		izz="1.0"/>
+    	</inertial>	
 	</link>
 	
     <link name="tool_link">
@@ -224,5 +284,11 @@
         <child link="tool_link" />
         <origin xyz="0 0 ${distance_hand_tool}" rpy="${-PI/2} ${-PI/2} 0" />
 	</joint>
+    
+    <!--plugin-->
+	<gazebo>
+  		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+  		</plugin>
+  	</gazebo>
 
 </robot>
