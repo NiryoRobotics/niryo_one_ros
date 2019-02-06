@@ -171,7 +171,6 @@ class NiryoOne:
                 raise NiryoOneException('Action Server is not up : ' + str(action_name))
         
             # Send goal and check response
-            # todo : use send_goal_and_wait
             client.send_goal(goal)
             
             if not client.wait_for_result(timeout=rospy.Duration(self.action_execute_timeout)):

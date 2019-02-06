@@ -16,6 +16,11 @@ command_list:
     activate_digital_io: 21
     deactivate_digital_io: 22
 
+# Important note:
+# All the values finishing with "_hold_torque" have been computed so the
+# DXL-320 motor won't become too hot.
+# If you increase those values you may destroy (burn) the motor after a few minutes.
+
 tool_list:
     - name: "Gripper 1"
       type: "gripper"
