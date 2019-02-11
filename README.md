@@ -30,7 +30,9 @@ Create a catkin workspace and clone Niryo One ROS stack :
 ```
 mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws/src
-git clone https://github.com/NiryoRobotics/niryo_one_ros.git .
+git init
+git remote add origin https://github.com/NiryoRobotics/niryo_one_ros.git
+git pull origin master
 ```
 Build the packages :
 ```
