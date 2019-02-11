@@ -26,6 +26,10 @@ You'll also need to install an additional Python module :
 ```
 sudo -H pip install jsonpickle
 ```
+If pip is no installed, you can do it :
+```
+sudo easy_install pip
+```
 Create a catkin workspace and clone Niryo One ROS stack :
 ```
 mkdir -p ~/catkin_ws/src
