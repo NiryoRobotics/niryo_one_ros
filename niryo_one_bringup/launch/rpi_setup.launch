@@ -8,7 +8,9 @@
 
     <!-- rosbridge websocket server -->
     <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher"/>
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+        <arg name="port" value="9090"/>
+    </include>
 
     <!-- Setup interface -->
     <node name="niryo_one_rpi" pkg="niryo_one_rpi" type="niryo_one_rpi_node.py" output="screen">
