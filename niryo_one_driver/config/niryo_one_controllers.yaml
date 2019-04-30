@@ -5,7 +5,7 @@ hardware_control_loop:
 # Publish all joint states -----------------------
 joint_state_controller:
     type: "joint_state_controller/JointStateController"
-    publish_rate: 10
+    publish_rate: 50
     
 # Joint Trajectory Controller - position based -----------------------
 niryo_one_follow_joint_trajectory_controller:
