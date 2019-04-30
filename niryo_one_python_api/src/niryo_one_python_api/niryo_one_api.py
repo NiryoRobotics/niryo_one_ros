@@ -292,6 +292,12 @@ class NiryoOne:
             if result.status != 200:
                 raise NiryoOneException(result.message)
 
+        def enable_joystick(self, enable):
+            result = self.call_service('/niryo_one/joystick_interface/enable',
+                    SetInt, [enable])
+            if result.status != 200:
+                raise NiryoOneException(result.message)
+
         def open_gripper(self, gripper_id, speed):
             goal = RobotMoveGoal()
             goal.cmd.cmd_type = MoveCommandType.TOOL

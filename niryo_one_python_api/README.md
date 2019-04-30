@@ -122,6 +122,13 @@ Params:
 
 Set the arm max velocity scaling factor.
 
+##### enable\_joystick
+
+Params:
+* enable (0 or 1)
+
+Enable or disable joystick mode (control the robot with a joystick controller).
+
 ##### pin\_mode
 
 Params:
