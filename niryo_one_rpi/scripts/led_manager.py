@@ -27,6 +27,8 @@ from niryo_one_msgs.msg import HardwareStatus
 from niryo_one_msgs.srv import SetInt
 from niryo_one_msgs.srv import SetLeds
 
+from niryo_one_rpi.rpi_ros_utils import LedState
+
 LED_GPIO_R = 18
 LED_GPIO_G = 24
 LED_GPIO_B = 22
@@ -39,13 +41,6 @@ LED_RED        = 4
 LED_PURPLE     = 5
 LED_RED_GREEN  = 6
 LED_WHITE      = 7
-
-LED_STATE_SHUTDOWN  = 1
-LED_STATE_HOTSPOT   = 2
-LED_STATE_HW_ERROR  = 3
-LED_STATE_OK        = 4
-LED_STATE_WAIT_HOTSPOT = 5
-
 
 class LEDManager:
 
@@ -97,28 +92,28 @@ class LEDManager:
     
     
     def set_led_from_state(self, dxl_leds=False):
-        if self.state == LED_STATE_SHUTDOWN:
+        if self.state == LedState.SHUTDOWN:
             self.set_led(LED_PURPLE, dxl_leds)
-        elif self.state == LED_STATE_HOTSPOT:
+        elif self.state == LedState.HOTSPOT:
             self.set_led(LED_BLUE, dxl_leds)
-        elif self.state == LED_STATE_WAIT_HOTSPOT:
+        elif self.state == LedState.WAIT_HOTSPOT:
             self.set_led(LED_BLUE, dxl_leds)
-        elif self.state == LED_STATE_OK:
+        elif self.state == LedState.OK:
             self.set_led(LED_GREEN, dxl_leds)
         else:
             self.set_led(LED_OFF, dxl_leds)
 
     
     def callback_hotspot_state(self, msg):
-        if self.state == LED_STATE_SHUTDOWN:
+        if self.state == LedState.SHUTDOWN:
             return 
 
         if msg.data:
-            if self.state != LED_STATE_HOTSPOT:
-                self.state = LED_STATE_HOTSPOT
+            if self.state != LedState.HOTSPOT:
+                self.state = LedState.HOTSPOT
                 self.set_led_from_state(dxl_leds=True)
-        elif self.state == LED_STATE_HOTSPOT:
-            self.state = LED_STATE_OK
+        elif self.state == LedState.HOTSPOT:
+            self.state = LedState.OK
             self.set_led_from_state(dxl_leds=True)
             
     
@@ -131,11 +126,11 @@ class LEDManager:
 
     def callback_set_led_state(self, req):
         state = req.value
-        if state == LED_STATE_SHUTDOWN:
-            self.state = LED_STATE_SHUTDOWN
+        if state == LedState.SHUTDOWN:
+            self.state = LedState.SHUTDOWN
             self.set_led_from_state(dxl_leds=True)
-        elif state == LED_STATE_WAIT_HOTSPOT:
-            self.state = LED_STATE_WAIT_HOTSPOT
+        elif state == LedState.WAIT_HOTSPOT:
+            self.state = LedState.WAIT_HOTSPOT
             self.set_led_from_state(dxl_leds=True)
         else:
             return {'status': 400, 'message': 'Not yet implemented'}
@@ -153,7 +148,7 @@ class LEDManager:
         GPIO.setup(LED_GPIO_B, GPIO.OUT)
 
         rospy.sleep(0.1)
-        self.state = LED_STATE_OK 
+        self.state = LedState.OK 
         self.set_led_from_state(dxl_leds=True)
    
         self.set_led_state_server = rospy.Service('/niryo_one/rpi/set_led_state', 

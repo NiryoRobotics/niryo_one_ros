@@ -33,9 +33,16 @@ CHANGE_MOTOR_CONFIG_READ_FAIL     = -1
 CHANGE_MOTOR_CONFIG_WRITE_FAIL    = -2
 CHANGE_MOTOR_CONFIG_WRONG_VERSION = -3
 
+class LedState:
+    SHUTDOWN  = 1
+    HOTSPOT   = 2
+    HW_ERROR  = 3
+    OK        = 4
+    WAIT_HOTSPOT = 5
+
 def send_hotspot_command():
     rospy.loginfo("HOTSPOT")
-    send_led_state(5)
+    send_led_state(LedState.WAIT_HOTSPOT)
     rospy.wait_for_service('/niryo_one/wifi/set_hotspot')
     try:
         set_hotspot = rospy.ServiceProxy('/niryo_one/wifi/set_hotspot', SetInt)
@@ -54,7 +61,7 @@ def send_trigger_sequence_autorun():
 
 def send_shutdown_command():
     rospy.loginfo("SHUTDOWN")
-    send_led_state(1)
+    send_led_state(LedState.SHUTDOWN)
     rospy.loginfo("Activate learning mode")
     try:
         rospy.wait_for_service('/niryo_one/activate_learning_mode', 1)
@@ -73,7 +80,7 @@ def send_shutdown_command():
 
 def send_reboot_command():
     rospy.loginfo("REBOOT")
-    send_led_state(1)
+    send_led_state(LedState.SHUTDOWN)
     rospy.loginfo("Activate learning mode")
     try:
         rospy.wait_for_service('/niryo_one/activate_learning_mode', 1)

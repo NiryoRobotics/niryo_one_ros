@@ -25,7 +25,6 @@ from niryo_one_rpi.rpi_ros_utils import *
 
 from niryo_one_msgs.srv import SetInt
 
-# todo include led_state constant
 
 BUTTON_GPIO = 4
 
@@ -90,9 +89,9 @@ class NiryoButton:
             
         # Use LED to help user know which action to execute
         if self.consecutive_pressed > self.timer_frequency * 20:
-            send_led_state(1)
+            send_led_state(LedState.SHUTDOWN)
         elif self.consecutive_pressed > self.timer_frequency * 6:
-            send_led_state(5)
+            send_led_state(LedState.WAIT_HOTSPOT)
         elif self.consecutive_pressed > self.timer_frequency * 3:
-            send_led_state(1)
+            send_led_state(LedState.SHUTDOWN)
 
