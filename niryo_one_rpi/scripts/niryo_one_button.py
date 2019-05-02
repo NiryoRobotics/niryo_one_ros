@@ -23,10 +23,14 @@ import subprocess
 
 from niryo_one_rpi.rpi_ros_utils import * 
 
+from std_msgs.msg import Int32
 from niryo_one_msgs.srv import SetInt
 
-
 BUTTON_GPIO = 4
+
+class ButtonMode:
+    TRIGGER_SEQUENCE_AUTORUN = 1
+    BLOCKLY_SAVE_POINT = 2
 
 class NiryoButton:
     
@@ -48,6 +52,17 @@ class NiryoButton:
         self.shutdown_action = False
         self.hotspot_action = False
 
+        self.button_mode = ButtonMode.TRIGGER_SEQUENCE_AUTORUN
+        self.change_button_mode_server = rospy.Service(
+                "/niryo_one/rpi/change_button_mode", SetInt, self.callback_change_button_mode)
+        self.monitor_button_mode_timer = rospy.Timer(rospy.Duration(3.0), self.monitor_button_mode)
+        self.last_time_button_mode_changed = rospy.Time.now()
+        
+        # Publisher used to send info to Niryo One Studio, so the user can add a move block
+        # by pressing the button
+        self.save_point_publisher = rospy.Publisher(
+                "/niryo_one/blockly/save_current_point", Int32, queue_size=10)
+
         self.button_timer = rospy.Timer(rospy.Duration(1.0/self.timer_frequency), self.check_button)
         rospy.on_shutdown(self.shutdown)
         rospy.loginfo("Niryo One Button started")
@@ -55,6 +70,33 @@ class NiryoButton:
     def shutdown(self):
         rospy.loginfo("Shutdown button, cleanup GPIO")
         self.button_timer.shutdown()
+
+    def blockly_save_current_point(self):
+        msg = Int32()
+        msg.data = 1
+        self.save_point_publisher.publish(msg)
+
+    def callback_change_button_mode(self, req):
+        message = ""
+        if req.value == ButtonMode.TRIGGER_SEQUENCE_AUTORUN:
+            message = "Successfully changed button mode to trigger sequence autorun"
+        elif req.value == ButtonMode.BLOCKLY_SAVE_POINT:
+            message = "Successfully changed button mode to save point"
+        else:
+            return {"status": 400, "message": "Incorrect button mode."}
+        self.button_mode = req.value
+        self.last_time_button_mode_changed = rospy.Time.now()
+        return {"status": 200, "message": message}
+
+    def monitor_button_mode(self, event):
+        duration = rospy.Time.now() - self.last_time_button_mode_changed
+        # Make sure the button's behavior goes back to default if no news from the Blockly interface
+        # This is to prevent the button from being stuck in BLOCKLY_SAVE_POINT mode in case of a 
+        # deconnection or broken communication
+        # --> To keep the non-default mode, you have to call the change_button_mode service at least
+        # every 3 seconds
+        if self.button_mode == ButtonMode.BLOCKLY_SAVE_POINT and duration.to_sec() > 3.0:
+            self.button_mode = ButtonMode.TRIGGER_SEQUENCE_AUTORUN
 
     def check_button(self, event):
         if not self.activated:
@@ -84,7 +126,10 @@ class NiryoButton:
             elif self.consecutive_pressed > self.timer_frequency * 3:
                 self.shutdown_action = True
             elif self.consecutive_pressed >= 1:
-                send_trigger_sequence_autorun()
+                if self.button_mode == ButtonMode.TRIGGER_SEQUENCE_AUTORUN:
+                    send_trigger_sequence_autorun()
+                elif self.button_mode == ButtonMode.BLOCKLY_SAVE_POINT:
+                    self.blockly_save_current_point()
             self.consecutive_pressed = 0
             
         # Use LED to help user know which action to execute
