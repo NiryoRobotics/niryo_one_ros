@@ -20,6 +20,7 @@
 import rospy, actionlib
 
 from std_msgs.msg import Bool
+from std_msgs.msg import Int32
 from sensor_msgs.msg import Joy
 
 from sensor_msgs.msg import JointState
@@ -95,8 +96,14 @@ class JointMode:
         self.multiplier = DEFAULT_MULTIPLIER
         self.learning_mode_on = True
         
+        # Publisher used to send info to Niryo One Studio, so the user can add a move block
+        # by pressing a button on the joystick controller
+        self.save_point_publisher = rospy.Publisher(
+                "/niryo_one/blockly/save_current_point", Int32, queue_size=10)
+        
         self.joint_mode_timer = rospy.Timer(rospy.Duration(self.timer_rate), self.send_joint_trajectory)
         self.time_debounce_start_button = rospy.Time.now()
+        self.time_debounce_A_button = rospy.Time.now()
         
     def increase_speed(self):
         self.multiplier += STEP_MULTIPLIER
@@ -107,6 +114,11 @@ class JointMode:
         self.multiplier -= STEP_MULTIPLIER
         if self.multiplier < MIN_MULTIPLIER:
             self.multiplier = MIN_MULTIPLIER
+    
+    def blockly_save_current_point(self):
+        msg = Int32()
+        msg.data = 1
+        self.save_point_publisher.publish(msg)
 
     def process_joy_message(self, joy):
         self.axes = joy.axes
@@ -122,6 +134,11 @@ class JointMode:
                 self.time_debounce_start_button = rospy.Time.now() + rospy.Duration(0.5) # debounce 0.5 sec
                 self.set_learning_mode()
                 self.synchronization_needed = True
+
+        if self.buttons[BUTTON_A]:
+            if rospy.Time.now() > self.time_debounce_A_button:
+                self.time_debounce_A_button = rospy.Time.now() + rospy.Duration(0.2)
+                self.blockly_save_current_point()
    
     def set_learning_mode(self):
         rospy.wait_for_service('niryo_one/activate_learning_mode')
