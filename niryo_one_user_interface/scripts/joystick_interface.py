@@ -125,9 +125,9 @@ class JointMode:
         self.buttons = joy.buttons
         
         if self.buttons[BUTTON_RB]:
-            self.decrease_speed()
-        elif self.buttons[BUTTON_LB]:
             self.increase_speed()
+        elif self.buttons[BUTTON_LB]:
+            self.decrease_speed()
 
         if self.buttons[BUTTON_START]:
             if rospy.Time.now() > self.time_debounce_start_button:
