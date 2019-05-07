@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import rospy
-import os
+import os, signal
 import subprocess
 
+from std_msgs.msg import String
 from std_srvs.srv import SetBool
 
 def create_directory(directory_path):
@@ -26,6 +27,10 @@ class SequenceCodeExecutor:
         create_directory(self.blockly_dir)
         self.process = None
         self.cancel_flag = False
+        self.is_paused = False
+        
+        # Highlight publisher (to highlight blocks in Blockly interface)
+        self.highlight_block_publisher = rospy.Publisher('/niryo_one/blockly/highlight_block', String, queue_size=10)
 
     def execute_generated_code(self, python_code): 
         # 1. Check if still executing
@@ -41,6 +46,7 @@ class SequenceCodeExecutor:
 
         # 4. Wait for process to finish
         output = self.process.communicate()
+        self.is_paused = False
 
         # 5. Check if cmd was canceled
         if self.cancel_flag:
@@ -72,8 +78,32 @@ class SequenceCodeExecutor:
         if self.is_executing_code():
             rospy.logwarn("Stopping sequence code execution")
             self.cancel_flag = True
+            self.resume_execution()
             self.process.terminate()
-    
+            # Publish empty block ID for Blockly
+            # Only visual, no functionality here
+            msg = String()
+            msg.data = ''
+            self.highlight_block_publisher.publish(msg)
+  
+    def break_point(self):
+        if self.process is None:
+            return
+        if self.is_executing_code():
+            rospy.logwarn("Break point - pause sequence interruption")
+            os.kill(self.process.pid, signal.SIGSTOP)
+            self.is_paused = True
+
+    def resume_execution(self):
+        if self.process is None:
+            return
+        rospy.logwarn("Resume sequence execution")
+        os.kill(self.process.pid, signal.SIGCONT)
+        self.is_paused = False
+
+    def is_execution_paused(self):
+        return self.is_paused
+
     def stop_robot_action(self):
         # Stop current move command
         try:

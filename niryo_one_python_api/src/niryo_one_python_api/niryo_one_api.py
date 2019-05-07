@@ -22,6 +22,7 @@ import actionlib
 
 from actionlib_msgs.msg import GoalStatus
 
+from std_msgs.msg import Int32
 from std_msgs.msg import String
 
 from niryo_one_msgs.msg import RobotMoveAction
@@ -110,6 +111,9 @@ class NiryoOne:
 
             # Highlight publisher (to highlight blocks in Blockly interface)
             self.highlight_block_publisher = rospy.Publisher('/niryo_one/blockly/highlight_block', String, queue_size=10)
+
+            # Break point publisher (for break point blocks in Blockly interface)
+            self.break_point_publisher = rospy.Publisher('/niryo_one/blockly/break_point', Int32, queue_size=10)
 
             self.joints = None
             self.pose = None
@@ -407,4 +411,15 @@ class NiryoOne:
             msg = String()
             msg.data = block_id
             self.highlight_block_publisher.publish(msg)
+
+        # Will stop the execution of the current sequence
+        # Need to press on "play" button on Niryo One Studio
+        # to resume execution
+        def break_point(self):
+            msg = Int32()
+            msg.data = 1
+            self.break_point_publisher.publish(msg)
+	    # This delay makes sure the program has time
+	    # to stop, before executing next command
+	    rospy.sleep(0.5)
 

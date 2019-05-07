@@ -36,6 +36,8 @@ from sequence_manager import SequenceManager
 from niryo_one_user_interface.sequences.sequence_code_executor import SequenceCodeExecutor
 from niryo_one_user_interface.sequences.sequence_action_type import SequenceActionType
 
+from std_msgs.msg import Int32
+
 
 class SequenceActionServer:
 
@@ -48,6 +50,11 @@ class SequenceActionServer:
         self.current_goal_handle = None
 
         self.seq_manager = sequence_manager
+
+        self.break_point_subscriber = rospy.Subscriber("/niryo_one/blockly/break_point", Int32, self.callback_break_point)
+
+    def callback_break_point(self, msg):
+        self.seq_code_executor.break_point()
 
     def start(self):
         self.server.start()
@@ -63,10 +70,17 @@ class SequenceActionServer:
         rospy.loginfo("Sequence action server : Received goal. Check if exists")
         # print goal_handle.__dict__
 
-        # check if still have a goal -> set_rejected() 
+        # check if still have a goal
         if self.current_goal_handle is not None:
-            result = self.create_result(CommandStatus.GOAL_STILL_ACTIVE, "Current command still active. Cancel it if you want to execute a new one")
-            goal_handle.set_rejected(result)
+            # check if sequence execution has been paused due to a break point
+            # then resume execution
+            if self.seq_code_executor.is_execution_paused():
+                self.seq_code_executor.resume_execution()
+            # if goal is active and program not in pause, set rejected
+            else:
+                result = self.create_result(CommandStatus.GOAL_STILL_ACTIVE,
+                        "Current command still active. Cancel it if you want to execute a new one")
+                goal_handle.set_rejected(result)
             return
       
         # set accepted

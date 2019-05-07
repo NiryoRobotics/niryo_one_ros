@@ -429,6 +429,18 @@ Blockly.Blocks['niryo_one_comment'] = {
     }
 };
 
+Blockly.Blocks['niryo_one_break_point'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Break Point");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#3D4D9A");
+        this.setTooltip("Stop the execution of the program. Press 'play' to resume.");
+        this.setHelpUrl("");
+	}
+};
+
 /*
  * Generators
  */
@@ -620,6 +632,11 @@ Blockly.Python['niryo_one_set_12v_switch'] = function(block) {
 Blockly.Python['niryo_one_comment'] = function(block) {
   var text_comment_text = block.getFieldValue('COMMENT_TEXT');
   var code = '# ' + text_comment_text + '\n';
+  return code;
+};
+
+Blockly.Python['niryo_one_break_point'] = function(block) {
+  var code = 'n.break_point()\n';
   return code;
 };
 
