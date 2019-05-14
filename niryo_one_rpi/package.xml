@@ -15,6 +15,10 @@
   <run_depend>rospy</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>niryo_one_msgs</run_depend>
+  <run_depend>python-flask</run_depend>
+  <run_depend>python-pymodbus</run_depend>
+  <run_depend>python-serial</run_depend>
+  <run_depend>python-rpi.gpio</run_depend>
   
   <export>
   </export>
