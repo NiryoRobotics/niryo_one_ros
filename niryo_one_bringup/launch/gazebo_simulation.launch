@@ -41,4 +41,6 @@
   <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher"/>
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find niryo_one_description)/config/default_config.rviz" />
+
 </launch>

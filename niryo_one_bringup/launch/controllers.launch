@@ -26,12 +26,14 @@
     </node>
 
     <!-- Load controller settings -->
-    <rosparam file="$(find niryo_one_driver)/config/niryo_one_controllers.yaml" command="load"/>
+    <rosparam file="$(find niryo_one_driver)/config/niryo_one_controllers.yaml" command="load"/>  
+
   
-    <!-- spawn controllers -->
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" 
-        args="joint_state_controller niryo_one_follow_joint_trajectory_controller
-        --shutdown-timeout 1"/>
+    <!-- spawn controllers (including gripper 2)-->
+     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" 
+        args="joint_state_controller niryo_one_follow_joint_trajectory_controller gripper_right_controller gripper_left_controller
+        --shutdown-timeout 1"/> 
+
 
     <!-- robot state publisher -->
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen" />

@@ -84,4 +84,177 @@
     <disable_collisions link1="tool_link" link2="hand_link" reason="Adjacent" />
     <disable_collisions link1="tool_link" link2="wrist_link" reason="Default" />
     <disable_collisions link1="hand_link" link2="wrist_link" reason="Adjacent" />
+
+
+<!--NIRYO GRIPPER 1 -->
+ <!--   <disable_collisions link1="gripper_servo_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_servo_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="tool_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="hand_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_servo_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_left_finger_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_right_finger_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_right_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_servo_link" link2="gripper_left_finger_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_servo_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_servo_link" link2="gripper_right_finger_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_servo_link" link2="gripper_right_finger_base_link" reason="Adjacent" /> 
+    <disable_collisions link1="gripper_right_finger_link" link2="gripper_left_finger_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_right_finger_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_right_finger_link" link2="gripper_right_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_left_finger_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_left_finger_link" link2="gripper_right_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_left_finger_base_link" link2="gripper_right_finger_base_link" reason="Adjacent" />
+-->
+
+
+<!--NIRYO GRIPPER 2 -->
+ 
+    <disable_collisions link1="gripper_base_link" link2="tool_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="hand_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_gear_left_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_gear_right_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_right_finger_base_link" reason="Adjacent" /> 
+    <disable_collisions link1="gripper_base_link" link2="gripper_rod_left_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_rod_right_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_left_finger_base_link" link2="gripper_rod_left_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_right_finger_base_link" link2="gripper_rod_right_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_right_finger_base_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_rod_left_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_rod_right_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_right_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_rod_right_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_right_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+
+
+<!--NIRYO GRIPPER 3 -->
+<!--
+    <disable_collisions link1="gripper_base_link" link2="tool_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="hand_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_gear_left_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_gear_right_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_left_finger_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_right_finger_base_link" reason="Adjacent" /> 
+    <disable_collisions link1="gripper_base_link" link2="gripper_rod_left_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_rod_right_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_link1_left_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_link1_right_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_link2_left_link" reason="Adjacent" />
+    <disable_collisions link1="gripper_base_link" link2="gripper_link2_right_link" reason="Adjacent" />
+
+    <disable_collisions link1="gripper_gear_right_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="arm_tool0" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="arm_wrist_3_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_gear_left_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_left_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_right_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_rod_left_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_rod_right_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_link1_left_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_link2_left_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_right_link" link2="gripper_link2_right_link" reason="Never" />
+
+    <disable_collisions link1="gripper_gear_left_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="arm_tool0" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="arm_wrist_3_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_gear_right_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_left_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_right_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_rod_left_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_rod_right_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_link1_left_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_link2_left_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="gripper_link2_right_link" reason="Never" />
+    <disable_collisions link1="gripper_gear_left_link" link2="arm_camera_mount_link" reason="Never" />c
+
+    <disable_collisions link1="gripper_rod_right_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="arm_tool0" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="arm_wrist_3_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_gear_right_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_left_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_right_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_rod_left_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_link1_left_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_link2_left_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_right_link" link2="gripper_link2_right_link" reason="Never" />
+
+    <disable_collisions link1="gripper_rod_left_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="arm_tool0" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="arm_wrist_3_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_gear_right_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_gear_left_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_left_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_right_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_rod_right_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_link1_left_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_link2_left_link" reason="Never" />
+    <disable_collisions link1="gripper_rod_left_link" link2="gripper_link2_right_link" reason="Never" />
+
+    <disable_collisions link1="gripper_link1_left_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="gripper_gear_right_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="gripper_left_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="gripper_right_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="gripper_rod_left_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="gripper_link2_left_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_left_link" link2="gripper_link2_right_link" reason="Never" />
+
+    <disable_collisions link1="gripper_link1_right_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="gripper_gear_right_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="gripper_left_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="gripper_right_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="gripper_rod_left_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="gripper_link1_left_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="gripper_link2_left_link" reason="Never" />
+    <disable_collisions link1="gripper_link1_right_link" link2="gripper_link2_right_link" reason="Never" />
+
+
+    <disable_collisions link1="gripper_link2_left_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_link2_left_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_left_link" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_left_link" link2="gripper_link1_right_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_left_link" link2="gripper_gear_right_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_left_link" link2="gripper_left_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_left_link" link2="gripper_right_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_left_link" link2="gripper_rod_left_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_left_link" link2="gripper_link2_right_link" reason="Never" />
+
+    <disable_collisions link1="gripper_link2_right_link" link2="summit_xl_base_footprint" reason="Never" />
+    <disable_collisions link1="gripper_link2_right_link" link2="summit_xl_imu_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_right_link" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_right_link" link2="gripper_gear_right_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_right_link" link2="gripper_left_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_right_link" link2="gripper_right_finger_base_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_right_link" link2="gripper_rod_left_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_right_link" link2="gripper_link1_left_link" reason="Never" />
+    <disable_collisions link1="gripper_link2_right_link" link2="gripper_link2_left_link" reason="Never" /> 
+-->
 </robot>

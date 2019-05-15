@@ -1,0 +1,428 @@
+<?xml version="1.0"?>
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
+   xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+   xmlns:xacro="http://ros.org/wiki/xacro" name="egp_40">
+
+
+   <xacro:macro name="cylinder_inertia" params="m r h">
+      <inertia ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0" iyy="${m*(3*r*r+h*h)/12}" iyz = "0" izz="${m*r*r/2}" />
+   </xacro:macro>
+
+   <xacro:macro name="default_transmission" params="jname">
+    <transmission name="${jname}_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${jname}_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <!--<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>-->
+      </joint>
+      <actuator name="${jname}_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+
+   <xacro:macro name="niryo_gripper_3" params="prefix parent *origin">
+
+      <joint name="${prefix}base_joint" type="fixed">
+         <xacro:insert_block name="origin"/>
+         <parent link="${parent}"/>
+         <child link="${prefix}base_link"/>
+      </joint>
+
+      <!-- BASE LINK -->
+      <link name="${prefix}base_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="-0.035 0.05 0.03" rpy="0 3.14 3.14" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_MainSupport.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="grey">
+               <color rgba="0.5 0.5 0.5 1"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="-0.035 0.02 0.05" rpy="0 3.14 3.14" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_MainSupport.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}base_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+      <!-- GEAR LEFT LINK -->
+      <joint name="${prefix}gear_left_joint" type="fixed">
+         <parent link="${prefix}base_link"/>
+         <child link="${prefix}gear_left_link"/>
+         <origin xyz="-0.035 0.05 0.03" rpy="3.14 0.0 0.0" />
+         <axis xyz="-1 0 0" />
+      </joint>
+      
+      <gazebo reference="${prefix}gear_left_joint">
+        <implicitSpringDamper>1</implicitSpringDamper>
+      </gazebo>
+
+      <link name="${prefix}gear_left_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_GearLeft.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+
+            <material name="black">
+  		<color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_GearLeft.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}gear_left_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+
+      <!-- GEAR RIGHT LINK -->
+      <joint name="${prefix}gear_right_joint" type="fixed">
+         <parent link="${prefix}base_link"/>
+         <child link="${prefix}gear_right_link"/>
+         <origin xyz="-0.035 0.05 0.03" rpy="3.14 0.0 0.0" />
+         <axis xyz="-1 0 0" />
+      </joint>
+      
+      <gazebo reference="${prefix}gear_right_joint">
+        <implicitSpringDamper>1</implicitSpringDamper>
+      </gazebo>
+
+      <link name="${prefix}gear_right_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_GearRight.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+
+            <material name="black">
+  		<color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_GearRight.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}gear_right_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+
+      <!-- GRIPPER LINK 1 LEFT -->
+
+     <joint name="${prefix}link1_left_joint" type="fixed">
+         <parent link="${prefix}base_link"/>
+         <child link="${prefix}link1_left_link"/>
+         <origin xyz="-0.035 0.0495 0.03" rpy="3.14 0.0 0.0" />
+         <axis xyz="-1 0 0" />
+      </joint>
+      
+      <gazebo reference="${prefix}link1_left_joint">
+        <implicitSpringDamper>1</implicitSpringDamper>
+      </gazebo>
+
+      <link name="${prefix}link1_left_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Link1.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+
+            <material name="black">
+  		<color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Link1.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}link1_left_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+      <!-- GRIPPER  LINK 1 RIGHT -->
+
+    <joint name="${prefix}link1_right_joint" type="fixed">
+         <parent link="${prefix}base_link"/>
+         <child link="${prefix}link1_right_link"/>
+         <origin xyz="0.029 -0.02 0.0295" rpy="0 3.14 0" />
+         <axis xyz="-1 0 0" />
+      </joint>
+      
+      <gazebo reference="${prefix}link1_right_joint">
+        <implicitSpringDamper>1</implicitSpringDamper>
+      </gazebo>
+
+      <link name="${prefix}link1_right_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Link1.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+
+            <material name="black">
+  		<color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Link1.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}link1_right_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+
+
+    
+    <!-- ROD LEFT -->
+
+      <joint name="${prefix}rod_left_joint" type="fixed">
+         <parent link="${prefix}gear_left_link"/>
+         <child link="${prefix}rod_left_link"/>
+         <origin xyz="-0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+         <axis xyz="-1 0 0" />
+      </joint>
+      
+      <gazebo reference="${prefix}rod_left_joint">
+        <implicitSpringDamper>1</implicitSpringDamper>
+      </gazebo>
+
+      <link name="${prefix}rod_left_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Rod.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+
+            <material name="black">
+  		<color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Rod.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}rod_left_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+      <!-- ROD RIGHT -->
+
+      <joint name="${prefix}rod_right_joint" type="fixed">
+         <parent link="${prefix}gear_right_link"/>
+         <child link="${prefix}rod_right_link"/>
+         <origin xyz="0.065 0.07 0.0" rpy="0.0 0.0 3.14" />
+         <axis xyz="-1 0 0" />
+      </joint>
+      
+      <gazebo reference="${prefix}rod_right_joint">
+        <implicitSpringDamper>1</implicitSpringDamper>
+      </gazebo>
+
+      <link name="${prefix}rod_right_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Rod.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+
+            <material name="black">
+  		<color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Rod.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}rod_right_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+
+   
+      <!-- GRIPPER  LINK 2 LEFT -->
+
+     <joint name="${prefix}link2_left_joint" type="fixed">
+         <parent link="${prefix}rod_left_link"/>
+         <child link="${prefix}link2_left_link"/>
+         <origin xyz="0.00 0.0 -0.00" rpy="0 0.0 0.0" />
+         <axis xyz="-1 0 0" />
+      </joint>
+      
+      <gazebo reference="${prefix}link2_left_joint">
+        <implicitSpringDamper>1</implicitSpringDamper>
+      </gazebo>
+
+      <link name="${prefix}link2_left_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Link2.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+
+            <material name="black">
+  		<color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Link2.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}link2_left_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+      <!-- GRIPPER  LINK 2 RIGHT -->
+
+     <joint name="${prefix}link2_right_joint" type="fixed">
+         <parent link="${prefix}rod_right_link"/>
+         <child link="${prefix}link2_right_link"/>
+         <origin xyz="-0.0 0.00 -0.0" rpy="3.14 3.14  3.14 " />
+         <axis xyz="-1 0 0" />
+      </joint>
+      
+      <gazebo reference="${prefix}link2_right_joint">
+        <implicitSpringDamper>1</implicitSpringDamper>
+      </gazebo>
+
+      <link name="${prefix}link2_right_link">
+         <inertial>
+            <mass value="0.25" />
+            <origin xyz="0 0 0" />
+            <cylinder_inertia m="0.20" r="0.05" h="0.05" />
+         </inertial>
+
+         <visual>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Link2.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+
+            <material name="black">
+  		<color rgba="0.0 0.0 0.0 1.0"/>
+            </material>
+         </visual>
+
+         <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://niryo_one_description/meshes/v2/stl/G3_Link2.STL" scale="0.001 0.001 0.001"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${prefix}link2_right_link">
+         <material>Gazebo/Black</material>
+         <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+
+  <!--  <xacro:default_transmission jname="${prefix}left_finger"/>
+    <xacro:default_transmission jname="${prefix}right_finger"/>  -->
+
+   </xacro:macro>
+
+</robot>
+

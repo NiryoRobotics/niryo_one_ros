@@ -30,5 +30,33 @@ niryo_one_follow_joint_trajectory_controller:
     state_publish_rate: 20
     #action_monitor_rate: 20
 
+# Gripper controller
+gripper_left_controller:
+   type: effort_controllers/JointEffortController
+   joint: gripper_gear_left_joint
+   action_monitor_rate: 20
+   goal_tolerance: 0.002
+   max_effort: 10
+   stall_velocity_threshold: 0.041
+   stall_timeout: 1.0
+   lower: -0.001
+   upper: 0.0301
+   velocity: 0.041
 
+# mimic tag in urdf does not seem to work in gazebo, I make another controller
+gripper_right_controller:
+  type: effort_controllers/JointEffortController
+  joint: gripper_gear_right_joint
+  action_monitor_rate: 20
+  goal_tolerance: 0.002
+  max_effort: 10
+  stall_velocity_threshold: 0.041
+  stall_timeout: 1.0
+  lower: -0.001
+  upper: 0.0301
+  velocity: 0.041
+
+joint_read_state_controller:
+   type: joint_state_controller/JointStateController 
+   publish_rate: 100.0
 

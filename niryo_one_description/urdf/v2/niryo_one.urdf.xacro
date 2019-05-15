@@ -53,6 +53,10 @@
 	<xacro:include filename="$(find niryo_one_description)/urdf/gazebo/utils.xacro" />
 	<xacro:include filename="$(find niryo_one_description)/urdf/gazebo/niryo_one.transmission.xacro" />
 
+	<!-- Gripper -->	
+<!--	<xacro:include filename="$(find niryo_one_description)/urdf/v2/gripper/niryo_gripper_1.urdf.xacro" />  -->
+	<xacro:include filename="$(find niryo_one_description)/urdf/v2/gripper/niryo_gripper_2.urdf.xacro" /> 
+
 	<!-- Links -->
 
     <link name="ground_link"/>
@@ -285,6 +289,16 @@
         <origin xyz="0 0 ${distance_hand_tool}" rpy="${-PI/2} ${-PI/2} 0" />
 	</joint>
     
+
+<!--	<xacro:niryo_gripper_1 prefix="gripper_" parent="tool_link" >
+	  <origin xyz="0.025 0 -0.013" rpy="${PI/2} ${PI} ${PI/2} " />
+	</xacro:niryo_gripper_1> 
+-->
+
+	<xacro:niryo_gripper_2 prefix="gripper_" parent="tool_link" >
+	  <origin xyz="0.025 0 -0.013" rpy="${PI/2} ${PI} ${PI/2} " />
+	</xacro:niryo_gripper_2> 
+
     <!--plugin-->
 	<gazebo>
   		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
