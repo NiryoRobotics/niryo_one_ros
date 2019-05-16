@@ -266,11 +266,11 @@ class JointMode:
             multiplier = self.multiplier
 
             positions[0] = positions[0] + self.axes[AXE_JOY_R_H] * multiplier 
-            positions[1] = positions[1] + self.axes[AXE_JOY_R_V] * multiplier 
+            positions[1] = positions[1] - self.axes[AXE_JOY_R_V] * multiplier 
             positions[2] = positions[2] + self.axes[AXE_JOY_L_V] * multiplier 
-            positions[3] = positions[3] + self.axes[AXE_JOY_L_H] * multiplier 
+            positions[3] = positions[3] - self.axes[AXE_JOY_L_H] * multiplier 
             positions[4] = positions[4] + self.axes[AXE_ARROW_V] * multiplier 
-            positions[5] = positions[5] + self.axes[AXE_ARROW_H] * multiplier 
+            positions[5] = positions[5] - self.axes[AXE_ARROW_H] * multiplier 
 
             self.validate_joints(positions)
 
