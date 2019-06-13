@@ -18,34 +18,34 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import rospy 
-import tf 
-from niryo_one_commander.position.position import Position 
+import rospy
+import tf
+from niryo_one_commander.position.position import Position
 
 from moveit_msgs.msg import RobotState
 from moveit_msgs.srv import GetPositionFK
 from std_msgs.msg import Header
 
 
-def get_forward_kinematic(joints): 
+def get_forward_kinematic(joints):
 
     try:
-	  rospy.wait_for_service('compute_fk',2)
-    except (rospy.ServiceException, rospy.ROSException), e:
-          rospy.logerr("Service call failed:",e)
-          return None 
+	    rospy.wait_for_service('compute_fk', 2)
+    except (rospy.ServiceException, rospy.ROSException) as e:
+        rospy.logerr("Service call failed:", e)
+        return None
     try:
-	  moveit_fk = rospy.ServiceProxy('compute_fk', GetPositionFK)
-	  fk_link= ['base_link','hand_link']
-    	  joint_names = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
-    	  header = Header(0,rospy.Time.now(),"/ground_link")
-    	  rs = RobotState()
-          rs.joint_state.name = joint_names
-          rs.joint_state.position = joints
-          response = moveit_fk(header, fk_link, rs)
-    except rospy.ServiceException,e:
-          rospy.logerr("Service call failed:",e)
-	  return(None)
+        moveit_fk = rospy.ServiceProxy('compute_fk', GetPositionFK)
+        fk_link = ['base_link', 'tool_link']
+        joint_names = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
+        header = Header(0,rospy.Time.now(),"/ground_link")
+        rs = RobotState()
+        rs.joint_state.name = joint_names
+        rs.joint_state.position = joints
+        response = moveit_fk(header, fk_link, rs)
+    except rospy.ServiceException as e:
+        rospy.logerr("Service call failed:", e)
+        return(None)
 
     quaternion=[response.pose_stamped[1].pose.orientation.x, response.pose_stamped[1].pose.orientation.y, 
 	response.pose_stamped[1].pose.orientation.z, response.pose_stamped[1].pose.orientation.w]
@@ -62,9 +62,9 @@ def get_rpy_from_quaternion(rot):
     PI = 3.14159
     euler = tf.transformations.euler_from_quaternion(rot)
     rpy=[0,0,0]
-    rpy[0] = euler[1] * (-1.0)
-    rpy[1] = euler[0] - PI/2.0
-    rpy[2] = euler[2] - PI/2.0
+    rpy[0] = euler[0]
+    rpy[1] = euler[1]
+    rpy[2] = euler[2]
                                                                
      # force angle between -PI/PI
     for i, angle in enumerate(rpy):

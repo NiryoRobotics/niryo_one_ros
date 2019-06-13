@@ -41,7 +41,7 @@ class NiryoRobotStatePublisher:
 
     def get_robot_pose(self, event):
         try:
-            (pos, rot) = self.tf_listener.lookupTransform('base_link', 'hand_link', rospy.Time(0))  
+            (pos, rot) = self.tf_listener.lookupTransform('base_link', 'tool_link', rospy.Time(0))  
             self.position = pos
             self.rpy = get_rpy_from_quaternion(rot)
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
