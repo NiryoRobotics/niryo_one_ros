@@ -121,6 +121,11 @@ void FakeCommunication::addCustomDxlCommand(int motor_type, uint8_t id, uint32_t
 {
     ROS_INFO("Add custom Dxl command");
 }
+
+void FakeCommunication::rebootMotors()
+{
+    ROS_INFO("Reboot Motors");
+}
         
 void FakeCommunication::getHardwareStatus(bool *is_connection_ok, std::string &error_message, 
         int *calibration_needed, bool *calibration_in_progress,

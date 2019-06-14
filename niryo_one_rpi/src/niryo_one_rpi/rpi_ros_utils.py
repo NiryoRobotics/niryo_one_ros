@@ -59,6 +59,18 @@ def send_trigger_sequence_autorun():
     except (rospy.ServiceException, rospy.ROSException), e:
         return
 
+def send_reboot_motors_command():
+    rospy.loginfo("Send reboot motor command")
+    try:
+        rospy.wait_for_service('/niryo_one/reboot_motors', 1)
+    except rospy.ROSException, e:
+        pass
+    try:
+        reboot_motors = rospy.ServiceProxy('/niryo_one/reboot_motors', SetInt)
+        reboot_motors(1)
+    except rospy.ServiceException, e:
+        pass
+
 def send_shutdown_command():
     rospy.loginfo("SHUTDOWN")
     send_led_state(LedState.SHUTDOWN)
@@ -72,6 +84,8 @@ def send_shutdown_command():
         activate_learning_mode(1)
     except rospy.ServiceException, e:
         pass
+    send_reboot_motors_command()
+    rospy.sleep(0.2)
     rospy.loginfo("Command 'sudo shutdown now'")
     try: 
         output = subprocess.check_output(['sudo', 'shutdown', 'now'])
@@ -91,6 +105,8 @@ def send_reboot_command():
         activate_learning_mode(1)
     except rospy.ServiceException, e:
         pass
+    send_reboot_motors_command()
+    rospy.sleep(0.2)
     rospy.loginfo("Command 'sudo reboot'")
     try: 
         output = subprocess.check_output(['sudo', 'reboot'])

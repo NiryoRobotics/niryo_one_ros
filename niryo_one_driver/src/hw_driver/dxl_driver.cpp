@@ -56,6 +56,19 @@ int DxlDriver::scan(std::vector<uint8_t> &id_list)
     return packetHandler->broadcastPing(portHandler, id_list);
 }
 
+int DxlDriver::reboot(uint8_t id)
+{
+    uint8_t dxl_error = 0;
+    
+    int result = packetHandler->reboot(portHandler, id, &dxl_error);
+
+    if (dxl_error != 0) {
+        return dxl_error;
+    }
+
+    return result;
+}
+
 /*
  *  -----------------   SYNC WRITE   --------------------
  */

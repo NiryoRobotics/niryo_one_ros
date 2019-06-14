@@ -153,6 +153,7 @@ int DxlCommunication::init(int hardware_version)
     is_tool_connected = false;
     
     torque_on = 0;
+    should_reboot_motors = false;
     
     // for hardware control loop
     hw_is_busy = false;
@@ -176,6 +177,11 @@ void DxlCommunication::addCustomDxlCommand(int motor_type, uint8_t id, uint32_t 
         uint32_t reg_address, uint32_t byte_number)
 {
     custom_command_queue.push(DxlCustomCommand(motor_type, id, value, reg_address, byte_number));
+}
+
+void DxlCommunication::rebootMotors()
+{
+    should_reboot_motors = true;
 }
 
 int DxlCommunication::setupCommunication()
@@ -508,6 +514,22 @@ void DxlCommunication::hardwareControlWrite()
                 xl430_motor_list.push_back(motors.at(i));
             }
         }
+    }
+    
+    // If asked to reboot motors, reboot all motors
+    // Even the ones which are not enabled
+    // Same command for xl320 and xl430 (depends on protocol,
+    // not motor type)
+    if (should_reboot_motors) {
+        for (int i = 0; i < motors.size(); i++) {
+            ROS_WARN("Reboot Dxl motor with ID: %d", (int)motors.at(i)->getId());
+            xl430->reboot(motors.at(i)->getId());
+        }
+        if (tool.getId() != 0) {
+            ROS_WARN("Reboot Dxl tool with ID: %d", (int)tool.getId());
+            xl430->reboot(tool.getId());
+        }
+        should_reboot_motors = false;
     }
     
     if (ros::Time::now().toSec() - time_hw_data_last_write > 1.0/hw_data_write_frequency) {

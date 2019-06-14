@@ -198,6 +198,14 @@ bool RosInterface::callbackSendCustomDxlValue(niryo_one_msgs::SendCustomDxlValue
     return true;
 }
 
+bool RosInterface::callbackRebootMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res)
+{
+    comm->rebootMotors();
+    res.status = 200;
+    res.message = "OK";
+    return true;
+}
+
 void RosInterface::startServiceServers()
 {
     calibrate_motors_server = nh_.advertiseService("niryo_one/calibrate_motors", &RosInterface::callbackCalibrateMotors, this);
@@ -214,6 +222,7 @@ void RosInterface::startServiceServers()
 
     change_hardware_version_server = nh_.advertiseService("niryo_one/change_hardware_version", &RosInterface::callbackChangeHardwareVersion, this);
     send_custom_dxl_value_server = nh_.advertiseService("niryo_one/send_custom_dxl_value", &RosInterface::callbackSendCustomDxlValue, this);
+    reboot_motors_server = nh_.advertiseService("niryo_one/reboot_motors", &RosInterface::callbackRebootMotors, this);
 }
 
 void RosInterface::publishHardwareStatus()

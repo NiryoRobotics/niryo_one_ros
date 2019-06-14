@@ -497,7 +497,15 @@ void NiryoOneCommunication::sendPositionToRobot(const double cmd[6])
 void NiryoOneCommunication::addCustomDxlCommand(int motor_type, uint8_t id, uint32_t value,
         uint32_t reg_address, uint32_t byte_number)
 {
-    dxlComm->addCustomDxlCommand(motor_type, id, value, reg_address, byte_number);
+    if (dxl_enabled) {
+        dxlComm->addCustomDxlCommand(motor_type, id, value, reg_address, byte_number);
+    }
+}
+
+void NiryoOneCommunication::rebootMotors()
+{
+    // Only useful for Dynamixel motors
+    if (dxl_enabled) { dxlComm->rebootMotors(); }
 }
 
 void NiryoOneCommunication::activateLearningMode(bool activate) 

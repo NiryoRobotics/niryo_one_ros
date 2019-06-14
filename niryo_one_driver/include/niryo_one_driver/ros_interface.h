@@ -105,6 +105,7 @@ class RosInterface {
 
         ros::ServiceServer change_hardware_version_server;
         ros::ServiceServer send_custom_dxl_value_server;
+        ros::ServiceServer reboot_motors_server;
 
         // callbacks
         
@@ -127,6 +128,8 @@ class RosInterface {
 
         bool callbackSendCustomDxlValue(niryo_one_msgs::SendCustomDxlValue::Request &req, 
                 niryo_one_msgs::SendCustomDxlValue::Response &res);
+
+        bool callbackRebootMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
 
 };
 

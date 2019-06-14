@@ -111,6 +111,7 @@ class DxlCommunication {
         void moveAllMotorsToHomePosition();
         void addCustomDxlCommand(int motor_type, uint8_t id, uint32_t value,
                 uint32_t reg_address, uint32_t byte_number);
+        void rebootMotors();
 
         // Dxl Tools
         void setTool(uint8_t id, std::string name);
@@ -188,6 +189,7 @@ class DxlCommunication {
         double hw_status_read_frequency;
 
         std::queue<DxlCustomCommand> custom_command_queue;
+        bool should_reboot_motors;
 
         // enable flags
 
