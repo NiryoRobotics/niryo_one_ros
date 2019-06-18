@@ -80,8 +80,8 @@ Accepted Modbus functions :
 | 310 | Request new calibration |
 | 311 | Start auto calibration |
 | 312 | Start manual calibration |
-| 401 | Gripper open speed (1-5) |
-| 402 | Gripper close speed (1-5) |
+| 401 | Gripper open speed (100-1000) |
+| 402 | Gripper close speed (100-1000) |
 | 500 | Select tool from given id **|
 | 510 | Open gripper with given id |
 | 511 | Close gripper with given id |

@@ -153,14 +153,18 @@ class HoldingRegisterDataBlock(NiryoOneDataBlock):
 
     def open_gripper_command(self, tool_id):
         speed = self.getValuesOffset(HR_GRIPPER_OPEN_SPEED, 1)[0]
-        if (speed < 1) or (speed > 5):
-            speed = 3
+        if speed < 100:
+            speed = 100
+        elif speed > 1000:
+            speed = 1000
         self.open_gripper(tool_id, speed)
 
     def close_gripper_command(self, tool_id):
         speed = self.getValuesOffset(HR_GRIPPER_CLOSE_SPEED, 1)[0]
-        if (speed < 1) or (speed > 5):
-            speed = 3
+        if speed < 100:
+            speed = 100
+        elif speed > 1000:
+            speed = 1000
         self.close_gripper(tool_id, speed)
 
     def pull_air_vacuum_pump_command(self, tool_id):
