@@ -19,7 +19,7 @@
 
 import socket
 import select
-from threading import Thread, Lock
+from threading import Thread
 from command_interpreter import CommandInterpreter
 
 class TcpServer:
@@ -96,11 +96,11 @@ class TcpServer:
             self.__client.send(content)
 
     def __treat_command(self, command):
-        self.__interpreter.interpret_command(command, self.__send)
-        pass
-
-    def __send_command(self, command):
-        pass
+        result = self.__interpreter.interpret_command(command)
+        try:
+            self.__send(result)
+        except socket.error as e:
+            print("Error while send answer to client: " + str(e))
 
 # TO REMOVE BELOW AND REMOVE CHMOD EXECUTABLE
 

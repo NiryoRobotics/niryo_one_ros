@@ -20,7 +20,6 @@
 import niryo_one_python_api.niryo_one_api as python_api
 import rospy
 
-# from python_api import NiryoOne, NiryoOneException
 
 class TcpCommandException(Exception): pass
 
@@ -31,7 +30,7 @@ class CommandInterpreter:
         self.__niryo_one = python_api.NiryoOne()
         self.__commands_dict = {
             "CALIBRATE": self.__calibrate,
-            "LEARNING_MODE": self.__learning_mode,
+            "SET_LEARNING_MODE": self.__set_learning_mode,
             "MOVE_JOINTS": self.__move_joints,
             "MOVE_POSE": self.__move_pose,
             "SHIFT_POSE": self.__shift_pose,
@@ -63,12 +62,12 @@ class CommandInterpreter:
                                              "PITCH": python_api.ROT_PITCH,
                                              "YAW": python_api.ROT_YAW
                                              }
-        self.__pin_nbr_string_dict_convertor = {"1A": python_api.GPIO_1A,
-                                                "1B": python_api.GPIO_1B,
-                                                "1C": python_api.GPIO_1C,
-                                                "2A": python_api.GPIO_2A,
-                                                "2B": python_api.GPIO_2B,
-                                                "2C": python_api.GPIO_2C
+        self.__pin_nbr_string_dict_convertor = {"GPIO_1A": python_api.GPIO_1A,
+                                                "GPIO_1B": python_api.GPIO_1B,
+                                                "GPIO_1C": python_api.GPIO_1C,
+                                                "GPIO_2A": python_api.GPIO_2A,
+                                                "GPIO_2B": python_api.GPIO_2B,
+                                                "GPIO_2C": python_api.GPIO_2C
                                                 }
         self.__pin_mode_string_dict_convertor = {"OUTPUT": python_api.PIN_MODE_OUTPUT,
                                                  "INPUT": python_api.PIN_MODE_INPUT
@@ -90,15 +89,15 @@ class CommandInterpreter:
 
     #TODO Replaced "expected_*" by one of the private list and iter on it's key to construct string
     def __raise_exception_expected_choice(self, expected_choice, given):
-        raise TcpCommandException("Expected one of the following: " + expected_choice + ", given: " + given)
+        raise TcpCommandException("Expected one of the following: " + expected_choice + ".\n Given: " + given)
 
     def __raise_exception_expected_type(self, expected_type, given):
-        raise TcpCommandException("Expected the following type: " + expected_type + ", given: " + given)
+        raise TcpCommandException("Expected the following type: " + expected_type + ".\n Given: " + given)
 
     def __raise_exception_expected_parameters_nbr(self, expected_nbr, given):
         raise TcpCommandException("Expected: " + str(expected_nbr) + " parameters, given: " + str(given))
 
-    def interpret_command(self, command_received, send_function):
+    def interpret_command(self, command_received):
         if not isinstance(command_received, basestring):
             raise ValueError("Cannot interpret command of incorrect type: " + type(command_received))
         split_list = command_received.split(":")
@@ -114,20 +113,20 @@ class CommandInterpreter:
                 # Getter functions (functions without parameter)
                 else:
                     ret = self.__commands_dict[command_string_part]()
-                send_function(command_string_part + ": " + ret)
+                return command_string_part + ": " + ret
             except TypeError as e:
                 print("Incorrect number of parameter(s) given.")
                 print(e)
-                send_function("Incorrect number of parameter(s) given." + str(e))
+                return "Incorrect number of parameter(s) given." + str(e)
             except python_api.NiryoOneException as e:
                 print(e)
-                send_function(str(e))
+                return str(e)
             except TcpCommandException as e:
                 print("Incorrect parameter(s) given to : " + command_string_part + " function.")
                 print(e)
-                send_function("Incorrect parameter(s) given to : " + command_string_part + " function." + str(e))
+                return "Incorrect parameter(s) given to : " + command_string_part + " function." + str(e)
         else:
-            send_function("Unknown command: " + command_string_part)
+            return "Unknown command: " + command_string_part
 
     def __calibrate(self, param_string):
         calibrate_mode_string = param_string.strip().upper()
@@ -140,7 +139,7 @@ class CommandInterpreter:
             self.__niryo_one.calibrate_auto()
         return "OK"
 
-    def __learning_mode(self, param_string):
+    def __set_learning_mode(self, param_string):
         state_string = param_string.strip().upper()
         if state_string not in self.__boolean_string_dict_convertor:
             self.__raise_exception_expected_choice("[true, false]", param_string)
@@ -230,7 +229,8 @@ class CommandInterpreter:
 
         pin_string = parameters_string_array[0].strip().upper()
         if pin_string not in self.__pin_nbr_string_dict_convertor:
-            self.__raise_exception_expected_choice("[1a, 1b, 1c, 2a, 2b, 2c]", parameters_string_array[0])
+            self.__raise_exception_expected_choice("[gpio_1a, gpio_1b, gpio_1c, gpio_2a, gpio_2b, gpio_2c]",
+                                                   parameters_string_array[0])
         pin = self.__pin_nbr_string_dict_convertor[pin_string]
 
         pin_mode_string = parameters_string_array[1].strip().upper()
@@ -250,7 +250,8 @@ class CommandInterpreter:
 
         pin_string = parameters_string_array[0].strip().upper()
         if pin_string not in self.__pin_nbr_string_dict_convertor:
-            self.__raise_exception_expected_choice("[1a, 1b, 1c, 2a, 2b, 2c]", parameters_string_array[0])
+            self.__raise_exception_expected_choice("[gpio_1a, gpio_1b, gpio_1c, gpio_2a, gpio_2b, gpio_2c]",
+                                                   parameters_string_array[0])
         pin = self.__pin_nbr_string_dict_convertor[pin_string]
 
         state_string = parameters_string_array[1].strip().upper()
@@ -270,7 +271,8 @@ class CommandInterpreter:
 
         pin_string = parameters_string_array[0].strip().upper()
         if pin_string not in self.__pin_nbr_string_dict_convertor:
-            self.__raise_exception_expected_choice("[1a, 1b, 1c, 2a, 2b, 2c]", parameters_string_array[0])
+            self.__raise_exception_expected_choice("[gpio_1a, gpio_1b, gpio_1c, gpio_2a, gpio_2b, gpio_2c]",
+                                                   parameters_string_array[0])
         pin = self.__pin_nbr_string_dict_convertor[pin_string]
 
         return str(self.__niryo_one.digital_read(pin))
@@ -362,7 +364,8 @@ class CommandInterpreter:
 
         pin_string = parameters_string_array[1].strip().upper()
         if pin_string not in self.__pin_nbr_string_dict_convertor:
-            self.__raise_exception_expected_choice("[1a, 1b, 1c, 2a, 2b, 2c]", parameters_string_array[1])
+            self.__raise_exception_expected_choice("[gpio_1a, gpio_1b, gpio_1c, gpio_2a, gpio_2b, gpio_2c]",
+                                                   parameters_string_array[1])
         pin = self.__pin_nbr_string_dict_convertor[pin_string]
 
         self.__niryo_one.setup_electromagnet(electromagnet_id, pin)
@@ -382,7 +385,8 @@ class CommandInterpreter:
 
         pin_string = parameters_string_array[1].strip().upper()
         if pin_string not in self.__pin_nbr_string_dict_convertor:
-            self.__raise_exception_expected_choice("[1a, 1b, 1c, 2a, 2b, 2c]", parameters_string_array[1])
+            self.__raise_exception_expected_choice("[gpio_1a, gpio_1b, gpio_1c, gpio_2a, gpio_2b, gpio_2c]",
+                                                   parameters_string_array[1])
         pin = self.__pin_nbr_string_dict_convertor[pin_string]
 
         self.__niryo_one.activate_electromagnet(electromagnet_id, pin)
@@ -402,7 +406,8 @@ class CommandInterpreter:
 
         pin_string = parameters_string_array[1].strip().upper()
         if pin_string not in self.__pin_nbr_string_dict_convertor:
-            self.__raise_exception_expected_choice("[1a, 1b, 1c, 2a, 2b, 2c]", parameters_string_array[1])
+            self.__raise_exception_expected_choice("[gpio_1a, gpio_1b, gpio_1c, gpio_2a, gpio_2b, gpio_2c]",
+                                                   parameters_string_array[1])
         pin = self.__pin_nbr_string_dict_convertor[pin_string]
 
         self.__niryo_one.deactivate_electromagnet(electromagnet_id, pin)
