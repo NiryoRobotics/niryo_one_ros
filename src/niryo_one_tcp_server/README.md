@@ -20,7 +20,7 @@ For easier usage and easier debugging, the communication is in ascii format.
 * For all **active** commands (setter, move, ...), the result look like this:
     * `COMMAND: [OK / KO]`
         * Example: `OPEN_GRIPPER: KO`
-    * **On error**: A message displaying the error that occured
+    * **On error**: A message displaying the error that occurred
 
 ### Commands
 
@@ -48,6 +48,7 @@ For easier usage and easier debugging, the communication is in ascii format.
 * "GET_POSE"
 * "GET_HARDWARE_STATUS"
 * "GET_LEARNING_MODE"
+* "GET_DIGITAL_IO_STATE"
 
 #### Calibrate
 
