@@ -19,8 +19,11 @@
 
 import socket
 import select
+import rospy
+import Queue
 from threading import Thread
 from command_interpreter import CommandInterpreter
+
 
 class TcpServer:
     def __init__(self):
@@ -31,26 +34,67 @@ class TcpServer:
         self.__server.listen(1)
         self.__is_client_connected = False
         self.__loop_thread = Thread(target=self.__loop)
+        self.__command_executor_thread = Thread(target=self.__command_executor_loop)
         self.__is_running = True
+        self.__is_busy = False
         self.__client = None
         self.__interpreter = CommandInterpreter()
+        self.__queue = Queue.Queue(1)
 
     def __del__(self):
         self.quit()
-        pass
 
     def start(self):
         self.__loop_thread.start()
-        pass
+        self.__command_executor_thread.start()
 
     def quit(self):
         self.__is_running = False
         if self.__loop_thread.isAlive():
             self.__loop_thread.join()
+        if self.__command_executor_thread.isAlive():
+            self.__command_executor_thread.join()
+        if self.__client is not None:
+            self.__shutdown_client()
         self.__server.close()
 
+    def __treat_command(self, command):
+        result = self.__interpreter.interpret_command(command)
+        self.__send(result)
+
+    def __command_executor_loop(self):
+        while self.__is_running is True:
+            try:
+                command_received = self.__queue.get(block=True, timeout=0.5)
+                self.__is_busy = True
+                self.__treat_command(command_received)
+                self.__is_busy = False
+            except Queue.Empty as e:
+                pass
+
+    def __answer_client_robot_busy(self, command_received):
+        command_received_split = command_received.split(':', 1)
+        if len(command_received_split) != 2:
+            command_name = command_received
+        else:
+            command_name = command_received_split[0]
+        self.__send(command_name + ":KO,Robot is busy right now, command ignored.")
+
+    def __client_socket_event(self, inputs):
+        command_received = self.__read_command()
+        if command_received is not None:
+            if self.__is_busy:
+                self.__answer_client_robot_busy(command_received)
+            else:
+                self.__queue.put(command_received)
+        else:
+            rospy.loginfo("Client disconnect")
+            self.__is_client_connected = False
+            self.__shutdown_client()
+            inputs.remove(self.__client)
+
     def __loop(self):
-        print("Tcp server started on port : ", self.__port)
+        rospy.loginfo("Tcp server started on port : " + str(self.__port))
         inputs = [self.__server]
         while self.__is_running is True:
             readable, writable, exceptional = select.select(inputs, [], [], 0.5)
@@ -59,62 +103,36 @@ class TcpServer:
                     self.__accept_client()
                     inputs.append(self.__client)
                 elif s is not self.__server:
-                    ret = self.__read_command()
-                    if ret is not None:
-                        self.__treat_command(ret)
-                    else:
-                        self.__is_client_connected = False
-                        self.__shutdown_client()
-                        inputs.remove(self.__client)
+                    self.__client_socket_event(inputs)
 
     def __shutdown_client(self):
         if self.__client is not None:
-            self.__client.shutdown(socket.SHUT_RDWR)
+            try:
+                self.__client.shutdown(socket.SHUT_RDWR)
+            except socket.error as e:
+                pass
             self.__client.close()
 
     def __accept_client(self):
         self.__client, address = self.__server.accept()
         self.__is_client_connected = True
-        print("Client connected from ip address: ", address)
+        rospy.loginfo("Client connected from ip address: " + str(address))
 
     def __read_command(self):
         READ_SIZE = 512
         try:
             received = self.__client.recv(READ_SIZE)
         except socket.error as e:
-            print(e)
+            rospy.loginfo(e)
             return None
         # Means client is disconnected
         if not received:
             return None
-        print(received)
         return received
 
     def __send(self, content):
         if self.__client is not None:
-            print("SEND: ", content)
-            self.__client.send(content)
-
-    def __treat_command(self, command):
-        result = self.__interpreter.interpret_command(command)
-        try:
-            self.__send(result)
-        except socket.error as e:
-            print("Error while send answer to client: " + str(e))
-
-# TO REMOVE BELOW AND REMOVE CHMOD EXECUTABLE
-
-import signal
-
-if __name__ == "__main__":
-    server = TcpServer()
-    server.start()
-
-    def signal_handler(sig, frame):
-        print('You pressed Ctrl+C !')
-        server.quit()
-
-    signal.signal(signal.SIGINT, signal_handler)
-
-    signal.pause()
-    print("END")
+            try:
+                self.__client.send(content)
+            except socket.error as e:
+                rospy.loginfo("Error while sending answer to client: " + str(e))
