@@ -34,6 +34,10 @@ For easier usage and easier debugging, the communication is in ascii format.
 * Expected the following type: `expected_type`. Given: `type`.
 * Expected: `expected_nbr` parameters, given: `number_parameters`.
 
+### Clients
+
+For already existing clients, please go to the [clients](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients) folder and check if there's an already existing client that communicate with the Niryo One across TCP/IP.
+
 ### Commands
 
 * "CALIBRATE"
