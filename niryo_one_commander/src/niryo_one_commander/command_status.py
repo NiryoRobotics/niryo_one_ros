@@ -42,4 +42,7 @@ class CommandStatus:
 
     # ROS error
     ROS_ERROR           = 30
+    
+    # Restart traj execution (internal only)
+    SHOULD_RESTART      = 40
 
