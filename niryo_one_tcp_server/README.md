@@ -287,7 +287,7 @@ No parameters
     `GET_HARDWARE_STATUS`
 <br>**Answers:**
 * On success the format is `GET_HARDWARE_STATUS:OK,rpi_temperature,hardware_version,connection_up,error_message,calibration_needed,calibration_in_progress,[motor_names],[motor_types],[temperatures],[voltages],[hardware_errors]`
-    * ex: `GET_HARDWARE_STATUS:OK,59,2,True,,0,False,['Stepper Axis 1', 'Stepper Axis 2', 'Stepper Axis 3', 'Servo Axis 4', 'Servo Axis 5', 'Servo Axis 6'],['Niryo Stepper', 'Niryo Stepper', 'Niryo Stepper', 'DXL XL-430', 'DXL XL-430', 'DXL XL-320'],(34, 34, 37, 43, 45, 37),(0.0, 0.0, 0.0, 11.3, 11.2, 7.9),(0, 0, 0, 0, 0, 0)`
+    * ex: `GET_HARDWARE_STATUS:OK,59,2,True,'',0,False,['Stepper Axis 1', 'Stepper Axis 2', 'Stepper Axis 3', 'Servo Axis 4', 'Servo Axis 5', 'Servo Axis 6'],['Niryo Stepper', 'Niryo Stepper', 'Niryo Stepper', 'DXL XL-430', 'DXL XL-430', 'DXL XL-320'],(34, 34, 37, 43, 45, 37),(0.0, 0.0, 0.0, 11.3, 11.2, 7.9),(0, 0, 0, 0, 0, 0)`
 #### GET_LEARNING_MODE
 
 No parameters

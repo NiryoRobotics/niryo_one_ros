@@ -5,6 +5,31 @@ Tcp client that communicates with the tcp server of the Niryo One
 
 Port of the server: 40001
 
+### Linking
+
+* If you want to make this package available everywhere on your computer, execute the following command in the folder where setup.py is located: `pip install -e .`
+* If you prefer to just link manually the package, just add this folder to PYTHONPATH environment variable before executing your script.
+
+### Base script
+
+```
+#!/usr/bin/env python2
+
+from niryo_one_tcp_client import *
+
+niryo_one_client = NiryoOneClient()
+niryo_one_client.connect("10.10.10.10") # =< Replace by robot ip address
+
+# YOUR CODE HERE
+
+niryo_one_client.quit()
+
+```
+
+### Examples
+
+See the [examples](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients/python/examples) folder for existing scripts.
+
 ### Functions available
 
 All enums are registered in the Command.py file.
@@ -150,12 +175,11 @@ All enums are registered in the Command.py file.
     Returns an array containing the current angles for all 6 axis (in radian).
 
 * `get_pose()`
-
-    Returns a RobotState object (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_msgs/msg)) containing the pose (position in meters + orientation in radian) of the end effector tool.
+    Returns a PoseObject (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients/python/niryo_one_tcp_client/pose_object.py)).
 
 * `get_hardware_status()`
 
-    Returns a HardwareStatus object (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_msgs/msg)) containing useful info about the motors state, connection, temperature, etc. (temperature unit: °C)
+    Returns a HardwareStatusObject (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients/python/niryo_one_tcp_client/hardware_status_object.py)) containing useful info about the motors state, connection, temperature, etc. (temperature unit: °C)
 
 * `get_learning_mode()`
 
@@ -163,4 +187,4 @@ All enums are registered in the Command.py file.
 
 * `get_digital_io_state()`
 
-    Returns a DigitalIOState object (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_msgs/msg)) containing information (mode: input or output + state: high or low) for all the 6\* 5V digital pins + 2\* 12V switches.
+    Returns a DigitalPinObject object (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients/python/niryo_one_tcp_client/digital_pin_object.py)) containing information (mode: input or output + state: high or low) for all the 6\* 5V digital pins + 2\* 12V switches.

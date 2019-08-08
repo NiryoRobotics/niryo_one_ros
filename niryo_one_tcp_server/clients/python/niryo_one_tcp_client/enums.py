@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# packet_builder.py
+# enums.py
 # Copyright (C) 2017 Niryo
 # All rights reserved.
 #

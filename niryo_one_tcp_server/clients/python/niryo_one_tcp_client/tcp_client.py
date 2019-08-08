@@ -18,8 +18,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import socket
+
+from .pose_object import PoseObject
+from .hardware_status_object import HardwareStatusObject
 from .packet_builder import PacketBuilder
-from .command import Command
+from .enums import Command
+from .digital_pin_object import DigitalPinObject
+import re
+import ast
 
 
 class NiryoOneClient:
@@ -120,7 +126,10 @@ class NiryoOneClient:
 
     def digital_read(self, pin):
         self.send_command(Command.DIGITAL_READ, [pin])
-        return self.receive_answer()
+        status, data = self.receive_answer()
+        if status is True:
+            return status, int(data)
+        return status, data
 
     def change_tool(self, tool):
         self.send_command(Command.CHANGE_TOOL, [tool])
@@ -164,23 +173,72 @@ class NiryoOneClient:
 
     def get_joints(self):
         self.send_command(Command.GET_JOINTS)
-        return self.receive_answer()
+        status, data = self.receive_answer()
+        if status is True:
+            joint_array = map(float, data.split(','))
+            return status, joint_array
+        return status, data
 
     def get_pose(self):
         self.send_command(Command.GET_POSE)
-        return self.receive_answer()
+        status, data = self.receive_answer()
+        if status is True:
+            pose_array = map(float, data.split(','))
+            pose_object = PoseObject(*pose_array)
+            return status, pose_object
+        return status, data
 
     def get_hardware_status(self):
         self.send_command(Command.GET_HARDWARE_STATUS)
-        return self.receive_answer()
+        status, data = self.receive_answer()
+        if status is True:
+            matches = re.findall('((?:\[[^\]]+\])|(?:\([^\)]+\))|True|False|\d+|\'\w*\')', data)
+            if len(matches) != 11:
+                print("[get_hardware_status] Incorrect answer received, cannot understand received format.")
+                return status, data
+            rpi_temperature = int(matches[0])
+            hardware_version = int(matches[1])
+            connection_up = bool(matches[2])
+            error_message = matches[3].strip('\'')
+            calibration_needed = int(matches[4])
+            calibration_in_progress = bool(matches[5])
+
+            motor_names = ast.literal_eval(matches[6])
+            motor_types = ast.literal_eval(matches[7])
+
+            temperatures = ast.literal_eval(matches[8])
+            voltages = ast.literal_eval(matches[9])
+            hardware_errors = ast.literal_eval(matches[10])
+
+            hardware_status = HardwareStatusObject(rpi_temperature, hardware_version, connection_up, error_message,
+                                                   calibration_needed, calibration_in_progress,
+                                                   motor_names, motor_types,
+                                                   temperatures, voltages, hardware_errors)
+            return status, hardware_status
+        return status, data
 
     def get_learning_mode(self):
         self.send_command(Command.GET_LEARNING_MODE)
-        return self.receive_answer()
+        status, data = self.receive_answer()
+        if status is True:
+            return status, bool(data)
+        return status, data
 
     def get_digital_io_state(self):
         self.send_command(Command.GET_DIGITAL_IO_STATE)
-        return self.receive_answer()
+        status, data = self.receive_answer()
+        if status is True:
+            matches = re.findall('(\[\d+, ?\'\w+\', ?[0-1], \d+\])+', data)
+            digital_pin_array = []
+            for match in matches:
+                elements = match.split(', ')
+                pin_id = elements[0].lstrip('[')
+                name = elements[1]
+                mode = int(elements[2])
+                state = int(elements[3].rstrip(']'))
+                digital_pin_array.append(DigitalPinObject(pin_id, name, mode, state))
+            return status, digital_pin_array
+        return status, data
 
     def send_command(self, command_type, parameter_list=None):
         if self.__is_connected is False:

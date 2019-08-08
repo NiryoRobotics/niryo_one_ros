@@ -440,12 +440,11 @@ class CommandInterpreter:
 
     def __get_hardware_status(self):
         hw_status = self.__niryo_one.get_hardware_status()
-        print(hw_status)
         data_answer = []
         data_answer.append(hw_status.rpi_temperature)
         data_answer.append(hw_status.hardware_version)
         data_answer.append(hw_status.connection_up)
-        data_answer.append(hw_status.error_message)
+        data_answer.append("\'" + hw_status.error_message + "\'")
         data_answer.append(hw_status.calibration_needed)
         data_answer.append(hw_status.calibration_in_progress)
         data_answer.append(hw_status.motor_names)
@@ -457,7 +456,6 @@ class CommandInterpreter:
 
     def __get_learning_mode(self):
         is_learning_mode_enabled = self.__niryo_one.get_learning_mode()
-        print(is_learning_mode_enabled)
         return self.__successfull_answer([is_learning_mode_enabled])
 
     def __get_digital_io_state(self):
