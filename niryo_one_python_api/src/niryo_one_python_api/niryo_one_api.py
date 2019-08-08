@@ -240,6 +240,7 @@ class NiryoOne:
                     SetInt, [activate])
             if result.status != 200:
                 raise NiryoOneException(result.message)
+            rospy.sleep(0.1)
         
         def pin_mode(self, pin, mode):
             result = self.call_service('niryo_one/rpi/set_digital_io_mode', 
