@@ -55,7 +55,8 @@ class ArmCommander:
                     # if joint_trajectory_controller aborts the goal, it will still try to 
                     # finish executing the trajectory --> so we ask it to stop from here
                     self.set_position_hold_mode()
-                    return CommandStatus.CONTROLLER_PROBLEMS, "Command has been aborted"
+                    return CommandStatus.CONTROLLER_PROBLEMS, \
+                        "Command has been aborted due to a collision or a motor not able to follow the given trajectory"
                 else: # problem from ros_control itself
                     self.current_goal_id = None
                     return CommandStatus.SHOULD_RESTART, ""
@@ -74,7 +75,6 @@ class ArmCommander:
         msg = JointTrajectory()
         msg.header.stamp = rospy.Time.now()
         msg.points = []
-        rospy.logwarn("SEND POSITION HOLD MODE TO CONTROLLER")
         self.joint_trajectory_publisher.publish(msg)
 
     def stop_current_plan(self):

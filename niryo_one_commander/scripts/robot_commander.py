@@ -360,7 +360,7 @@ class RobotCommander:
 
         if not response:
             self.current_goal_handle.set_aborted(result)
-            rospy.loginfo("Execution has been aborted")
+            rospy.logwarn("Execution has been aborted")
         elif response.status == CommandStatus.SUCCESS:
             self.current_goal_handle.set_succeeded(result)
             rospy.loginfo("Goal has been set as succeeded")
@@ -369,7 +369,9 @@ class RobotCommander:
             rospy.loginfo("Goal has been successfully canceled")
         elif response.status == CommandStatus.CONTROLLER_PROBLEMS:
             self.current_goal_handle.set_aborted(result)
-            rospy.loginfo("Controller failed during execution : Goal has been aborted")
+            rospy.logwarn("Controller failed during execution : Goal has been aborted.\n" + \
+                    "This is due to either a collision, or a motor unable to follow a given command" + \
+                    " (overload, extreme positions, ...)")
         else:
             self.current_goal_handle.set_aborted(result)
             rospy.loginfo("Unknown result, goal has been set as aborted")
