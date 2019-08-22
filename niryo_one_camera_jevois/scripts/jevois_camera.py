@@ -38,6 +38,11 @@ class JevoisCamera:
             return True, ''
 
         # If config file doesn't exist, create a default one
+
+        if not os.path.exists(self.video_config_path):
+            rospy.loginfo("Create guvcview config directory: " + str(self.video_config_path))
+            os.makedirs(self.video_config_path)
+
         rospy.loginfo("Create default guvcview config file for device " + str(self.camera_device))
         try:
             with open(filename, 'w') as f:
