@@ -1,3 +1,10 @@
+# Niryo One Tcp Server
+This a Tcp server built on top of the [Niryo Python API](../niryo_one_python_api/README.md).
+<br><br>Programs can communicate through network TCP with the robots in any language available. (see [clients](client) folder for available clients)
+<br>It offers a simple way for developers to create programs for robot to control them via remote communication on a computer, on a mobile or any device with network facilities.
+
+## Documentation
+
 ### Connection
 
 Port of the server: 40001
@@ -10,6 +17,8 @@ Port of the server: 40001
 ### Format
 
 For easier usage and easier debugging, the communication is in ascii format.
+
+#### General format
 
 * For command without parameter, the format is:
     * `COMMAND`
@@ -24,7 +33,7 @@ For easier usage and easier debugging, the communication is in ascii format.
     * `COMMAND:OK,DATA`
         * Example: `DIGITAL_READ:OK,1`
     * `COMMAND:KO,"REASON"`
-        * Example:
+        * Example: `SET_LEARNING_MODE; TRUE, Incorrect command format: "SET_LEARNING_MODE, TRUE"`
 
 **Notes:** That means, if you develop you own tcp client, just parse the status ('OK' / 'KO') and act in consequence.
 
@@ -36,7 +45,7 @@ For easier usage and easier debugging, the communication is in ascii format.
 
 ### Clients
 
-For already existing clients, please go to the [clients](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients) folder and check if there's an already existing client that communicate with the Niryo One across TCP/IP.
+For already existing clients, please go to the [clients](clients/README.md) folder and check if there's an already existing client that communicate with the Niryo One across TCP/IP.
 
 ### Commands
 
@@ -46,7 +55,7 @@ For already existing clients, please go to the [clients](https://github.com/Niry
 * "MOVE_POSE"
 * "SHIFT_POSE"
 * "SET_ARM_MAX_VELOCITY"
-* "SET_JOYSTICK_MODE"
+* "ENABLE_JOYSTICK"
 * "SET_PIN_MODE"
 * "DIGITAL_WRITE"
 * "DIGITAL_READ"
@@ -133,13 +142,13 @@ Parameters:
     `SET_ARM_MAX_VELOCITY:50`
 <br>**Answers:** See [answer format section](#answer-format)
 
-#### SET_JOYSTICK_MODE
+#### ENABLE_JOYSTICK
 
 Parameters:
 * enabled: TRUE / FALSE
 
 **Example:**
-    `SET_JOYSTICK_MODE:FALSE`
+    `ENABLE_JOYSTICK:FALSE`
 <br>**Answers:** See [answer format section](#answer-format)
 
 #### SET_PIN_MODE
@@ -162,6 +171,8 @@ Parameters:
     `DIGITAL_WRITE:GPIO_2A,LOW`
 <br>**Answers:** See [answer format section](#answer-format)
 
+**Notes:** The pin must have been previously set as OUTPUT.
+
 #### DIGITAL_READ
 
 Parameters:
@@ -180,6 +191,8 @@ Parameters:
     `CHANGE_TOOL:GRIPPER_2`
 <br>**Answers:** See [answer format section](#answer-format)
 
+**Notes:** Before you execute any action on a tool, you have to select it with this method.
+
 #### OPEN_GRIPPER
 
 Parameters:
@@ -189,7 +202,7 @@ Parameters:
     * **Recommended** : between 100 and 500
 
 **Example:**
-    `OPEN_GRIPPER:GRIPPER_3`
+    `OPEN_GRIPPER:GRIPPER_3,200`
 <br>**Answers:** See [answer format section](#answer-format)
 
 #### CLOSE_GRIPPER
@@ -201,7 +214,7 @@ Parameters:
     * **Recommended** : between 100 and 500
 
 **Example:**
-    `CLOSE_GRIPPER:GRIPPER_1`
+    `CLOSE_GRIPPER:GRIPPER_1,200`
 <br>**Answers:** See [answer format section](#answer-format)
 
 #### PULL_AIR_VACUUM_PUMP
@@ -232,7 +245,7 @@ Parameters:
 * pin: GPIO_1A / GPIO_1B / GPIO_1C / GPIO_2A / GPIO_2B / GPIO_2C
 
 **Example:**
-    `SETUP_ELECTROMAGNET:ELECTROMAGNET_1`
+    `SETUP_ELECTROMAGNET:ELECTROMAGNET_1,GPIO_2B`
 <br>**Answers:** See [answer format section](#answer-format)
 
 #### ACTIVATE_ELECTROMAGNET
@@ -267,9 +280,6 @@ No parameters
 * On success the format is `GET_JOINTS:OK,j1,j2,j3,j4,j5,j6`:
     * ex: `GET_JOINTS:OK,0.0,0.640187,-1.397485,0.0,0.0,0.0`
     * j1, ..., j6 values are expressed in radian
-* On error:
-    * `MOVE_JOINTS:KO,Incorrect number of parameter(s) given.`
-    * `MOVE_JOINTS:KO,6 parameters expected, given: X`
 
 #### GET_POSE
 

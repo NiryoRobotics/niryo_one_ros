@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # digital_pin_object.py
-# Copyright (C) 2017 Niryo
+# Copyright (C) 2019 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,11 @@
 
 class DigitalPinObject:
     def __init__(self, pin_id, name, mode, state):
+        # Pin ID
         self.pin_id = pin_id
+        # Name
         self.name = name
+        # Input or output
         self.mode = mode
+        # High or Low
         self.state = state

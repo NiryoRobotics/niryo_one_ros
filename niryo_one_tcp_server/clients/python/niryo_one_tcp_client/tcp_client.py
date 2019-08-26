@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # tcp_client.py
-# Copyright (C) 2017 Niryo
+# Copyright (C) 2019 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -112,8 +112,8 @@ class NiryoOneClient:
         self.send_command(Command.SET_ARM_MAX_VELOCITY, [percentage_speed])
         return self.receive_answer()
 
-    def set_joystick_mode(self, enabled):
-        self.send_command(Command.SET_JOYSTICK_MODE, [enabled])
+    def enable_joystick(self, enabled):
+        self.send_command(Command.ENABLE_JOYSTICK, [enabled])
         return self.receive_answer()
 
     def set_pin_mode(self, pin, pin_mode):
@@ -263,7 +263,6 @@ class NiryoOneClient:
         if not received:
             raise self.HostNotReachableException()
         received_split_list = received.split(':', 1)
-        # TODO If it's a different command than command sent previously, should be an error=> Check the command
         if len(received_split_list) != 2:
             raise self.InvalidAnswerException(received)
         command_answer = received_split_list[1]

@@ -1,16 +1,17 @@
 # niryo_one_python_tcp_client
-Tcp client that communicates with the tcp server of the Niryo One
+Tcp client that communicates with the [tcp server](../../README.md) of the Niryo One
+<br>**Notes:** The TCP server use the underlying [python_api](../../../niryo_one_python_api/README.md) package so the functions available will be similar with this package but may differ in some minor terms, please refer to the current documentation.
 
-### Connection
+## Connection
 
 Port of the server: 40001
 
-### Linking
+## Linking
 
-* If you want to make this package available everywhere on your computer, execute the following command in the folder where setup.py is located: `pip install -e .`
+* If you want to make this package available everywhere on your computer, execute the following command in this folder: `pip install -e .`
 * If you prefer to just link manually the package, just add this folder to PYTHONPATH environment variable before executing your script.
 
-### Base script
+## Base script
 
 ```
 #!/usr/bin/env python2
@@ -26,11 +27,11 @@ niryo_one_client.quit()
 
 ```
 
-### Examples
+## Examples
 
-See the [examples](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients/python/examples) folder for existing scripts.
+See the [examples](examples) folder for existing scripts.
 
-### Functions available
+## Functions available
 
 All enums are registered in the Command.py file.
 
@@ -84,7 +85,7 @@ All enums are registered in the Command.py file.
 
     Set the arm max velocity scaling factor.
 
-* `set_joystick_mode(enabled)`
+* `enable_joystick(enabled)`
     * enabled: enable the joystick mode on True / disable on False
         * **Boolean** (`True` / `False`)
 
@@ -105,6 +106,8 @@ All enums are registered in the Command.py file.
         * **DigitalState** enum type (`LOW`, `HIGH`)
 
     Set a digital I/O pin to LOW or HIGH. Note that the pin must have been previously set as OUTPUT.
+    <br><br>**Notes:** The pin must have been previously set as OUTPUT.
+
 
 * `digital_read(pin)`
     * pin: from which pin we will read it's state
@@ -175,11 +178,11 @@ All enums are registered in the Command.py file.
     Returns an array containing the current angles for all 6 axis (in radian).
 
 * `get_pose()`
-    Returns a PoseObject (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients/python/niryo_one_tcp_client/pose_object.py)).
+    Returns a [PoseObject](niryo_one_tcp_client/pose_object.py)
 
 * `get_hardware_status()`
 
-    Returns a HardwareStatusObject (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients/python/niryo_one_tcp_client/hardware_status_object.py)) containing useful info about the motors state, connection, temperature, etc. (temperature unit: °C)
+    Returns a [HardwareStatusObject](niryo_one_tcp_client/hardware_status_object.py) containing useful info about the motors state, connection, temperature, etc. (temperature unit: °C)
 
 * `get_learning_mode()`
 
@@ -187,4 +190,4 @@ All enums are registered in the Command.py file.
 
 * `get_digital_io_state()`
 
-    Returns a DigitalPinObject object (see [the niryo one ros object package documentation](https://github.com/NiryoRobotics/niryo_one_ros/tree/master/niryo_one_tcp_server/clients/python/niryo_one_tcp_client/digital_pin_object.py)) containing information (mode: input or output + state: high or low) for all the 6\* 5V digital pins + 2\* 12V switches.
+    Returns a [DigitalPinObject](niryo_one_tcp_client/digital_pin_object.py) object containing information for all the 6\* 5V digital pins + 2\* 12V switches.

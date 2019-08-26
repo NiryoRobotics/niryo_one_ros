@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # packet_builder.py
-# Copyright (C) 2017 Niryo
+# Copyright (C) 2019 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@
 from .enums import *
 
 
-##TODO class for storing function + string (which name ?)
 class PacketBuilder:
     class NotEnoughParameterException(Exception):
         pass
@@ -46,7 +45,7 @@ class PacketBuilder:
             Command.MOVE_POSE: self.__CommandElement("MOVE_POSE", self.__move_pose),
             Command.SHIFT_POSE: self.__CommandElement("SHIFT_POSE", self.__shift_pose),
             Command.SET_ARM_MAX_VELOCITY: self.__CommandElement("SET_ARM_MAX_VELOCITY", self.__set_arm_max_velocity),
-            Command.SET_JOYSTICK_MODE: self.__CommandElement("SET_JOYSTICK_MODE", self.__set_joystick_mode),
+            Command.ENABLE_JOYSTICK: self.__CommandElement("ENABLE_JOYSTICK", self.__enable_joystick),
             Command.SET_PIN_MODE: self.__CommandElement("SET_PIN_MODE", self.__set_pin_mode),
             Command.DIGITAL_WRITE: self.__CommandElement("DIGITAL_WRITE", self.__digital_write),
             Command.DIGITAL_READ: self.__CommandElement("DIGITAL_READ", self.__digital_read),
@@ -132,7 +131,6 @@ class PacketBuilder:
         if not isinstance(shift_value, float):
             raise self.InvalidValueException(" Expected float parameter, given: {}".format(type(shift_value)))
 
-        #parameter_string_list = [axis.name, shift_value]
         return self.__build_packet_with_parameter(Command.SHIFT_POSE, parameter_list)
 
     def __set_arm_max_velocity(self, parameter_list):
@@ -145,14 +143,14 @@ class PacketBuilder:
             raise self.InvalidValueException(" Expected a percentage, given: {}".format(percentage))
         return self.__build_packet_with_parameter(Command.SET_ARM_MAX_VELOCITY, parameter_list)
 
-    def __set_joystick_mode(self, parameter_list):
+    def __enable_joystick(self, parameter_list):
         if parameter_list is None or len(parameter_list) < 1:
             raise self.NotEnoughParameterException(
                 "One parameter expected [True / False], {} parameters given".format(len(parameter_list)))
 
         if not isinstance(parameter_list[0], bool):
             raise self.InvalidValueException(" Expected bool parameter, given: {}".format(type(parameter_list[0])))
-        return self.__build_packet_with_parameter(Command.SET_JOYSTICK_MODE, parameter_list)
+        return self.__build_packet_with_parameter(Command.ENABLE_JOYSTICK, parameter_list)
 
     def __set_pin_mode(self, parameter_list):
         if parameter_list is None or len(parameter_list) < 2:

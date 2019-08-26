@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # tcp_server.py
-# Copyright (C) 2017 Niryo
+# Copyright (C) 2019 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -125,7 +125,6 @@ class TcpServer:
         except socket.error as e:
             rospy.loginfo(e)
             return None
-        # Means client is disconnected
         if not received:
             return None
         return received

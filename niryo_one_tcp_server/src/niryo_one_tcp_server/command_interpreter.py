@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # command_interpreter.py
-# Copyright (C) 2017 Niryo
+# Copyright (C) 2019 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ class CommandInterpreter:
             "MOVE_POSE": self.__move_pose,
             "SHIFT_POSE": self.__shift_pose,
             "SET_ARM_MAX_VELOCITY": self.__set_arm_max_velocity,
-            "SET_JOYSTICK_MODE": self.__set_joystick_mode,
+            "ENABLE_JOYSTICK": self.__enable_joystick,
             "SET_PIN_MODE": self.__set_pin_mode,
             "DIGITAL_WRITE": self.__digital_write,
             "DIGITAL_READ": self.__digital_read,
@@ -84,8 +84,12 @@ class CommandInterpreter:
                                                         "ELECTROMAGNET_1": python_api.TOOL_ELECTROMAGNET_1_ID,
                                                         "VACUUM_PUMP_1": python_api.TOOL_VACUUM_PUMP_1_ID,
                                                         }
+        self.__available_gripper_tools_string_dict_convertor = {"NONE": python_api.TOOL_NONE,
+                                                                "GRIPPER_1": python_api.TOOL_GRIPPER_1_ID,
+                                                                "GRIPPER_2": python_api.TOOL_GRIPPER_2_ID,
+                                                                "GRIPPER_3": python_api.TOOL_GRIPPER_3_ID
+                                                                }
 
-    # TODO Replaced "expected_*" by one of the private list and iter on it's key to construct string
     def __raise_exception_expected_choice(self, expected_choice, given):
         raise TcpCommandException("Expected one of the following: " + expected_choice + ".\nGiven: " + given)
 
@@ -221,7 +225,7 @@ class CommandInterpreter:
             self.__niryo_one.set_arm_max_velocity(percentage)
         return self.__successfull_answer()
 
-    def __set_joystick_mode(self, param_string):
+    def __enable_joystick(self, param_string):
         state_string = param_string.rstrip('\r\n')
         if state_string not in self.__boolean_string_dict_convertor:
             self.__raise_exception_expected_choice("[TRUE, FALSE]", param_string)
@@ -304,8 +308,7 @@ class CommandInterpreter:
             self.__raise_exception_expected_parameters_nbr(2, nbr_parameters)
 
         gripper_id_string = parameters_string_array[0]
-        # TODO only accept gripper_* ?
-        if gripper_id_string not in self.__available_tools_string_dict_convertor:
+        if gripper_id_string not in self.__available_gripper_tools_string_dict_convertor:
             self.__raise_exception_expected_choice("GRIPPER_1, GRIPPER_2, GRIPPER_3]", parameters_string_array[0])
         gripper_id = self.__available_tools_string_dict_convertor[gripper_id_string]
 
@@ -327,8 +330,7 @@ class CommandInterpreter:
             self.__raise_exception_expected_parameters_nbr(2, nbr_parameters)
 
         gripper_id_string = parameters_string_array[0]
-        # TODO only accept gripper_* ?
-        if gripper_id_string not in self.__available_tools_string_dict_convertor:
+        if gripper_id_string not in self.__available_gripper_tools_string_dict_convertor:
             self.__raise_exception_expected_choice("[GRIPPER_1, GRIPPER_2, GRIPPER_3]", parameters_string_array[0])
         gripper_id = self.__available_tools_string_dict_convertor[gripper_id_string]
 
@@ -467,5 +469,3 @@ class CommandInterpreter:
                                 digital_io_state_array.modes[counter],
                                 digital_io_state_array.states[counter]])
         return self.__successfull_answer(data_answer)
-
-    pass

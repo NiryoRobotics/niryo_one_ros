@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # enums.py
-# Copyright (C) 2017 Niryo
+# Copyright (C) 2019 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ class Command(Enum):
     MOVE_POSE = 3
     SHIFT_POSE = 4
     SET_ARM_MAX_VELOCITY = 5
-    SET_JOYSTICK_MODE = 6
+    ENABLE_JOYSTICK = 6
     SET_PIN_MODE = 7
     DIGITAL_WRITE = 8
     DIGITAL_READ = 9

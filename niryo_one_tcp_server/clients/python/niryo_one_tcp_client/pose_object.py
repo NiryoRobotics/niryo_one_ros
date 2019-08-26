@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # pose_object.py
-# Copyright (C) 2017 Niryo
+# Copyright (C) 2019 Niryo
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,10 +20,16 @@
 
 class PoseObject:
     def __init__(self, x, y, z, roll, pitch, yaw):
+        # X (meter)
         self.x = x
+        # Y (meter)
         self.y = y
+        # Z (meter)
         self.z = z
+        # Roll (radian)
         self.roll = roll
+        # Pitch (radian)
         self.pitch = pitch
+        # Yaw (radian)
         self.yaw = yaw
 

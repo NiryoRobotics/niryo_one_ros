@@ -7,7 +7,7 @@ niryo_one_client.connect("10.10.10.10")  # =< Replace by robot ip address
 
 initial_pose = None
 
-status, data = niryo_one_client.calibrate(CalibrateMode.MANUAL)
+status, data = niryo_one_client.calibrate(CalibrateMode.AUTO)
 if status is False:
     print("Error: " + data)
 
