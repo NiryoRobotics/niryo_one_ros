@@ -52,11 +52,13 @@ class JevoisManager:
             # 4. start guvcview if needed
             if self.current_module.should_start_guvcview:
                 rospy.loginfo("Start guvcview")
-                self.camera.start_guvcview()
+                self.camera.start_guvcview(self.current_module.res_x,
+                    self.current_module.res_y, self.current_module.video_format)
+                rospy.sleep(1)
 
             # 5. send params to serial
-            rospy.loginfo("Send module params to serial")
-            params = self.current_module.get_params()
+            rospy.loginfo("Send module params to Jevois serial")
+            params = self.current_module.get_serial_params()
             for param in params:
                 self.serial.send_command(param)
 
@@ -80,11 +82,14 @@ class JevoisManager:
             self.current_module = None
 
     def start(self):
+        # setup serial communication
         success, message = self.serial.start()
         if success:
             self.serial.set_callbacks(
                 self.callback_data_serial,
                 self.callback_on_serial_error)
+            # setup camera
+            success, message = self.camera.setup()
         return success, message
 
     def stop(self):
@@ -92,6 +97,7 @@ class JevoisManager:
         self.camera.stop_guvcview()
 
     def callback_data_serial(self, data):
+        # rospy.loginfo(data)
         # remove info that is not data related to modules
         if data.startswith('OK') or \
                 data.startswith('INF') or \

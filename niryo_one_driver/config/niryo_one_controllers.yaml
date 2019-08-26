@@ -20,10 +20,10 @@ niryo_one_follow_joint_trajectory_controller:
     constraints:
         goal_time: 1.0 
         stopped_velocity_tolerance: 0.05
-        joint_1: {trajectory: 0.5, goal: 0.1}
-        joint_2: {trajectory: 0.5, goal: 0.1}
-        joint_3: {trajectory: 0.5, goal: 0.1}
-        joint_4: {trajectory: 0.5, goal: 0.1}
+        joint_1: {trajectory: 0.5, goal: 0.2}
+        joint_2: {trajectory: 0.5, goal: 0.2}
+        joint_3: {trajectory: 0.5, goal: 0.2}
+        joint_4: {trajectory: 0.5, goal: 0.2}
         joint_5: {trajectory: 1.0, goal: 0.3}
         joint_6: {trajectory: 1.0, goal: 0.3}
     stop_trajectory_duration: 1.0

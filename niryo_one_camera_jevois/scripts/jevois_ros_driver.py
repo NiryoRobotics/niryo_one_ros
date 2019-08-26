@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+import os
 from niryo_one_msgs.srv import SetString
 from std_msgs.msg import String
 
@@ -11,8 +12,8 @@ from jevois_manager import JevoisManager
 from modules.qr_code_module import QRCodeModule
 from modules.dice_counter_module import DiceCounterModule
 
-VIDEO_CONFIG_PATH = '/home/niryo/.config/guvcview2/'
 SERIAL_PORT = '/dev/ttyACM0'
+USER_HOME_DIR = os.path.expanduser('~')
 VIDEO_DEVICES_PATH = '/sys/class/video4linux/'
 
 class JevoisRosDriver:
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     rospy.init_node("jevois_ros_driver")
     serial = JevoisSerial(port=SERIAL_PORT)
     camera = JevoisCamera(video_devices_path=VIDEO_DEVICES_PATH,
-                          video_config_path=VIDEO_CONFIG_PATH)
+                          user_home_dir=USER_HOME_DIR)
     jevois_manager = JevoisManager(serial, camera)
     jevois_ros_driver = JevoisRosDriver(jevois_manager)
     rospy.on_shutdown(jevois_ros_driver.stop)
@@ -71,7 +72,7 @@ if __name__ == "__main__":
         jevois_ros_driver.stop()
         exit()
 
-    # Add modules to JevoisManager
+    # Add modules to JevoisManager and give them a name
     # For each module you create, add a line below
     qrcode = QRCodeModule("qr_code")
     dicecounter = DiceCounterModule("dice_counter")

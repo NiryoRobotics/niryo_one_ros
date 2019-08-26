@@ -30,26 +30,23 @@ from niryo_one_commander.move_group_arm import MoveGroupArm
 from niryo_one_commander.robot_commander_exception import RobotCommanderException
 from niryo_one_commander.command_status import CommandStatus
 
-TrajectoryTimeOutMin = 2
+TrajectoryTimeOutMin = 3
 
 class ArmCommander:
 
     def execute_plan(self, plan , wait=False):
         if plan:
             # reset event
-
             self.traj_finished_event.clear()
             self.current_goal_id = None
             self.current_goal_result = GoalStatus.LOST
             # send traj and wait 
             self.move_group_arm.execute(plan, wait=False)
             trajectory_time_out = 1.5 * self.get_plan_time(plan)
-            # if trajectory_time_out is less than to seconds, the default value will be 2 seconds 
-            if trajectory_time_out < TrajectoryTimeOutMin : 
+            # if trajectory_time_out is less than 3 seconds, the default value will be 3 seconds 
+            if trajectory_time_out < TrajectoryTimeOutMin:
                 trajectory_time_out = TrajectoryTimeOutMin 
             if self.traj_finished_event.wait(trajectory_time_out):
-                plan = None
-
                 if self.current_goal_result == GoalStatus.SUCCEEDED:
                     return CommandStatus.SUCCESS, "Command has been successfully processed"
                 elif self.current_goal_result == GoalStatus.PREEMPTED:
@@ -58,17 +55,19 @@ class ArmCommander:
                     # if joint_trajectory_controller aborts the goal, it will still try to 
                     # finish executing the trajectory --> so we ask it to stop from here
                     self.set_position_hold_mode()
-                    return CommandStatus.CONTROLLER_PROBLEMS, "Command has been aborted"
-                else: # what else could happen ? 
-                    return CommandStatus.ROS_ERROR, "Error, try to restart."
+                    return CommandStatus.CONTROLLER_PROBLEMS, \
+                        "Command has been aborted due to a collision or a motor not able to follow the given trajectory"
+                else: # problem from ros_control itself
+                    self.current_goal_id = None
+                    return CommandStatus.SHOULD_RESTART, ""
             else:
-                # todo cancel goal
-                plan = None
-                raise RobotCommanderException(CommandStatus.CONTROLLER_PROBLEMS,
-                        "Trajectory timeout - Try to restart the robot")
+                # this timeout will happen if something fails in ros_control
+                # not related to a trajectory failure
+                self.current_goal_id = None
+                return CommandStatus.SHOULD_RESTART, ""
         else:
             raise RobotCommanderException(CommandStatus.NO_PLAN_AVAILABLE,
-                    "You are trying to execute a plan which does't exist")
+                    "You are trying to execute a plan which doesn't exist")
 
     # http://wiki.ros.org/joint_trajectory_controller -> preemption policy
     # Send an empty trajectory from the topic interface
@@ -76,7 +75,6 @@ class ArmCommander:
         msg = JointTrajectory()
         msg.header.stamp = rospy.Time.now()
         msg.points = []
-        rospy.logwarn("SEND POSITION HOLD MODE TO CONTROLLER")
         self.joint_trajectory_publisher.publish(msg)
 
     def stop_current_plan(self):

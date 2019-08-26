@@ -219,10 +219,6 @@ class SequenceAutorun:
         self.calibration_in_progress = msg.calibration_in_progress
     
     def sub_learning_mode(self, msg):
-        if (not self.learning_mode_on) and msg.data:
-            self.activated = False
-            self.cancel_sequence = True
-            self.cancel_sequence_goal()
         self.learning_mode_on = msg.data
 
     def create_response(self, status, message):

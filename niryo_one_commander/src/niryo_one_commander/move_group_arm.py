@@ -73,56 +73,11 @@ class MoveGroupArm:
     """
     
     def compute_plan(self):
-        trajectory_found_but_not_correct = True
-        plan_counter = 0
+        plan = self.arm.plan()
 
-        while trajectory_found_but_not_correct:
-            plan = self.arm.plan()
-            plan_counter += 1
-
-            if not plan.joint_trajectory.points:
-                return None 
-            else:
-                if self.check_trajectory(plan):
-                    trajectory_found_but_not_correct = False
-                    next_plan = plan
-                elif plan_counter > 10: # if 10 plans are not enough, then it has a great chance to continue to plan forever
-                    rospy.logwarn("Moveit trajectory has been found, but acceleration is not stable.")
-                    rospy.logwarn("Max plan tries reach, execute trajectory...")
-                    trajectory_found_but_not_correct = False
-                    next_plan = plan
-                else:
-                    rospy.logwarn("Moveit trajectory has been found, but acceleration is not stable.")
-                    rospy.logwarn("Computing another trajectory...")
-        return(next_plan)
-
-    # see --> https://github.com/ros-planning/moveit/issues/416
-    # Sometimes (on Kinetic) the trajectory will slow down, one or multiple
-    # times, at any moment. Here we check if there are some variations in 
-    # traj accelerations. If no, it means for each axis, vel is going up,
-    # then down (correct case). If yes, we should retry to compute the traj
-    
-    def check_trajectory(self, plan):
-        for i in range(0,6):
-            accs = []
-            for point in plan.joint_trajectory.points:
-                accs.append(point.accelerations[i]) 
-
-            sign_change_counter = 0
-            last_acc = accs[1] # accs[0] is 0.0
-
-            for acc in accs:
-                if (acc == 0.0):
-                    pass
-                else:
-                    if (acc < 0.0 and last_acc > 0.0) or (acc > 0.0 and last_acc < 0.0):
-                        sign_change_counter += 1
-                    last_acc = acc
-
-            if sign_change_counter > 1:
-                return False
-            #rospy.loginfo("Sign change counter : " + str(sign_change_counter))
-        return True
+        if not plan.joint_trajectory.points:
+            return None
+        return plan
 
     def execute(self, plan, wait=False):
         self.arm.execute(plan, wait=wait)

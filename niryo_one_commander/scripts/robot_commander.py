@@ -21,6 +21,7 @@ import rospy, sys
 import moveit_commander
 import actionlib
 import threading
+
 # Lib
 from niryo_one_commander.command_type import CommandType
 from niryo_one_commander.command_status import CommandStatus
@@ -65,14 +66,34 @@ This class handles the arm and tools through a service interface
 class RobotCommander:
 
     def compute_and_execute_plan(self):
-        plan = self.move_group_arm.compute_plan()
-        if not plan : 
-            raise RobotCommanderException(
-                CommandStatus.PLAN_FAILED, "Moveit failed to compute the plan.")
+        status = None
+        message = None
+        tries = 0
+        while True:
+            tries += 1
 
-        self.reset_controller()
-        rospy.loginfo("Send Moveit trajectory")
-        return self.arm_commander.execute_plan(plan)
+            if tries > 3:
+                rospy.logerr("Big failure from the controller. Try to restart the robot")
+                return CommandStatus.ROS_ERROR, "Please restart the robot and try again."
+
+            # if we are re-trying, first stop current plan
+            if tries > 1:
+                self.arm_commander.stop_current_plan()
+                rospy.sleep(0.1)
+            plan = self.move_group_arm.compute_plan()
+            if not plan:
+                raise RobotCommanderException(
+                    CommandStatus.PLAN_FAILED, "Moveit failed to compute the plan.")
+
+            self.reset_controller()
+            rospy.loginfo("Send Moveit trajectory to controller.")
+            status, message = self.arm_commander.execute_plan(plan)
+            
+            if status != CommandStatus.SHOULD_RESTART:
+                break
+            rospy.logwarn("WILL RETRY COMPUTING AND EXECUTING TRAJECTORY.")
+
+        return status, message
 
     def set_plan_and_execute(self, traj):
         self.reset_controller()
@@ -85,6 +106,8 @@ class RobotCommander:
     def reset_controller(self):
         msg = Empty() 
         self.reset_controller_pub.publish(msg)
+        # very important delay to avoid unexpected issues from ros_control
+        rospy.sleep(0.05)
 
     def activate_learning_mode(self, activate):
         try:
@@ -207,8 +230,8 @@ class RobotCommander:
         self.cancel_command()
         return True, "Command stopped"
 
- # robot action server functions 
-    # Check if no other command is being processed
+    # Robot action server functions 
+    # - Check if no other command is being processed
     # - Validate params
     # - Execute command and return status + message
     # - Cancel command if asked
@@ -337,7 +360,7 @@ class RobotCommander:
 
         if not response:
             self.current_goal_handle.set_aborted(result)
-            rospy.loginfo("Execution has been aborted")
+            rospy.logwarn("Execution has been aborted")
         elif response.status == CommandStatus.SUCCESS:
             self.current_goal_handle.set_succeeded(result)
             rospy.loginfo("Goal has been set as succeeded")
@@ -346,12 +369,13 @@ class RobotCommander:
             rospy.loginfo("Goal has been successfully canceled")
         elif response.status == CommandStatus.CONTROLLER_PROBLEMS:
             self.current_goal_handle.set_aborted(result)
-            rospy.loginfo("Controller failed during execution : Goal has been aborted")
+            rospy.logwarn("Controller failed during execution : Goal has been aborted.\n" + \
+                    "This is due to either a collision, or a motor unable to follow a given command" + \
+                    " (overload, extreme positions, ...)")
         else:
             self.current_goal_handle.set_aborted(result)
             rospy.loginfo("Unknown result, goal has been set as aborted")
         self.current_goal_handle = None
-
     
     # Send a cancel signal to Moveit interface
     def cancel_current_command(self):
@@ -359,11 +383,7 @@ class RobotCommander:
             self.cancel_command ()
         except RobotCommanderException:
             rospy.logwarn("Could not cancel current command ")
-    
-
-  # command validation 
-
-       
+            
     def validate_params(self, cmd): 
         cmd_type = cmd.cmd_type
         if cmd_type == CommandType.JOINTS:
@@ -392,7 +412,6 @@ class RobotCommander:
         else:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Wrong command type")
 
-
     def validate_saved_trajectory(self, cmd): 
         rospy.loginfo("Checking saved trajectory validity")
         saved_traj = self.trajectory_manager.get_trajectory(cmd.saved_trajectory_id)
@@ -400,7 +419,6 @@ class RobotCommander:
             raise RobotCommanderException(CommandStatus.INVALID_PARAMETERS, "Saved trajectory  not found") 
         self.parameters_validation.validate_trajectory(saved_traj.trajectory_plan)
          
-
     def validate_saved_position(self, position_name):
         rospy.loginfo("Checking joints validity")
         saved_position = self.pos_manager.get_position(position_name)
@@ -409,14 +427,7 @@ class RobotCommander:
         self.parameters_validation.validate_joints(saved_position.joints)
 
 
-
-
-
-
 if __name__ == '__main__':
     
     pass
-
-
-
 
