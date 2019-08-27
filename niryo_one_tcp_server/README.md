@@ -5,6 +5,10 @@ This a Tcp server built on top of the [Niryo Python API](../niryo_one_python_api
 
 ## Documentation
 
+### Architecture
+
+![Niryo One TCP architecture](img/Niryo&#32;One&#32;TCP&#32;Architecture.jpg)
+
 ### Connection
 
 Port of the server: 40001
@@ -32,10 +36,11 @@ For easier usage and easier debugging, the communication is in ascii format.
         * Example: `OPEN_GRIPPER:OK`
     * `COMMAND:OK,DATA`
         * Example: `DIGITAL_READ:OK,1`
-    * `COMMAND:KO,"REASON"`
-        * Example: `SET_LEARNING_MODE; TRUE, Incorrect command format: "SET_LEARNING_MODE, TRUE"`
+    * `COMMAND:KO,"REASON"
+            * Given: `SET_LEARNING_MODE`
+            * Returned error: `SET_LEARNING_MODE:KO,"Incorrect number of parameter(s) given."`
 
-**Notes:** That means, if you develop you own tcp client, just parse the status ('OK' / 'KO') and act in consequence.
+**Notes:** That means, if you develop you own tcp client, just parse the status ('OK' / 'KO') after your given command and act in consequence.
 
 ### Common error answers
 

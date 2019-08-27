@@ -103,8 +103,9 @@ class CommandInterpreter:
         if not isinstance(command_received, basestring):
             raise ValueError("Cannot interpret command of incorrect type: " + type(command_received))
         split_list = command_received.split(":")
-        if len(split_list) > 2:
+        if len(split_list) != 2:
             rospy.loginfo("Incorrect command format: ", command_received)
+            return command_received + ":KO,Incorrect command format."
         command_string_part = split_list[0].rstrip('\r\n')
         ret_string = command_string_part + ":"
         if command_string_part in self.__commands_dict:
