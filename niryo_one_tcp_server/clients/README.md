@@ -5,7 +5,7 @@ All the clients available in this folder communicate directly with the [TCP serv
 
 ## Available TCP clients
 
-* Python
+* [Python client](python)
 
 **Notes:**
 <br> If you need a specific language client that is not currently proposed, please send an email to c.ducatez@niryo.com, explaining :

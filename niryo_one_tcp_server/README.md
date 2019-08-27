@@ -1,6 +1,6 @@
 # Niryo One Tcp Server
 This a Tcp server built on top of the [Niryo Python API](../niryo_one_python_api).
-<br><br>Programs can communicate through network TCP with the robots in any language available. (see [clients](client) folder for available clients)
+<br><br>Programs can communicate through network TCP with the robots in any language available. (see [clients](clients) folder for available clients)
 <br>It offers a simple way for developers to create programs for robot to control them via remote communication on a computer, on a mobile or any device with network facilities.
 
 ## Documentation
@@ -36,9 +36,9 @@ For easier usage and easier debugging, the communication is in ascii format.
         * Example: `OPEN_GRIPPER:OK`
     * `COMMAND:OK,DATA`
         * Example: `DIGITAL_READ:OK,1`
-    * `COMMAND:KO,"REASON"
-            * Given: `SET_LEARNING_MODE`
-            * Returned error: `SET_LEARNING_MODE:KO,"Incorrect number of parameter(s) given."`
+    * `COMMAND:KO,"REASON"`
+        * Given: `SET_LEARNING_MODE`
+        * Returned error: `SET_LEARNING_MODE:KO,"Incorrect number of parameter(s) given."`
 
 **Notes:** That means, if you develop you own tcp client, just parse the status ('OK' / 'KO') after your given command and act in consequence.
 
