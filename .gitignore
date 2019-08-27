@@ -7,4 +7,5 @@ tmp_code_to_execute/
 .vscode
 *_test.py
 /CMakeLists.txt
+*.egg-info
 

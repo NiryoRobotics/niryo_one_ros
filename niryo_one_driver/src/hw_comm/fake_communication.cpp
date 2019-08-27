@@ -89,7 +89,7 @@ bool FakeCommunication::isConnectionOk()
 int FakeCommunication::allowMotorsCalibrationToStart(int mode, std::string &result_message)
 {
     ROS_INFO("Motor calibration with mode : %d", mode);
-    return 1;
+    return 200;
 }
 
 void FakeCommunication::requestNewCalibration() 
