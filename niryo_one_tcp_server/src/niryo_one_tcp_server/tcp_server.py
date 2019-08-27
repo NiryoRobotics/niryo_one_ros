@@ -123,7 +123,7 @@ class TcpServer:
         try:
             received = self.__client.recv(READ_SIZE)
         except socket.error as e:
-            rospy.loginfo(e)
+            rospy.logwarn("Error while receiving answer: " + str(e))
             return None
         if not received:
             return None
@@ -134,4 +134,4 @@ class TcpServer:
             try:
                 self.__client.send(content)
             except socket.error as e:
-                rospy.loginfo("Error while sending answer to client: " + str(e))
+                rospy.logwarn("Error while sending answer to client: " + str(e))

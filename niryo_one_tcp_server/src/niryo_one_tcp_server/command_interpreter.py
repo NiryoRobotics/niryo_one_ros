@@ -101,10 +101,11 @@ class CommandInterpreter:
 
     def interpret_command(self, command_received):
         if not isinstance(command_received, basestring):
+            rospy.logerr("Cannot interpret command of incorrect type: " + type(command_received))
             raise ValueError("Cannot interpret command of incorrect type: " + type(command_received))
         split_list = command_received.split(":")
-        if len(split_list) != 2:
-            rospy.loginfo("Incorrect command format: ", command_received)
+        if len(split_list) > 2:
+            rospy.logwarn("Incorrect command format: " + command_received)
             return command_received + ":KO,Incorrect command format."
         command_string_part = split_list[0].rstrip('\r\n')
         ret_string = command_string_part + ":"
@@ -119,13 +120,13 @@ class CommandInterpreter:
                     ret = self.__commands_dict[command_string_part]()
                 return ret_string + ret
             except TypeError as e:
-                rospy.loginfo("Incorrect number of parameter(s) given. " + str(e))
+                rospy.logwarn("Incorrect number of parameter(s) given. " + str(e))
                 return ret_string + "KO,\"" + "Incorrect number of parameter(s) given.\""
             except python_api.NiryoOneException as e:
-                rospy.loginfo(e)
+                rospy.logwarn(e)
                 return ret_string + "KO,\"" + str(e) + "\""
             except TcpCommandException as e:
-                rospy.loginfo("Incorrect parameter(s) given to : " + command_string_part + " function. " + str(e))
+                rospy.logwarn("Incorrect parameter(s) given to : " + command_string_part + " function. " + str(e))
                 return ret_string + "KO,\"" + str(e) + "\""
         else:
             return command_string_part + ": " + "KO,\"" + "Unknown command\""
@@ -171,7 +172,7 @@ class CommandInterpreter:
         try:
             joints_value_array = map(float, parameters_string_array)
         except ValueError as e:
-            rospy.loginfo(str(e))
+            rospy.logwarn(str(e))
             self.__raise_exception_expected_type("float", parameters_string_array)
         else:
             self.__niryo_one.move_joints(joints_value_array)
@@ -186,7 +187,7 @@ class CommandInterpreter:
         try:
             parameters_value_array = map(float, parameters_string_array)
         except ValueError as e:
-            rospy.loginfo(str(e))
+            rospy.logwarn(str(e))
             self.__raise_exception_expected_type("float", parameters_string_array)
         else:
             self.__niryo_one.move_pose(*parameters_value_array)
@@ -207,7 +208,7 @@ class CommandInterpreter:
         try:
             value = float(parameters_string_array[1])
         except ValueError as e:
-            rospy.loginfo(str(e))
+            rospy.logwarn(str(e))
             self.__raise_exception_expected_type("float", parameters_string_array[1])
         else:
             self.__niryo_one.shift_pose(axis, value)
@@ -217,7 +218,7 @@ class CommandInterpreter:
         try:
             value = int(param_string)
         except ValueError as e:
-            rospy.loginfo(str(e))
+            rospy.logwarn(str(e))
             self.__raise_exception_expected_type("integer", param_string)
         else:
             if value < 0 or value > 100:
@@ -317,7 +318,7 @@ class CommandInterpreter:
         try:
             speed = int(speed_string)
         except ValueError as e:
-            rospy.loginfo(str(e))
+            rospy.logwarn(str(e))
             self.__raise_exception_expected_type("integer", speed_string)
         else:
             self.__niryo_one.open_gripper(gripper_id, speed)
@@ -339,7 +340,7 @@ class CommandInterpreter:
         try:
             speed = int(speed_string)
         except ValueError as e:
-            rospy.loginfo(str(e))
+            rospy.logwarn(str(e))
             self.__raise_exception_expected_type("integer", speed_string)
         else:
             self.__niryo_one.close_gripper(gripper_id, speed)
