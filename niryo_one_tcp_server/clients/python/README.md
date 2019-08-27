@@ -1,6 +1,6 @@
 # niryo_one_python_tcp_client
-Tcp client that communicates with the [tcp server](../../README.md) of the Niryo One
-<br>**Notes:** The TCP server use the underlying [python_api](../../../niryo_one_python_api/README.md) package so the functions available will be similar with this package but may differ in some minor terms, please refer to the current documentation.
+Tcp client that communicates with the [tcp server](../..) of the Niryo One
+<br>**Notes:** The TCP server use the underlying [python_api](../../../niryo_one_python_api) package so the functions available will be similar with this package but may differ in some minor terms, please refer to the current documentation.
 
 ## Connection
 

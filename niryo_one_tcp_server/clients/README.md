@@ -1,6 +1,6 @@
 # TCP clients
 
-All the clients available in this folder communicate directly with the [TCP server](../README.md) of the Niryo One.
+All the clients available in this folder communicate directly with the [TCP server](..) of the Niryo One.
 <br>**Notes:** New TCP client available may arrived in the future
 
 ## Available TCP clients

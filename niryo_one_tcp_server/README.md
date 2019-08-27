@@ -1,5 +1,5 @@
 # Niryo One Tcp Server
-This a Tcp server built on top of the [Niryo Python API](../niryo_one_python_api/README.md).
+This a Tcp server built on top of the [Niryo Python API](../niryo_one_python_api).
 <br><br>Programs can communicate through network TCP with the robots in any language available. (see [clients](client) folder for available clients)
 <br>It offers a simple way for developers to create programs for robot to control them via remote communication on a computer, on a mobile or any device with network facilities.
 
@@ -50,7 +50,7 @@ For easier usage and easier debugging, the communication is in ascii format.
 
 ### Clients
 
-For already existing clients, please go to the [clients](clients/README.md) folder and check if there's an already existing client that communicate with the Niryo One across TCP/IP.
+For already existing clients, please go to the [clients](clients) folder and check if there's an already existing client that communicate with the Niryo One across TCP/IP.
 
 ### Commands
 
