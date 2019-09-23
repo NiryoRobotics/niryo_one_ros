@@ -38,7 +38,7 @@ def get_forward_kinematic(joints):
         moveit_fk = rospy.ServiceProxy('compute_fk', GetPositionFK)
         fk_link = ['base_link', 'tool_link']
         joint_names = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
-        header = Header(0,rospy.Time.now(),"/ground_link")
+        header = Header(0,rospy.Time.now(),"/world")
         rs = RobotState()
         rs.joint_state.name = joint_names
         rs.joint_state.position = joints

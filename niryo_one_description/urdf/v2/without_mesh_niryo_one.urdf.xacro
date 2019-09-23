@@ -52,7 +52,7 @@
 
 	<!-- Links -->
 
-    <link name="ground_link"/>
+    <link name="world"/>
 
     <link name="base_link">
 	</link>
@@ -81,8 +81,8 @@
 
 	<!--Joints -->
 
-    <joint name="ground_joint" type="fixed">
-        <parent link="ground_link" />
+    <joint name="joint_world" type="fixed">
+        <parent link="world" />
         <child link="base_link" />
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>

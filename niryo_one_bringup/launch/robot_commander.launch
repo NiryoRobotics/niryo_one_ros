@@ -17,7 +17,7 @@
   
     <!-- Robot commander -->
     <node name="niryo_one_commander" pkg="niryo_one_commander" type="niryo_one_commander_node.py" output="screen" respawn="false">
-        <param name="reference_frame"            type="string" value="ground_link" />
+        <param name="reference_frame"            type="string" value="world" />
         <param name="move_group_commander_name"  type="string" value="arm" />
         <param name="allow_replanning"           type="bool"   value="true" />
         <param name="goal_joint_tolerance"       type="double" value="0.0001" />
