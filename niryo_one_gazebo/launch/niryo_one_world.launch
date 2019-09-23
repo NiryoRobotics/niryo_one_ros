@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Gazebo world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+    
+    <!-- URDF -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro" />
+
+    <!-- Gazebo model - add a delay to let the controller start properly -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" 
+        args="-param robot_description -urdf -model niryo_one" respawn="false" output="screen"/>
+        
+</launch>
