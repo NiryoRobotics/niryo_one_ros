@@ -1,5 +1,7 @@
 # Niryo One ROS stack
 
+Licensed under GPLv3 (see [LICENSE file](https://github.com/NiryoRobotics/niryo_one_ros/blob/master/LICENSE))
+
 (Niryo One : [https://niryo.com](https://niryo.com/?utm_source=github))
 
 ![niryo one rviz simulation](https://niryo.com/wp-content/uploads/2018/08/ros_rviz_niryo_one_colors.png)
