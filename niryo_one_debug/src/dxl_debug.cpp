@@ -53,12 +53,18 @@ int main (int argc, char **argv)
             ("id,i", po::value<int>()->default_value(0), "Dxl motor ID")
             ("scan", "Scan all Dxl motors on the bus")
             ("ping", "ping specific ID")
-            ("set-register", po::value<std::vector<int>>(), "Set a value to a register (args: reg_addr, value, size)");
+            ("set-register", "Set a value to a register (args: reg_addr, value, size)")
+            ("get-register", "Get the value of a register (args: reg_addr, size)");
+
+        po::options_description parserOptions("Options");
+        parserOptions.add(description);
+        parserOptions.add_options()
+            ("args", po::value<std::vector<int>>(), "reg_addr, [value], size");
 
         po::positional_options_description p;
-        p.add("set-register", -1);
+        p.add("args", -1);
         po::variables_map vars;
-        po::store(po::command_line_parser(argc, argv).options(description).positional(p).run(), vars);
+        po::store(po::command_line_parser(argc, argv).options(parserOptions).positional(p).run(), vars);
         po::notify(vars);
 
         // Display usage if no args or --help
@@ -99,7 +105,7 @@ int main (int argc, char **argv)
             }
         }
         else if (vars.count("set-register")) {
-            std::vector<int> params = vars["set-register"].as<std::vector<int>>();
+            std::vector<int> params = vars["args"].as<std::vector<int>>();
             if (params.size() != 3) {
                 printf("ERROR: set-register needs 3 arguments (reg_addr, value, size)\n");
             }
@@ -108,6 +114,18 @@ int main (int argc, char **argv)
                 printf("Register address: %d, Value: %d, Size (bytes): %d\n",
                         params.at(0), params.at(1), params.at(2));
                 dxlTools.setRegister(id, params.at(0), params.at(1), params.at(2));
+            }
+        }
+        else if (vars.count("get-register")) {
+            std::vector<int> params = vars["args"].as<std::vector<int>>();
+            if (params.size() != 2) {
+                printf("ERROR: get-register needs 2 arguments (reg_addr, size)\n");
+            }
+            else {
+                printf("--> GET REGISTER for Motor (ID:%d)\n", id);
+                printf("Register address: %d, Size (bytes): %d\n",
+                        params.at(0), params.at(1));
+                dxlTools.getRegister(id, params.at(0), params.at(1));
             }
         }
         else {
