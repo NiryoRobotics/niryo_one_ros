@@ -134,11 +134,28 @@ void DxlTools::getRegister(int id, int reg_address, int size)
 
     if (dxl_comm_result != COMM_SUCCESS) {
         printf("Failed to get register: result %d, error %d\n", dxl_comm_result, error);
-        packetHandler.printTxRxResult(dxl_comm_result);
-        packetHandler.printRxPacketError(error);
+        packetHandler->printTxRxResult(dxl_comm_result);
+        packetHandler->printRxPacketError(error);
     }
     else {
         printf("Register value = %d\n", value);
+    }
+}
+
+void DxlTools::factoryReset(int id)
+{
+    int dxl_comm_result = COMM_TX_FAIL;
+    uint8_t error = 0;
+
+    dxl_comm_result = packetHandler->factoryReset(portHandler, (uint8_t) id, (uint8_t) 0xFF, &error);
+
+    if (dxl_comm_result != COMM_SUCCESS) {
+        printf("Factory reset failed: result %d, error %d\n", dxl_comm_result, error);
+        packetHandler->printTxRxResult(dxl_comm_result);
+        packetHandler->printRxPacketError(error);
+    }
+    else {
+        printf("Factory reset successful (id and baudrate reset)\n");
     }
 }
 

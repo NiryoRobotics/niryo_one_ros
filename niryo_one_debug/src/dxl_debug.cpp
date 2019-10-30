@@ -54,7 +54,8 @@ int main (int argc, char **argv)
             ("scan", "Scan all Dxl motors on the bus")
             ("ping", "ping specific ID")
             ("set-register", "Set a value to a register (args: reg_addr, value, size)")
-            ("get-register", "Get the value of a register (args: reg_addr, size[, ...])");
+            ("get-register", "Get the value of a register (args: reg_addr, size[, ...])")
+            ("factory-reset", "Reset the motor to factory settings (id -> 1, baudrate -> 57600)");
 
         po::options_description parserOptions("Options");
         parserOptions.add(description);
@@ -131,6 +132,10 @@ int main (int argc, char **argv)
                     reg_address += params.at(idx);
                 }
             }
+        }
+        else if (vars.count("factory-reset")) {
+            printf("--> FACTORY RESET for Motor (ID:%d)\n", id);
+            dxlTools.factoryReset(id);
         }
         else {
             std::cout << description << "\n";
