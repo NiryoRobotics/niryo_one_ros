@@ -54,7 +54,7 @@ int main (int argc, char **argv)
             ("scan", "Scan all Dxl motors on the bus")
             ("ping", "ping specific ID")
             ("set-register", "Set a value to a register (args: reg_addr, value, size)")
-            ("get-register", "Get the value of a register (args: reg_addr, size)");
+            ("get-register", "Get the value of a register (args: reg_addr, size[, ...])");
 
         po::options_description parserOptions("Options");
         parserOptions.add(description);
@@ -118,14 +118,18 @@ int main (int argc, char **argv)
         }
         else if (vars.count("get-register")) {
             std::vector<int> params = vars["args"].as<std::vector<int>>();
-            if (params.size() != 2) {
-                printf("ERROR: get-register needs 2 arguments (reg_addr, size)\n");
+            if (params.size() < 2) {
+                printf("ERROR: get-register needs 2 or more arguments (reg_addr, size[, ...])\n");
             }
             else {
                 printf("--> GET REGISTER for Motor (ID:%d)\n", id);
-                printf("Register address: %d, Size (bytes): %d\n",
-                        params.at(0), params.at(1));
-                dxlTools.getRegister(id, params.at(0), params.at(1));
+                int reg_address = params.at(0);
+                for (int idx = 1; idx < params.size(); idx++) {
+                    printf("Register address: %d, Size (bytes): %d\n",
+                            reg_address, params.at(idx));
+                    dxlTools.getRegister(id, reg_address, params.at(idx));
+                    reg_address += params.at(idx);
+                }
             }
         }
         else {
