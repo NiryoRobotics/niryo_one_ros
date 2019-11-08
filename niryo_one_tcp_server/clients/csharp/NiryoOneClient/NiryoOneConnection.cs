@@ -65,9 +65,7 @@ namespace NiryoOneClient
                 cmd = $"{ToSnakeCaseUpper(command_type)}:{string.Join(",", args)}";
             else
                 cmd = ToSnakeCaseUpper(command_type);
-            Console.WriteLine(cmd);
             await WriteLineAsync(cmd);
-            Console.WriteLine("r");
         }
 
         protected async Task<string> ReceiveAnswerAsync(string command_type)
