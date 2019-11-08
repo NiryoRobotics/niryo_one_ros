@@ -4,6 +4,15 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>NiryoOneClient</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>rickardraysearch</Authors>
+    <Company>Niryo</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageDescription>A tcp client in C# that manages the tcp communication with a Niryo One robot</PackageDescription>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="4.6.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />

@@ -1,4 +1,4 @@
-﻿/*  MIT License
+/*  MIT License
 
     Copyright (c) 2019 Niryo
 
@@ -22,36 +22,15 @@
  */
 
 using System;
-using System.Net.Sockets;
-using System.Threading.Tasks;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace NiryoOneClient {
-    public enum CalibrateMode {
-        AUTO,
-        MANUAL
-    }
-
-    public class NiryoOneClient {
-        private TcpClient _client;
-        private int _port;
-        private string _server;
-
-        public NiryoOneClient (string server, int port) {
-            _server = server;
-            _port = port;
-        }
-
-        public async Task<NiryoOneConnection> Connect () {
-            if (_client != null) {
-                _client.Close ();
-                _client.Dispose ();
-                _client = null;
-            }
-
-            _client = new TcpClient ();
-            await _client.ConnectAsync (_server, _port);
-            var stream = _client.GetStream ();
-            return new NiryoOneConnection (new System.IO.StreamReader (stream), new System.IO.StreamWriter (stream));
-        }
+    public enum RobotTool {
+        GRIPPER_1,
+        GRIPPER_2,
+        GRIPPER_3,
+        VACUUM_PUMP_1,
+        ELECTROMAGNET_1
     }
 }
