@@ -87,7 +87,7 @@ namespace NiryoOneClient
 
         /// <summary>
         /// Request calibration.
-        /// <param name="mode">Whether to request automatic or manual calibration<param>
+        /// <param name="mode">Whether to request automatic or manual calibration</param>
         /// </summary>
         public async Task Calibrate(CalibrateMode mode)
         {
@@ -157,7 +157,7 @@ namespace NiryoOneClient
 
         /// <summary>
         /// Configure a GPIO pin for input or output.
-        /// <summary>
+        /// </summary>
         public async Task SetPinMode(RobotPin pin, PinMode mode)
         {
             await SendCommandAsync(nameof(SetPinMode), pin.ToString(), mode.ToString());

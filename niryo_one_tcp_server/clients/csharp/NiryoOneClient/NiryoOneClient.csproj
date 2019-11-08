@@ -13,6 +13,10 @@
     <PackageDescription>A tcp client in C# that manages the tcp communication with a Niryo One robot</PackageDescription>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="4.6.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
