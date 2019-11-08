@@ -18,6 +18,22 @@
             }
         },
         {
+            "label": "pack",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "pack",
+                "${workspaceFolder}/NiryoOneClient.sln",
+                "--configuration", "Release",
+                "--include-symbols"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "publish",
             "command": "dotnet",
             "type": "process",
