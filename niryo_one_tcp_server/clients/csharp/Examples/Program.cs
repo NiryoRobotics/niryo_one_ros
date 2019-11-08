@@ -32,7 +32,13 @@ namespace Examples
     {
         public static async Task Main(string[] args)
         {
-            string server = args.FirstOrDefault() ?? "10.10.10.10";
+            string server = "10.10.10.10";
+
+            if (args.Length == 1 || args.Length == 7)
+            {
+                server = args.FirstOrDefault();
+                args = args.Skip(1).ToArray();
+            }
 
             using (var niryoOneClient = new NiryoOneClient.NiryoOneClient(server))
             {
@@ -41,6 +47,8 @@ namespace Examples
                 Console.WriteLine($"Connected!");
 
                 PoseObject initialPose = null;
+                if (args.Length == 6)
+                    initialPose = new PoseObject(args.Select(f => float.Parse(f)).ToArray());
 
                 Console.WriteLine("Calibrating...");
                 await niryo.Calibrate(CalibrateMode.AUTO);
