@@ -41,7 +41,7 @@ namespace NiryoOneClient
         private NetworkStream _stream;
         private NiryoOneConnection _connection;
 
-        public NiryoOneClient(string server, int port)
+        public NiryoOneClient(string server, int port = 40001)
         {
             _server = server;
             _port = port;

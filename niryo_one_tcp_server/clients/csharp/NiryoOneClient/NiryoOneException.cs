@@ -23,9 +23,12 @@
 
 using System;
 
-namespace NiryoOneClient {
-    public class NiryoOneException : Exception {
-        public NiryoOneException (string reason) {
+namespace NiryoOneClient
+{
+    public class NiryoOneException : Exception
+    {
+        public NiryoOneException(string reason)
+        {
             Reason = reason;
         }
 

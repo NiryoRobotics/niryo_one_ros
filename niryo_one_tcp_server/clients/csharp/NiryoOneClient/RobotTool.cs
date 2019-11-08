@@ -25,8 +25,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace NiryoOneClient {
-    public enum RobotTool {
+namespace NiryoOneClient
+{
+    public enum RobotTool
+    {
         GRIPPER_1,
         GRIPPER_2,
         GRIPPER_3,
