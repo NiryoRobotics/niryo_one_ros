@@ -25,33 +25,51 @@ using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace NiryoOneClient {
-    public enum CalibrateMode {
+namespace NiryoOneClient
+{
+    public enum CalibrateMode
+    {
         AUTO,
         MANUAL
     }
 
-    public class NiryoOneClient {
+    public class NiryoOneClient : IDisposable
+    {
         private TcpClient _client;
         private int _port;
         private string _server;
+        private NetworkStream _stream;
+        private NiryoOneConnection _connection;
 
-        public NiryoOneClient (string server, int port) {
+        public NiryoOneClient(string server, int port)
+        {
             _server = server;
             _port = port;
         }
 
-        public async Task<NiryoOneConnection> Connect () {
-            if (_client != null) {
-                _client.Close ();
-                _client.Dispose ();
+        public async Task<NiryoOneConnection> Connect()
+        {
+            if (_client != null)
+            {
+                _client.Close();
                 _client = null;
             }
 
-            _client = new TcpClient ();
-            await _client.ConnectAsync (_server, _port);
-            var stream = _client.GetStream ();
-            return new NiryoOneConnection (new System.IO.StreamReader (stream), new System.IO.StreamWriter (stream));
+            _client = new TcpClient();
+            await _client.ConnectAsync(_server, _port);
+            _stream = _client.GetStream();
+            _connection = new NiryoOneConnection(new System.IO.StreamReader(_stream), new System.IO.StreamWriter(_stream));
+            return _connection;
+        }
+
+        public void Dispose()
+        {
+            _stream.Close();
+            _stream.Dispose();
+            _stream = null;
+            _client.Close();
+            _client.Dispose();
+            _client = null;
         }
     }
 }
