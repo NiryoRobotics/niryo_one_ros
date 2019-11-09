@@ -1,3 +1,4 @@
+
 /*  MIT License
 
     Copyright (c) 2019 Niryo
@@ -51,18 +52,13 @@ namespace NiryoOneClient
             return await _textReader.ReadLineAsync();
         }
 
-        protected string ToSnakeCaseUpper(string s)
-        {
-            return string.Concat(s.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToUpper();
-        }
-
         protected async Task SendCommandAsync(string command_type, params string[] args)
         {
             string cmd;
             if (args.Any())
-                cmd = $"{ToSnakeCaseUpper(command_type)}:{string.Join(",", args)}";
+                cmd = $"{command_type}:{string.Join(",", args)}";
             else
-                cmd = ToSnakeCaseUpper(command_type);
+                cmd = command_type;
             await WriteLineAsync(cmd);
         }
 
@@ -72,7 +68,7 @@ namespace NiryoOneClient
             result = result.TrimEnd('\n');
             var colonSplit = result.Split(':', 2);
             var cmd = colonSplit[0];
-            if (cmd != ToSnakeCaseUpper(command_type))
+            if (cmd != command_type)
                 throw new NiryoOneException("Wrong command response received.");
             var commaSplit2 = colonSplit[1].Split(',', 2);
             var status = commaSplit2[0];
@@ -91,8 +87,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task Calibrate(CalibrateMode mode)
         {
-            await SendCommandAsync(nameof(Calibrate), mode.ToString());
-            await ReceiveAnswerAsync(nameof(Calibrate));
+            await SendCommandAsync("CALIBRATE", mode.ToString());
+            await ReceiveAnswerAsync("CALIBRATE");
         }
 
         /// <summary>
@@ -101,8 +97,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task SetLearningMode(bool mode)
         {
-            await SendCommandAsync(nameof(SetLearningMode), mode.ToString().ToUpper());
-            await ReceiveAnswerAsync(nameof(SetLearningMode));
+            await SendCommandAsync("SET_LEARNING_MODE", mode.ToString().ToUpper());
+            await ReceiveAnswerAsync("SET_LEARNING_MODE");
         }
 
         /// <summary>
@@ -111,8 +107,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task MoveJoints(RobotJoints joints)
         {
-            await SendCommandAsync(nameof(MoveJoints), string.Join(',', joints));
-            await ReceiveAnswerAsync(nameof(MoveJoints));
+            await SendCommandAsync("MOVE_JOINTS", string.Join(',', joints));
+            await ReceiveAnswerAsync("MOVE_JOINTS");
         }
 
         /// <summary>
@@ -121,8 +117,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task MovePose(PoseObject pose)
         {
-            await SendCommandAsync(nameof(MovePose), string.Join(',', pose));
-            await ReceiveAnswerAsync(nameof(MovePose));
+            await SendCommandAsync("MOVE_POSE", string.Join(',', pose));
+            await ReceiveAnswerAsync("MOVE_POSE");
         }
 
         /// <summary>
@@ -132,8 +128,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task ShiftPose(RobotAxis axis, float value)
         {
-            await SendCommandAsync(nameof(ShiftPose), axis.ToString(), value.ToString());
-            await ReceiveAnswerAsync(nameof(ShiftPose));
+            await SendCommandAsync("SHIFT_POSE", axis.ToString(), value.ToString());
+            await ReceiveAnswerAsync("SHIFT_POSE");
         }
 
         /// <summary>
@@ -142,8 +138,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task SetArmMaxVelocity(int velocity)
         {
-            await SendCommandAsync(nameof(SetArmMaxVelocity), velocity.ToString());
-            await ReceiveAnswerAsync(nameof(SetArmMaxVelocity));
+            await SendCommandAsync("SET_ARM_MAX_VELOCITY", velocity.ToString());
+            await ReceiveAnswerAsync("SET_ARM_MAX_VELOCITY");
         }
 
         /// <summary>
@@ -151,8 +147,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task EnableJoystick(bool mode)
         {
-            await SendCommandAsync(nameof(EnableJoystick), mode.ToString().ToUpper());
-            await ReceiveAnswerAsync(nameof(EnableJoystick));
+            await SendCommandAsync("ENABLE_JOYSTICK", mode.ToString().ToUpper());
+            await ReceiveAnswerAsync("ENABLE_JOYSTICK");
         }
 
         /// <summary>
@@ -160,8 +156,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task SetPinMode(RobotPin pin, PinMode mode)
         {
-            await SendCommandAsync(nameof(SetPinMode), pin.ToString(), mode.ToString());
-            await ReceiveAnswerAsync(nameof(SetPinMode));
+            await SendCommandAsync("SET_PIN_MODE", pin.ToString(), mode.ToString());
+            await ReceiveAnswerAsync("SET_PIN_MODE");
         }
 
         /// <summary>
@@ -169,8 +165,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task DigitalWrite(RobotPin pin, DigitalState state)
         {
-            await SendCommandAsync(nameof(DigitalWrite), pin.ToString(), state.ToString());
-            await ReceiveAnswerAsync(nameof(DigitalWrite));
+            await SendCommandAsync("DIGITAL_WRITE", pin.ToString(), state.ToString());
+            await ReceiveAnswerAsync("DIGITAL_WRITE");
         }
 
         /// <summary>
@@ -178,8 +174,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task<DigitalState> DigitalRead(RobotPin pin)
         {
-            await SendCommandAsync(nameof(DigitalRead), pin.ToString());
-            var state = await ReceiveAnswerAsync(nameof(DigitalRead));
+            await SendCommandAsync("DIGITAL_READ", pin.ToString());
+            var state = await ReceiveAnswerAsync("DIGITAL_READ");
             return (DigitalState)Enum.Parse(typeof(DigitalState), state);
         }
 
@@ -188,8 +184,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task ChangeTool(RobotTool tool)
         {
-            await SendCommandAsync(nameof(ChangeTool), tool.ToString());
-            await ReceiveAnswerAsync(nameof(ChangeTool));
+            await SendCommandAsync("CHANGE_TOOL", tool.ToString());
+            await ReceiveAnswerAsync("CHANGE_TOOL");
         }
 
         /// <summary>
@@ -199,8 +195,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task OpenGripper(RobotTool gripper, int speed)
         {
-            await SendCommandAsync(nameof(OpenGripper), gripper.ToString(), speed.ToString());
-            await ReceiveAnswerAsync(nameof(OpenGripper));
+            await SendCommandAsync("OPEN_GRIPPER", gripper.ToString(), speed.ToString());
+            await ReceiveAnswerAsync("OPEN_GRIPPER");
         }
 
         /// <summary>
@@ -210,8 +206,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task CloseGripper(RobotTool gripper, int speed)
         {
-            await SendCommandAsync(nameof(CloseGripper), gripper.ToString(), speed.ToString());
-            await ReceiveAnswerAsync(nameof(CloseGripper));
+            await SendCommandAsync("CLOSE_GRIPPER", gripper.ToString(), speed.ToString());
+            await ReceiveAnswerAsync("CLOSE_GRIPPER");
         }
 
         /// <summary>
@@ -220,8 +216,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task PullAirVacuumPump(RobotTool vacuumPump)
         {
-            await SendCommandAsync(nameof(PullAirVacuumPump), vacuumPump.ToString());
-            await ReceiveAnswerAsync(nameof(PullAirVacuumPump));
+            await SendCommandAsync("PULL_AIR_VACUUM_PUMP", vacuumPump.ToString());
+            await ReceiveAnswerAsync("PULL_AIR_VACUUM_PUMP");
         }
 
         /// <summary>
@@ -230,8 +226,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task PushAirVacuumPump(RobotTool vacuumPump)
         {
-            await SendCommandAsync(nameof(PushAirVacuumPump), vacuumPump.ToString());
-            await ReceiveAnswerAsync(nameof(PushAirVacuumPump));
+            await SendCommandAsync("PUSH_AIR_VACUUM_PUMP", vacuumPump.ToString());
+            await ReceiveAnswerAsync("PUSH_AIR_VACUUM_PUMP");
         }
 
         /// <summary>
@@ -241,8 +237,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task SetupElectromagnet(RobotTool tool, RobotPin pin)
         {
-            await SendCommandAsync(nameof(SetupElectromagnet), tool.ToString(), pin.ToString());
-            await ReceiveAnswerAsync(nameof(SetupElectromagnet));
+            await SendCommandAsync("SETUP_ELECTROMAGNET", tool.ToString(), pin.ToString());
+            await ReceiveAnswerAsync("SETUP_ELECTROMAGNET");
         }
 
         /// <summary>
@@ -252,8 +248,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task ActivateElectromagnet(RobotTool tool, RobotPin pin)
         {
-            await SendCommandAsync(nameof(ActivateElectromagnet), tool.ToString(), pin.ToString());
-            await ReceiveAnswerAsync(nameof(ActivateElectromagnet));
+            await SendCommandAsync("ACTIVATE_ELECTROMAGNET", tool.ToString(), pin.ToString());
+            await ReceiveAnswerAsync("ACTIVATE_ELECTROMAGNET");
         }
 
         /// <summary>
@@ -263,8 +259,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task DeactivateElectromagnet(RobotTool tool, RobotPin pin)
         {
-            await SendCommandAsync(nameof(DeactivateElectromagnet), tool.ToString(), pin.ToString());
-            await ReceiveAnswerAsync(nameof(DeactivateElectromagnet));
+            await SendCommandAsync("DEACTIVATE_ELECTROMAGNET", tool.ToString(), pin.ToString());
+            await ReceiveAnswerAsync("DEACTIVATE_ELECTROMAGNET");
         }
 
         /// <summary>
@@ -272,8 +268,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task<RobotJoints> GetJoints()
         {
-            await SendCommandAsync(nameof(GetJoints));
-            var joints = await ReceiveAnswerAsync(nameof(GetJoints));
+            await SendCommandAsync("GET_JOINTS");
+            var joints = await ReceiveAnswerAsync("GET_JOINTS");
             return RobotJoints.Parse(joints);
         }
 
@@ -282,8 +278,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task<PoseObject> GetPose()
         {
-            await SendCommandAsync(nameof(GetPose));
-            var pose = await ReceiveAnswerAsync(nameof(GetPose));
+            await SendCommandAsync("GET_POSE");
+            var pose = await ReceiveAnswerAsync("GET_POSE");
             return PoseObject.Parse(pose);
         }
 
@@ -292,8 +288,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task<HardwareStatus> GetHardwareStatus()
         {
-            await SendCommandAsync(nameof(GetHardwareStatus));
-            var status = await ReceiveAnswerAsync(nameof(GetHardwareStatus));
+            await SendCommandAsync("GET_HARDWARE_STATUS");
+            var status = await ReceiveAnswerAsync("GET_HARDWARE_STATUS");
             return HardwareStatus.Parse(status);
         }
 
@@ -302,8 +298,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task<bool> GetLearningMode()
         {
-            await SendCommandAsync(nameof(GetLearningMode));
-            var mode = await ReceiveAnswerAsync(nameof(GetLearningMode));
+            await SendCommandAsync("GET_LEARNING_MODE");
+            var mode = await ReceiveAnswerAsync("GET_LEARNING_MODE");
             return bool.Parse(mode);
         }
 
@@ -312,8 +308,8 @@ namespace NiryoOneClient
         /// </summary>
         public async Task<DigitalPinObject[]> GetDigitalIoState()
         {
-            await SendCommandAsync(nameof(GetDigitalIoState));
-            var state = await ReceiveAnswerAsync(nameof(GetDigitalIoState));
+            await SendCommandAsync("GET_DIGITAL_IO_STATE");
+            var state = await ReceiveAnswerAsync("GET_DIGITAL_IO_STATE");
 
             var regex = new Regex("\\[[0-9]+, '[^']*', [0-9]+, [0-9+]\\]");
             var matches = regex.Matches(state);
