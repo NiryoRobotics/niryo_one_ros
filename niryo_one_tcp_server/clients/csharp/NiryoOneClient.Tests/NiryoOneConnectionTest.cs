@@ -306,12 +306,12 @@ namespace NiryoOneClient.Tests
         }
 
         [TestMethod]
-        public async Task GetDigitalIoState_Sample_Works()
+        public async Task GetDigitalIOState_Sample_Works()
         {
             _streamReader.ReadLineAsync().Returns(Task.FromResult(
                 "GET_DIGITAL_IO_STATE:OK,[2, '1A', 1, 1],[3, '1B', 1, 1],[16, '1C', 1, 1],[26, '2A', 1, 1],[19, '2B', 1, 1],[6, '2C', 1, 1],[12, 'SW1', 0, 0],[13, 'SW2', 0, 0]"
             ));
-            var state = await _connection.GetDigitalIoState();
+            var state = await _connection.GetDigitalIOState();
             Assert.AreEqual(2, state[0].PinId);
             Assert.AreEqual("1A", state[0].Name);
             Assert.AreEqual(PinMode.INPUT, state[0].Mode);

@@ -306,7 +306,7 @@ namespace NiryoOneClient
         /// <summary>
         /// Get the current state of the digital io pins.
         /// </summary>
-        public async Task<DigitalPinObject[]> GetDigitalIoState()
+        public async Task<DigitalPinObject[]> GetDigitalIOState()
         {
             await SendCommandAsync("GET_DIGITAL_IO_STATE");
             var state = await ReceiveAnswerAsync("GET_DIGITAL_IO_STATE");

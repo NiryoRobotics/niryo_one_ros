@@ -63,9 +63,9 @@ namespace Examples
                     await niryo.MovePose(initialPose);
                 }
 
-                var digitalIoPins = await niryo.GetDigitalIoState();
+                var digitalIOPins = await niryo.GetDigitalIOState();
 
-                foreach (var pin in digitalIoPins)
+                foreach (var pin in digitalIOPins)
                     Console.WriteLine($"Pin: {pin.PinId}, name: {pin.Name}, mode: {pin.Mode}, state: {pin.State}");
 
                 await niryo.SetLearningMode(true);
