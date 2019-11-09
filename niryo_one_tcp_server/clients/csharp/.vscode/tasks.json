@@ -28,10 +28,7 @@
                 "--include-symbols"
             ],
             "problemMatcher": "$msCompile",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
+            "group": "build"
         },
         {
             "label": "publish",
@@ -57,7 +54,8 @@
                 "test",
                 "${workspaceFolder}/NiryoOneClient.sln",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary",
+                "/p:CollectCoverage=true"
             ],
             "problemMatcher": "$msCompile"
         },
