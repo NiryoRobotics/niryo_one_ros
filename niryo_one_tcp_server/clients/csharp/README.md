@@ -14,7 +14,7 @@ Port of the server: 40001
 
 See the [Examples](Examples) folder for existing scripts.
 
-## Functions available
+## Functions available  
 
 After running `dotnet publish`, xml documentation will be generated at [NiryoOneClient](NiryoOneClient/bin/Debug/netcoreapp3.0/publish/NiryoOneClient.xml). 
 

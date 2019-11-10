@@ -23,12 +23,20 @@
 
 namespace NiryoOneClient
 {
+    /// <summary>
+    /// An enumeration of the known types of tools that can be connected to the Niryo One robotic arm
+    /// </summary>
     public enum RobotTool
     {
+        /// <summary>The first type of gripper</summary>
         GRIPPER_1,
+        /// <summary>The second type of gripper</summary>
         GRIPPER_2,
+        /// <summary>The third type of gripper</summary>
         GRIPPER_3,
+        /// <summary>A vacuum pump</summary>
         VACUUM_PUMP_1,
+        /// <summary>An electromagnet</summary>
         ELECTROMAGNET_1
     }
 }

@@ -25,13 +25,23 @@ using System;
 
 namespace NiryoOneClient
 {
+    /// <summary>
+    /// An exception representing an error from the Niryo One tcp server
+    /// </summary>
     public class NiryoOneException : Exception
     {
+        /// <summary>
+        /// Construct an exception with the specified reason
+        /// </summary>
+        /// <param name="reason">A description of the error</param>
         public NiryoOneException(string reason)
         {
             Reason = reason;
         }
 
+        /// <summary>
+        /// A description of the error
+        /// </summary>
         public string Reason { get; }
     }
 }

@@ -27,6 +27,9 @@ using System.Linq;
 
 namespace NiryoOneClient
 {
+    /// <summary>
+    /// A representation of the status of several system components in the Niryo One.
+    /// </summary>
     public class HardwareStatus
     {
         private static string Strip_(string s, char prefix, char suffix)
@@ -50,6 +53,11 @@ namespace NiryoOneClient
             return regex.Matches(s).Select(m => parser(m.Value)).ToArray();
         }
 
+        /// <summary>
+        /// Parse a string representation of the hardware status in the format of the tcp server
+        /// </summary>
+        /// <param name="data">The string representation</param>
+        /// <returns>A parsed object</returns>
         public static HardwareStatus Parse(string data)
         {
             var regex = new System.Text.RegularExpressions.Regex(@"((?:\[[^[\]]+\])|(?:\([^\)]+\))|True|False|\d+|'\w*')");
@@ -91,16 +99,59 @@ namespace NiryoOneClient
             return hardwareStatus;
         }
 
+        /// <summary>
+        /// The core temperature of the Raspberry Pi
+        /// </summary>
         public int RpiTemperature;
+
+        /// <summary>
+        /// The hardware version
+        /// </summary>
         public int HardwareVersion;
+
+        /// <summary>
+        /// Whether a connection to the robot is up
+        /// </summary>
         public bool ConnectionUp;
+
+        /// <summary>
+        /// The current error message
+        /// </summary>
         public string ErrorMessage;
+
+        /// <summary>
+        /// Whether the robot needs a calibartion to perform moves
+        /// </summary>
         public int CalibrationNeeded;
+
+        /// <summary>
+        /// Whether a calibration is in progress
+        /// </summary>
         public bool CalibrationInProgress;
+
+        /// <summary>
+        /// The names of the connected motors
+        /// </summary>
         public string[] MotorNames;
+
+        /// <summary>
+        /// The model names of the connected motors
+        /// </summary>
         public string[] MotorTypes;
+
+        /// <summary>
+        /// The temperatures in degrees celsius of the connected motors
+        /// </summary>
         public int[] Temperatures;
+
+        /// <summary>
+        /// The voltages applied to the connected motors
+        /// </summary>
         public decimal[] Voltages;
+
+        /// <summary>
+        /// The number of hardware errors on the respective motors
+        /// </summary>
         public int[] HardwareErrors;
     }
 }

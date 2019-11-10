@@ -27,12 +27,26 @@ using System.Threading.Tasks;
 
 namespace NiryoOneClient
 {
+    /// <summary>
+    /// The type of calibration to be performed
+    /// </summary>
     public enum CalibrateMode
     {
+        /// <summary>
+        /// Automatic calibration where the robot performs a set of move to establish calibration
+        /// </summary>
         AUTO,
+
+        /// <summary>
+        /// Manual calibration where the robot is manually positioned in the calibration pose and that
+        /// pose is used to establish calibration
+        /// </summary>
         MANUAL
     }
 
+    /// <summary>
+    /// A client capable of connecting to the tcp server of a Niryo One robotic arm
+    /// </summary>
     public class NiryoOneClient : IDisposable
     {
         private TcpClient _client;
@@ -41,12 +55,21 @@ namespace NiryoOneClient
         private NetworkStream _stream;
         private NiryoOneConnection _connection;
 
+        /// <summary>
+        /// Construct a client
+        /// </summary>
+        /// <param name="server">The server address, ip or hostname</param>
+        /// <param name="port">The port number, defaults to 40001</param>
         public NiryoOneClient(string server, int port = 40001)
         {
             _server = server;
             _port = port;
         }
 
+        /// <summary>
+        /// Create a connection to the robot
+        /// </summary>
+        /// <returns>A NiryoOneConnection object used for sending commands to the robot</returns>
         public async Task<NiryoOneConnection> Connect()
         {
             if (_client != null)
@@ -62,6 +85,9 @@ namespace NiryoOneClient
             return _connection;
         }
 
+        /// <summary>
+        /// Dispose the object
+        /// </summary>
         public void Dispose()
         {
             _stream.Close();

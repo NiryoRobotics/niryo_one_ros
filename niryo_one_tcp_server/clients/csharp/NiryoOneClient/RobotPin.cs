@@ -25,33 +25,83 @@ using System;
 
 namespace NiryoOneClient
 {
+    /// <summary>
+    /// An enumeration of the digital GPIO pins on the Niryo One robotic arm
+    /// </summary>
     public enum RobotPin
     {
+        /// <summary>The pin labeled 1A</summary>
         GPIO_1A,
+        /// <summary>The pin labeled 1B</summary>
         GPIO_1B,
+        /// <summary>The pin labeled 1C</summary>
         GPIO_1C,
+        /// <summary>The pin labeled 2A</summary>
         GPIO_2A,
+        /// <summary>The pin labeled 2B</summary>
         GPIO_2B,
+        /// <summary>The pin labeled 2C</summary>
         GPIO_2C
     }
 
+    /// <summary>
+    /// The configuration mode of a GPIO pin - input or output
+    /// </summary>
     public enum PinMode
     {
-        OUTPUT = 0, INPUT = 1
+        /// <summary>
+        /// The pin is configured as an output
+        /// </summary>
+        OUTPUT = 0,
+        /// <summary>
+        /// The pin is configured as an input
+        /// </summary>
+        INPUT = 1
     }
 
+    /// <summary>
+    /// The state of a pin - high or low
+    /// </summary>
     public enum DigitalState
     {
-        LOW = 0, HIGH = 1
+        /// <summary>
+        /// The pin is low
+        /// </summary>
+        LOW = 0, 
+        /// <summary>
+        /// The pin is high
+        /// </summary>
+        HIGH = 1
     }
 
+    /// <summary>
+    /// A representation of the state of a pin
+    /// </summary>
     public class DigitalPinObject
     {
+        /// <summary>
+        /// The internal pin id
+        /// </summary>
         public int PinId;
+        /// <summary>
+        /// The user-readable name of a pin
+        /// </summary>
         public string Name;
+        /// <summary>
+        /// Whether the pin is configured for output or input
+        /// </summary>
         public PinMode Mode;
+        /// <summary>
+        /// Whether the pin is low or high
+        /// </summary>
         public DigitalState State;
 
+
+        /// <summary>
+        /// Parse a string representation of a digital pin state in the format of the tcp server
+        /// </summary>
+        /// <param name="s">The string representation</param>
+        /// <returns>A parsed object</returns>
         public static DigitalPinObject Parse(string s)
         {
             if (!s.StartsWith('[') || !s.EndsWith(']'))

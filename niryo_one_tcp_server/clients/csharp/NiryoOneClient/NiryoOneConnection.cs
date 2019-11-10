@@ -31,28 +31,49 @@ using System.Threading.Tasks;
 
 namespace NiryoOneClient
 {
+    /// <summary>
+    /// A connection object allowing sending commands to the tcp server on a Niryo One robotic arm
+    /// </summary>
     public class NiryoOneConnection
     {
         private readonly TextWriter _textWriter;
         private readonly TextReader _textReader;
 
+        /// <summary>
+        /// Construct a connection object
+        /// </summary>
+        /// <param name="streamReader">A stream reader used for getting responses</param>
+        /// <param name="streamWriter">A stream writer used for sending commands</param>
         public NiryoOneConnection(TextReader streamReader, TextWriter streamWriter)
         {
             _textWriter = streamWriter;
             _textReader = streamReader;
         }
 
+        /// <summary>
+        /// Send a command to the tcp server
+        /// </summary>
+        /// <param name="s">A command</param>
         internal async Task WriteLineAsync(string s)
         {
             await _textWriter.WriteLineAsync(s);
             await _textWriter.FlushAsync();
         }
 
+        /// <summary>
+        /// Read a response line from the tcp server
+        /// </summary>
+        /// <returns>The line read</returns>
         internal async Task<string> ReadLineAsync()
         {
             return await _textReader.ReadLineAsync();
         }
 
+        /// <summary>
+        /// Send a command to the tcp server
+        /// </summary>
+        /// <param name="command_type">The type of command</param>
+        /// <param name="args">The arguments</param>
         protected async Task SendCommandAsync(string command_type, params string[] args)
         {
             string cmd;
@@ -63,6 +84,11 @@ namespace NiryoOneClient
             await WriteLineAsync(cmd);
         }
 
+        /// <summary>
+        /// Receive an answer fromt the tcp server related to a previously sent command
+        /// </summary>
+        /// <param name="command_type">The command for which a response is expected</param>
+        /// <returns>The data portion of the desponse</returns>
         protected async Task<string> ReceiveAnswerAsync(string command_type)
         {
             var result = await ReadLineAsync();

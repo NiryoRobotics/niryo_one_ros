@@ -29,15 +29,34 @@ using System.Linq;
 
 namespace NiryoOneClient
 {
+    /// <summary>
+    /// A representation of a cartesian position of the robotic arm in 6 dimensions.
+    /// For a description of the coordinate system, see <a href="https://www.ros.org/reps/rep-0103.html">REP-0103</a>.
+    /// </summary>
     public class PoseObject : IEnumerable<float>
     {
         private float[] _j = new float[6];
 
+        /// <summary>
+        /// Construct a PoseObject from explicit coordinates.
+        /// For a description of the coordinate system, see <a href="https://www.ros.org/reps/rep-0103.html">REP-0103</a>.
+        /// </summary>
+        /// <param name="x">X position in meters</param>
+        /// <param name="y">Y position in meters</param>
+        /// <param name="z">Z position in meters</param>
+        /// <param name="roll">Rotation about the fixed X axis in radians</param>
+        /// <param name="pitch">Rotation about the fixed Y axis in radians</param>
+        /// <param name="yaw">Rotation about the fixed Z axis in radians</param>
         public PoseObject(float x, float y, float z, float roll, float pitch, float yaw)
         {
             _j = new[] { x, y, z, roll, pitch, yaw };
         }
 
+        /// <summary>
+        /// Construct a PoseObject from a coordinate array.
+        /// For a description of the coordinate system, see <a href="https://www.ros.org/reps/rep-0103.html">REP-0103</a>.
+        /// </summary>
+        /// <param name="j">An array of the coordinates, in order X, Y, Z, roll, pitch, yaw</param>
         public PoseObject(float[] j)
         {
             if (j.Length != 6)
@@ -46,36 +65,80 @@ namespace NiryoOneClient
             _j = j;
         }
 
+        /// <summary>
+        /// Parse a string representation of a pose in the format of the tcp server
+        /// </summary>
+        /// <param name="s">The string representation</param>
+        /// <returns>A parsed object</returns>
         public static PoseObject Parse(string s)
         {
-            return new PoseObject(s.Split(",").Select(x => float.Parse(x, CultureInfo.InvariantCulture )).ToArray());
+            return new PoseObject(s.Split(",").Select(x => float.Parse(x, CultureInfo.InvariantCulture)).ToArray());
         }
 
+        /// <summary>
+        /// The X position in meters.
+        /// </summary>
         public float X { get => _j[0]; set => _j[0] = value; }
+
+        /// <summary>
+        /// The Y position in meters.
+        /// </summary>
         public float Y { get => _j[1]; set => _j[1] = value; }
+
+        /// <summary>
+        /// The Z position in meters.
+        /// </summary>
         public float Z { get => _j[2]; set => _j[2] = value; }
+
+        /// <summary>
+        /// The roll, i.e. the rotation around the fixed X axis in radians.
+        /// </summary>
         public float Roll { get => _j[3]; set => _j[3] = value; }
+
+        /// <summary>
+        /// The pitch, i.e. the rotation around the fixed Y axis in radians.
+        /// </summary>
         public float Pitch { get => _j[4]; set => _j[4] = value; }
+
+        /// <summary>
+        /// The yaw, i.e. the rotation around the fixed Z axis in radians.
+        /// </summary>
         public float Yaw { get => _j[5]; set => _j[5] = value; }
 
+        /// <summary>
+        /// Returns an enumerator which iterates through the collection
+        /// </summary>
         public IEnumerator<float> GetEnumerator()
         {
             return ((IEnumerable<float>)_j).GetEnumerator();
         }
 
+        /// <summary>
+        /// Returns an enumerator which iterates through the collection
+        /// </summary>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _j.GetEnumerator();
         }
     }
 
+    /// <summary>
+    /// One of the 6 axes.
+    /// For a description of the coordinate system, see <a href="https://www.ros.org/reps/rep-0103.html">REP-0103</a>.
+    /// </summary>
     public enum RobotAxis
     {
+        /// <summary>The X axis</summary>
         X,
+        /// <summary>The Y axis</summary>
         Y,
+        /// <summary>The Z axis</summary>
         Z,
+        /// <summary>The roll, i.e. the rotation around the fixed X axis in radians.</summary>
         ROLL,
+        /// <summary>The pitch, i.e. the rotation around the fixed Y axis in radians.</summary>
         PITCH,
+        /// <summary>The yaw, i.e. the rotation around the fixed Z axis in radians.</summary>
         YAW
     }
 }
