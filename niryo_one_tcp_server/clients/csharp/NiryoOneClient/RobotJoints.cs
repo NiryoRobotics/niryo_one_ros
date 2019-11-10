@@ -24,6 +24,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace NiryoOneClient
@@ -47,7 +48,7 @@ namespace NiryoOneClient
 
         public static RobotJoints Parse(string s)
         {
-            return new RobotJoints(s.Split(",").Select(float.Parse).ToArray());
+            return new RobotJoints(s.Split(",").Select(x => float.Parse(x, CultureInfo.InvariantCulture)).ToArray());
         }
 
         public float J1 { get => _j[0]; set => _j[0] = value; }

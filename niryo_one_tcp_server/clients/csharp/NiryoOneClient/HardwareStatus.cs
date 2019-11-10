@@ -22,6 +22,7 @@
  */
 
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace NiryoOneClient
@@ -70,7 +71,7 @@ namespace NiryoOneClient
             var motorTypes = ParseStrings_(matches[7].Value);
 
             var temperatures = ParseNumbers_(matches[8].Value, int.Parse);
-            var voltages = ParseNumbers_(matches[9].Value, decimal.Parse);
+            var voltages = ParseNumbers_(matches[9].Value, x => decimal.Parse(x, CultureInfo.InvariantCulture));
             var hardwareErrors = ParseNumbers_(matches[10].Value, int.Parse);
 
             var hardwareStatus = new HardwareStatus()

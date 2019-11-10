@@ -23,6 +23,7 @@
  */
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -107,7 +108,7 @@ namespace NiryoOneClient
         /// </summary>
         public async Task MoveJoints(RobotJoints joints)
         {
-            await SendCommandAsync("MOVE_JOINTS", string.Join(',', joints));
+            await SendCommandAsync("MOVE_JOINTS", string.Join(',', joints.Select(x => x.ToString(CultureInfo.InvariantCulture))));
             await ReceiveAnswerAsync("MOVE_JOINTS");
         }
 
@@ -117,7 +118,7 @@ namespace NiryoOneClient
         /// </summary>
         public async Task MovePose(PoseObject pose)
         {
-            await SendCommandAsync("MOVE_POSE", string.Join(',', pose));
+            await SendCommandAsync("MOVE_POSE", string.Join(',', pose.Select(x => x.ToString(CultureInfo.InvariantCulture))));
             await ReceiveAnswerAsync("MOVE_POSE");
         }
 
@@ -128,7 +129,7 @@ namespace NiryoOneClient
         /// </summary>
         public async Task ShiftPose(RobotAxis axis, float value)
         {
-            await SendCommandAsync("SHIFT_POSE", axis.ToString(), value.ToString());
+            await SendCommandAsync("SHIFT_POSE", axis.ToString(), value.ToString(CultureInfo.InvariantCulture));
             await ReceiveAnswerAsync("SHIFT_POSE");
         }
 

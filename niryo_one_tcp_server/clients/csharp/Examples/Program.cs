@@ -48,7 +48,7 @@ namespace Examples
 
                 PoseObject initialPose = null;
                 if (args.Length == 6)
-                    initialPose = new PoseObject(args.Select(f => float.Parse(f)).ToArray());
+                    initialPose = new PoseObject(args.Select(f => float.Parse(f, CultureInfo.InvariantCulture).ToArray());
 
                 Console.WriteLine("Calibrating...");
                 await niryo.Calibrate(CalibrateMode.AUTO);
