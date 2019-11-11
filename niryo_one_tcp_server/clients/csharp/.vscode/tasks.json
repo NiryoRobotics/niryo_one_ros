@@ -55,7 +55,9 @@
                 "${workspaceFolder}/NiryoOneClient.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
-                "/p:CollectCoverage=true"
+                "/p:CollectCoverage=true",
+                "/p:CoverletOutputFormat=lcov",
+                "/p:CoverletOutput=./lcov.info"
             ],
             "problemMatcher": "$msCompile"
         },

@@ -140,7 +140,7 @@ namespace NiryoOneClient
         public string[] MotorTypes;
 
         /// <summary>
-        /// The temperatures in degrees celsius of the connected motors
+        /// The temperatures in degrees celcius of the connected motors
         /// </summary>
         public int[] Temperatures;
 
