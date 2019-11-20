@@ -35,10 +35,5 @@ namespace NiryoOneClient
         /// </summary>
         /// <returns>A NiryoOneConnection object used for sending commands to the robot</returns>
         Task<INiryoOneConnection> Connect();
-
-        /// <summary>
-        /// Dispose the object
-        /// </summary>
-        void Dispose();
     }
 }
