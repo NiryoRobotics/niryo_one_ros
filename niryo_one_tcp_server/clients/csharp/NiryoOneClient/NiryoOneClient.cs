@@ -53,7 +53,7 @@ namespace NiryoOneClient
         /// Create a connection to the robot
         /// </summary>
         /// <returns>A NiryoOneConnection object used for sending commands to the robot</returns>
-        public async Task<NiryoOneConnection> Connect()
+        public async Task<INiryoOneConnection> Connect()
         {
             if (_client != null)
             {
