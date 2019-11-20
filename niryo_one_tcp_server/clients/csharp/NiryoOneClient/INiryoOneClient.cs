@@ -21,8 +21,6 @@
     SOFTWARE.
  */
 
-using System;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace NiryoOneClient
@@ -30,55 +28,17 @@ namespace NiryoOneClient
     /// <summary>
     /// A client capable of connecting to the tcp server of a Niryo One robotic arm
     /// </summary>
-    public class NiryoOneClient : IDisposable, INiryoOneClient
+    public interface INiryoOneClient
     {
-        private TcpClient _client;
-        private readonly int _port;
-        private readonly string _server;
-        private NetworkStream _stream;
-        private NiryoOneConnection _connection;
-
-        /// <summary>
-        /// Construct a client
-        /// </summary>
-        /// <param name="server">The server address, ip or hostname</param>
-        /// <param name="port">The port number, defaults to 40001</param>
-        public NiryoOneClient(string server, int port = 40001)
-        {
-            _server = server;
-            _port = port;
-        }
-
         /// <summary>
         /// Create a connection to the robot
         /// </summary>
         /// <returns>A NiryoOneConnection object used for sending commands to the robot</returns>
-        public async Task<NiryoOneConnection> Connect()
-        {
-            if (_client != null)
-            {
-                _client.Close();
-                _client = null;
-            }
-
-            _client = new TcpClient();
-            await _client.ConnectAsync(_server, _port);
-            _stream = _client.GetStream();
-            _connection = new NiryoOneConnection(new System.IO.StreamReader(_stream), new System.IO.StreamWriter(_stream));
-            return _connection;
-        }
+        Task<NiryoOneConnection> Connect();
 
         /// <summary>
         /// Dispose the object
         /// </summary>
-        public void Dispose()
-        {
-            _stream.Close();
-            _stream.Dispose();
-            _stream = null;
-            _client.Close();
-            _client.Dispose();
-            _client = null;
-        }
+        void Dispose();
     }
 }

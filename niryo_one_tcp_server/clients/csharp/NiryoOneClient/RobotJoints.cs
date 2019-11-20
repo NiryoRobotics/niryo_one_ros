@@ -62,17 +62,6 @@ namespace NiryoOneClient
             _j = j;
         }
 
-
-        /// <summary>
-        /// Parse a string representation of a joint configuration in the format of the tcp server
-        /// </summary>
-        /// <param name="s">The string representation</param>
-        /// <returns>A parsed object</returns> 
-        public static RobotJoints Parse(string s)
-        {
-            return new RobotJoints(s.Split(",").Select(x => float.Parse(x, CultureInfo.InvariantCulture)).ToArray());
-        }
-
         /// <summary>The value of the first joint, in radians</summary>
         public float J1 { get => _j[0]; set => _j[0] = value; }
         /// <summary>The value of the second joint, in radians</summary>
