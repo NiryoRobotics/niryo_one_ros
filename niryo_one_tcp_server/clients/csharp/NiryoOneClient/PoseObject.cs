@@ -66,16 +66,6 @@ namespace NiryoOneClient
         }
 
         /// <summary>
-        /// Parse a string representation of a pose in the format of the tcp server
-        /// </summary>
-        /// <param name="s">The string representation</param>
-        /// <returns>A parsed object</returns>
-        public static PoseObject Parse(string s)
-        {
-            return new PoseObject(s.Split(",").Select(x => float.Parse(x, CultureInfo.InvariantCulture)).ToArray());
-        }
-
-        /// <summary>
         /// The X position in meters.
         /// </summary>
         public float X { get => _j[0]; set => _j[0] = value; }

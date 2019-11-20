@@ -95,27 +95,5 @@ namespace NiryoOneClient
         /// Whether the pin is low or high
         /// </summary>
         public DigitalState State;
-
-
-        /// <summary>
-        /// Parse a string representation of a digital pin state in the format of the tcp server
-        /// </summary>
-        /// <param name="s">The string representation</param>
-        /// <returns>A parsed object</returns>
-        public static DigitalPinObject Parse(string s)
-        {
-            if (!s.StartsWith('[') || !s.EndsWith(']'))
-                throw new ArgumentException();
-
-            var ss = s.Substring(1, s.Length - 2).Split(", ");
-
-            return new DigitalPinObject
-            {
-                PinId = int.Parse(ss[0]),
-                Name = ss[1].Trim().Substring(1, ss[1].Length - 2),
-                Mode = (PinMode)int.Parse(ss[2]),
-                State = (DigitalState)int.Parse(ss[3])
-            };
-        }
     }
 }
