@@ -98,7 +98,8 @@ namespace NiryoOneClient
         /// <returns>The data portion of the response</returns>
         internal async Task<string> ReceiveAnswerAsync(string commandType, string regex = "")
         {
-            var fullRegex = new Regex($"^[A-Z_]+:(OK{regex}|KO,\"[^\"]*\")");
+
+            var fullRegex = new Regex($"^[A-Z_]+:(OK{regex}|KO,.*)");
             string s = _stringBuf;
             var sb = new StringBuilder(s);
             while (!fullRegex.IsMatch(s))
