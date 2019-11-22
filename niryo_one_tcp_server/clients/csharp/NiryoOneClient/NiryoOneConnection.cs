@@ -98,7 +98,8 @@ namespace NiryoOneClient
         /// <returns>The data portion of the response</returns>
         internal async Task<string> ReceiveAnswerAsync(string commandType, string regex = "")
         {
-            var fullRegex = new Regex($"^[A-Z_]+:(OK{regex}|KO,\"[^\"]*\")");
+
+            var fullRegex = new Regex($"^[A-Z_]+:(OK{regex}|KO,.*)");
             string s = _stringBuf;
             var sb = new StringBuilder(s);
             while (!fullRegex.IsMatch(s))
@@ -117,7 +118,7 @@ namespace NiryoOneClient
             var commaSplit2 = colonSplit[1].Split(',', 2);
             var status = commaSplit2[0];
             if (status != "OK")
-                throw new NiryoOneException(commaSplit2[1].TrimStart('"').TrimEnd('"'));
+                throw new NiryoOneException(commaSplit2[1]);
 
             if (commaSplit2.Length > 1)
                 return commaSplit2[1];

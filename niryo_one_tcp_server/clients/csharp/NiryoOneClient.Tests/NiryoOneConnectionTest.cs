@@ -93,7 +93,7 @@ namespace NiryoOneClient.Tests
         [TestMethod]
         public async Task Calibrate_Failure_Throws()
         {
-            SetupReadAsyncReturn_("CALIBRATE:KO,\"Sucks to be sucky\"");
+            SetupReadAsyncReturn_("CALIBRATE:KO,Sucks to be sucky");
             var e = await Assert.ThrowsExceptionAsync<NiryoOneException>(async () => await _connection.Calibrate(CalibrateMode.MANUAL));
             Assert.AreEqual("Sucks to be sucky", e.Reason);
             await _streamWriter.Received().WriteLineAsync("CALIBRATE:MANUAL");
@@ -127,7 +127,7 @@ namespace NiryoOneClient.Tests
         [TestMethod]
         public async Task SetLearningMode_ErrorResponse_Throws()
         {
-            SetupReadAsyncReturn_("SET_LEARNING_MODE:KO,\"No good\"");
+            SetupReadAsyncReturn_("SET_LEARNING_MODE:KO,No good");
             var e = await Assert.ThrowsExceptionAsync<NiryoOneException>(async () => await _connection.SetLearningMode(false));
             Assert.AreEqual("No good", e.Reason);
             await _streamWriter.Received().WriteLineAsync("SET_LEARNING_MODE:FALSE");
