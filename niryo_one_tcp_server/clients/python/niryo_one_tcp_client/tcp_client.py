@@ -49,6 +49,7 @@ class NiryoOneClient:
         self.__is_connected = False
         self.__timeout = timeout
         self.__client_socket = None
+        self.__client_sockfile = None
         self.__packet_builder = PacketBuilder()
 
     def __del__(self):
@@ -58,12 +59,14 @@ class NiryoOneClient:
         self.__is_running = False
         self.__shutdown_connection()
         self.__client_socket = None
+        self.__client_sockfile = None
 
     def __shutdown_connection(self):
         if self.__client_socket is not None and self.__is_connected is True:
             try:
                 self.__client_socket.shutdown(socket.SHUT_RDWR)
                 self.__client_socket.close()
+                self.__client_sockfile.close()
             except socket.error as e:
                 pass
             self.__is_connected = False
@@ -85,6 +88,7 @@ class NiryoOneClient:
             print("Connected to server ({}) on port: {}".format(ip_address, self.__port))
             self.__is_connected = True
             self.__client_socket.settimeout(None)
+            self.__client_sockfile = self.__client_socket.makefile()
 
         return self.__is_connected
 
@@ -244,19 +248,18 @@ class NiryoOneClient:
         if self.__is_connected is False:
             raise self.ClientNotConnectedException()
         send_success = False
-        if self.__client_socket is not None:
+        if self.__client_sockfile is not None:
             try:
                 packet = self.__packet_builder.build_command_packet(command_type, parameter_list)
-                self.__client_socket.send(packet)
+                self.__client_sockfile.write(packet + "\n")
             except socket.error as e:
                 print(e)
                 raise self.HostNotReachableException()
         return send_success
 
     def receive_answer(self):
-        READ_SIZE = 512
         try:
-            received = self.__client_socket.recv(READ_SIZE)
+            received = self.__client_sockfile.readline().rstrip()
         except socket.error as e:
             print(e)
             raise self.HostNotReachableException()
