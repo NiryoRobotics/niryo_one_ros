@@ -93,17 +93,15 @@ namespace NiryoOneClient
 
             var result = await ReadLineAsync();
 
-            var colonSplit = result.Trim().Split(':', 2);
+            var colonSplit = result.Trim().Split(new[] {':'}, 2);
             var cmd = colonSplit[0];
             if (cmd != commandType)
                 throw new NiryoOneException("Wrong command response received.");
-            var commaSplit2 = colonSplit[1].Split(',', 2);
+            var commaSplit2 = colonSplit[1].Split(new[] {','}, 2);
             var status = commaSplit2[0];
             if (status != "OK")
             {
-                var reason = commaSplit2[1];
-                if (reason.StartsWith('"') && reason.EndsWith('"'))
-                    reason = reason.Substring(1, reason.Length - 2);
+                var reason = ParserUtils.Strip(commaSplit2[1], "\"", "\"");
                 throw new NiryoOneException(reason);
             }
 
@@ -139,7 +137,7 @@ namespace NiryoOneClient
         /// </summary>
         public async Task MoveJoints(RobotJoints joints)
         {
-            await SendCommandAsync("MOVE_JOINTS", string.Join(',', joints.Select(x => x.ToString(CultureInfo.InvariantCulture))));
+            await SendCommandAsync("MOVE_JOINTS", string.Join(",", joints.Select(x => x.ToString(CultureInfo.InvariantCulture))));
             await ReceiveAnswerAsync("MOVE_JOINTS");
         }
 
@@ -149,7 +147,7 @@ namespace NiryoOneClient
         /// </summary>
         public async Task MovePose(PoseObject pose)
         {
-            await SendCommandAsync("MOVE_POSE", string.Join(',', pose.Select(x => x.ToString(CultureInfo.InvariantCulture))));
+            await SendCommandAsync("MOVE_POSE", string.Join(",", pose.Select(x => x.ToString(CultureInfo.InvariantCulture))));
             await ReceiveAnswerAsync("MOVE_POSE");
         }
 
@@ -346,7 +344,7 @@ namespace NiryoOneClient
             var regex = new Regex("\\[[0-9]+, '[^']*', [0-9]+, [0-9+]\\]");
             var matches = regex.Matches(state);
 
-            return matches.Select(m => ParserUtils.ParseDigitalPinObject(m.Value)).ToArray();
+            return matches.Cast<Match>().Select(m => ParserUtils.ParseDigitalPinObject(m.Value)).ToArray();
         }
     }
 }

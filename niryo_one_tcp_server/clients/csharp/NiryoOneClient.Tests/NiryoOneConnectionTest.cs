@@ -96,7 +96,7 @@ namespace NiryoOneClient.Tests
         [TestMethod]
         public async Task SetLearningMode_ErrorResponse_Throws()
         {
-            _streamReader.ReadLineAsync().Returns("SET_LEARNING_MODE:KO,No good");
+            _streamReader.ReadLineAsync().Returns("SET_LEARNING_MODE:KO,\"No good\"");
             var e = await Assert.ThrowsExceptionAsync<NiryoOneException>(async () => await _connection.SetLearningMode(false));
             Assert.AreEqual("No good", e.Reason);
             await _streamWriter.Received().WriteLineAsync("SET_LEARNING_MODE:FALSE");

@@ -51,7 +51,7 @@ namespace NiryoOneClient
             var rpiTemperature = int.Parse(matches[0].Value);
             var hardwareVersion = int.Parse(matches[1].Value);
             var connectionUp = bool.Parse(matches[2].Value);
-            var errorMessage = Strip_(matches[3].Value, '\'', '\'');
+            var errorMessage = Strip(matches[3].Value, "'", "'");
             var calibrationNeeded = int.Parse(matches[4].Value);
             var calibrationInProgress = bool.Parse(matches[5].Value);
 
@@ -87,7 +87,7 @@ namespace NiryoOneClient
         /// <returns>A parsed object</returns>
         public static PoseObject ParsePoseObject(string s)
         {
-            return new PoseObject(s.Split(",").Select(x => float.Parse(x, CultureInfo.InvariantCulture)).ToArray());
+            return new PoseObject(s.Split(',').Select(x => float.Parse(x, CultureInfo.InvariantCulture)).ToArray());
         }
 
 
@@ -98,7 +98,7 @@ namespace NiryoOneClient
         /// <returns>A parsed object</returns> 
         public static RobotJoints ParseRobotJoints(string s)
         {
-            return new RobotJoints(s.Split(",").Select(x => float.Parse(x, CultureInfo.InvariantCulture)).ToArray());
+            return new RobotJoints(s.Split(',').Select(x => float.Parse(x, CultureInfo.InvariantCulture)).ToArray());
         }
 
 
@@ -109,10 +109,10 @@ namespace NiryoOneClient
         /// <returns>A parsed object</returns>
         public static DigitalPinObject ParseDigitalPinObject(string s)
         {
-            if (!s.StartsWith('[') || !s.EndsWith(']'))
+            if (!s.StartsWith("[") || !s.EndsWith("]"))
                 throw new ArgumentException();
 
-            var ss = s.Substring(1, s.Length - 2).Split(", ");
+            var ss = s.Substring(1, s.Length - 2).Split(',').Select(x => x.Trim()).ToArray();
 
             return new DigitalPinObject
             {
@@ -123,7 +123,14 @@ namespace NiryoOneClient
             };
         }
         
-        private static string Strip_(string s, char prefix, char suffix)
+        /// <summary>
+        /// Require s to start with the supplied prefix and end with the supplied suffix. Return s without the prefix and suffix.
+        /// </summary>
+        /// <param name="s">The initial string</param>
+        /// <param name="prefix">The prefix to remove</param>
+        /// <param name="suffix">The suffix to remove</param>
+        /// <returns>The supplied string s without prefix and suffix</returns>
+        public static string Strip(string s, string prefix, string suffix)
         {
             if (!s.StartsWith(prefix))
                 throw new ArgumentException();
@@ -135,13 +142,13 @@ namespace NiryoOneClient
         private static string[] ParseStrings_(string s)
         {
             var regex = new Regex(@"'[^']*'");
-            return regex.Matches(s).Select(m => Strip_(m.Value, '\'', '\'')).ToArray();
+            return regex.Matches(s).Cast<Match>().Select(m => Strip(m.Value, "'", "'")).ToArray();
         }
 
         private static T[] ParseNumbers_<T>(string s, Func<string, T> parser)
         {
             var regex = new Regex(@"[0-9]+(\.[0-9]*)?");
-            return regex.Matches(s).Select(m => parser(m.Value)).ToArray();
+            return regex.Matches(s).Cast<Match>().Select(m => parser(m.Value)).ToArray();
         }
     }
 }
