@@ -25,7 +25,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -64,12 +63,9 @@ namespace NiryoOneClient
         /// Read response data from the tcp server
         /// </summary>
         /// <returns>The string read</returns>
-        internal async Task<string> ReadAsync()
+        internal async Task<string> ReadLineAsync()
         {
-            const int blockSize = 512;
-            Memory<char> memory = new Memory<char>(new char[blockSize]);
-            var count = await _textReader.ReadAsync(memory);
-            return new string(memory.Span.Slice(0, count).ToArray());
+            return await _textReader.ReadLineAsync();
         }
 
         /// <summary>
@@ -87,38 +83,29 @@ namespace NiryoOneClient
             await WriteLineAsync(cmd);
         }
 
-        private string _stringBuf = "";
-
         /// <summary>
         /// Receive an answer from the tcp server related to a previously sent command
         /// </summary>
         /// <param name="commandType">The command for which a response is expected</param>
-        /// <param name="regex">Optionally, the regular expression that the successful response arguments
-        /// are supposed to match</param>
         /// <returns>The data portion of the response</returns>
-        internal async Task<string> ReceiveAnswerAsync(string commandType, string regex = "")
+        internal async Task<string> ReceiveAnswerAsync(string commandType)
         {
 
-            var fullRegex = new Regex($"^[A-Z_]+:(OK{regex}|KO,.*)");
-            string s = _stringBuf;
-            var sb = new StringBuilder(s);
-            while (!fullRegex.IsMatch(s))
-            {
-                sb.Append(await ReadAsync());
-                s = sb.ToString();
-            }
-            var match = fullRegex.Match(s);
-            var result = match.Value.Trim();
-            _stringBuf = s.Substring(match.Index + match.Length).TrimStart();
+            var result = await ReadLineAsync();
 
-            var colonSplit = result.Split(':', 2);
+            var colonSplit = result.Trim().Split(':', 2);
             var cmd = colonSplit[0];
             if (cmd != commandType)
                 throw new NiryoOneException("Wrong command response received.");
             var commaSplit2 = colonSplit[1].Split(',', 2);
             var status = commaSplit2[0];
             if (status != "OK")
-                throw new NiryoOneException(commaSplit2[1]);
+            {
+                var reason = commaSplit2[1];
+                if (reason.StartsWith('"') && reason.EndsWith('"'))
+                    reason = reason.Substring(1, reason.Length - 2);
+                throw new NiryoOneException(reason);
+            }
 
             if (commaSplit2.Length > 1)
                 return commaSplit2[1];
@@ -220,7 +207,7 @@ namespace NiryoOneClient
         public async Task<DigitalState> DigitalRead(RobotPin pin)
         {
             await SendCommandAsync("DIGITAL_READ", pin.ToString());
-            var state = await ReceiveAnswerAsync("DIGITAL_READ", ",(0|1|HIGH|LOW)");
+            var state = await ReceiveAnswerAsync("DIGITAL_READ");
             return (DigitalState)Enum.Parse(typeof(DigitalState), state);
         }
 
@@ -314,7 +301,7 @@ namespace NiryoOneClient
         public async Task<RobotJoints> GetJoints()
         {
             await SendCommandAsync("GET_JOINTS");
-            var joints = await ReceiveAnswerAsync("GET_JOINTS", "(, *[-0-9.e]+){6}");
+            var joints = await ReceiveAnswerAsync("GET_JOINTS");
             return ParserUtils.ParseRobotJoints(joints);
         }
 
@@ -324,7 +311,7 @@ namespace NiryoOneClient
         public async Task<PoseObject> GetPose()
         {
             await SendCommandAsync("GET_POSE");
-            var pose = await ReceiveAnswerAsync("GET_POSE", "(, *[-0-9.e]+){6}");
+            var pose = await ReceiveAnswerAsync("GET_POSE");
             return ParserUtils.ParsePoseObject(pose);
         }
 
@@ -334,8 +321,7 @@ namespace NiryoOneClient
         public async Task<HardwareStatus> GetHardwareStatus()
         {
             await SendCommandAsync("GET_HARDWARE_STATUS");
-            var status = await ReceiveAnswerAsync("GET_HARDWARE_STATUS",
-            @"(, *([^,\[\]()]+|\[[^\[\]()]*\]|\([^\[\]()]*\))){11}");
+            var status = await ReceiveAnswerAsync("GET_HARDWARE_STATUS");
             return ParserUtils.ParseHardwareStatus(status);
         }
 
@@ -345,7 +331,7 @@ namespace NiryoOneClient
         public async Task<bool> GetLearningMode()
         {
             await SendCommandAsync("GET_LEARNING_MODE");
-            var mode = await ReceiveAnswerAsync("GET_LEARNING_MODE", ", *(TRUE|FALSE)");
+            var mode = await ReceiveAnswerAsync("GET_LEARNING_MODE");
             return bool.Parse(mode);
         }
 
@@ -355,7 +341,7 @@ namespace NiryoOneClient
         public async Task<DigitalPinObject[]> GetDigitalIOState()
         {
             await SendCommandAsync("GET_DIGITAL_IO_STATE");
-            var state = await ReceiveAnswerAsync("GET_DIGITAL_IO_STATE", @"(, *\[[^]]*\]){8}");
+            var state = await ReceiveAnswerAsync("GET_DIGITAL_IO_STATE");
 
             var regex = new Regex("\\[[0-9]+, '[^']*', [0-9]+, [0-9+]\\]");
             var matches = regex.Matches(state);
