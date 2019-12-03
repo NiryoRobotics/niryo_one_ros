@@ -73,12 +73,18 @@ namespace NiryoOneClient
         /// </summary>
         public void Dispose()
         {
-            _stream.Close();
-            _stream.Dispose();
-            _stream = null;
-            _client.Close();
-            _client.Dispose();
-            _client = null;
+            if (_stream != null)
+            {
+                _stream.Close();
+                _stream.Dispose();
+                _stream = null;
+            }
+            if (_client != null)
+            {
+                _client.Close();
+                _client.Dispose();
+                _client = null;
+            }
         }
     }
 }
