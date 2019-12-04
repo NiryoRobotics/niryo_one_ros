@@ -106,7 +106,7 @@ class CommandInterpreter:
         split_list = command_received.split(":")
         if len(split_list) > 2:
             rospy.logwarn("Incorrect command format: " + command_received)
-            return command_received + ":KO,Incorrect command format."
+            return command_received + ":KO,\"Incorrect command format.\""
         command_string_part = split_list[0].rstrip('\r\n')
         ret_string = command_string_part + ":"
         if command_string_part in self.__commands_dict:
@@ -121,7 +121,7 @@ class CommandInterpreter:
                 return ret_string + ret
             except TypeError as e:
                 rospy.logwarn("Incorrect number of parameter(s) given. " + str(e))
-                return ret_string + "KO,\"" + "Incorrect number of parameter(s) given.\""
+                return ret_string + "KO,\"Incorrect number of parameter(s) given.\""
             except python_api.NiryoOneException as e:
                 rospy.logwarn(e)
                 return ret_string + "KO,\"" + str(e) + "\""
@@ -129,7 +129,7 @@ class CommandInterpreter:
                 rospy.logwarn("Incorrect parameter(s) given to : " + command_string_part + " function. " + str(e))
                 return ret_string + "KO,\"" + str(e) + "\""
         else:
-            return command_string_part + ": " + "KO,\"" + "Unknown command\""
+            return command_string_part + ": " + "KO,\"Unknown command\""
 
     def __successfull_answer(self, param_list=None):
         string_answer = "OK"

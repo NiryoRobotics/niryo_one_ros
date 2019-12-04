@@ -38,6 +38,7 @@ class TcpServer:
         self.__is_running = True
         self.__is_busy = False
         self.__client = None
+        self.__sockfile = None
         self.__interpreter = CommandInterpreter()
         self.__queue = Queue.Queue(1)
 
@@ -78,7 +79,7 @@ class TcpServer:
             command_name = command_received
         else:
             command_name = command_received_split[0]
-        self.__send(command_name + ":KO,Robot is busy right now, command ignored.")
+        self.__send(command_name + ":KO,\"Robot is busy right now, command ignored.\"")
 
     def __client_socket_event(self, inputs):
         command_received = self.__read_command()
@@ -112,16 +113,17 @@ class TcpServer:
             except socket.error as e:
                 pass
             self.__client.close()
+            self.__sockfile.close()
 
     def __accept_client(self):
         self.__client, address = self.__server.accept()
+        self.__sockfile = self.__client.makefile()
         self.__is_client_connected = True
         rospy.loginfo("Client connected from ip address: " + str(address))
 
     def __read_command(self):
-        READ_SIZE = 512
         try:
-            received = self.__client.recv(READ_SIZE)
+            received = self.__sockfile.readline()
         except socket.error as e:
             rospy.logwarn("Error while receiving answer: " + str(e))
             return None
@@ -130,8 +132,9 @@ class TcpServer:
         return received
 
     def __send(self, content):
-        if self.__client is not None:
+        if self.__sockfile is not None:
             try:
-                self.__client.send(content)
+                self.__sockfile.write(content + "\n")
+                self.__sockfile.flush()
             except socket.error as e:
                 rospy.logwarn("Error while sending answer to client: " + str(e))
