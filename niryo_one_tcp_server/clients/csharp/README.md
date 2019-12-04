@@ -8,7 +8,7 @@ Port of the server: 40001
 
 ## Building
 
-* The target framework for the API is .NET Core 2.0. With the SDK for that installed, just run the command `dotnet pack` in the csharp directory, and a NuGet package will be produced in the directory `NiryoOneClient/bin/Release`. 
+* The target framework for the API is .NET Core 2.0. With the SDK for that installed, just run the command `dotnet pack --configuration Release --include-symbols` in the csharp directory, and a NuGet package will be produced in the directory `NiryoOneClient/bin/Release` along with a separate debug symbols package. Alternatively, in Visual Studio Code, just run the task "pack", which will do the same thing.
 
 ## Examples
 
