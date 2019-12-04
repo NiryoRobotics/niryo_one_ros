@@ -20,4 +20,4 @@ After running `dotnet publish`, xml documentation will be generated at [NiryoOne
 
 ## Tests
 
-Running the command `dotnet test` will compile and run the unit tests available.
+Running the command `dotnet test` will compile and run the unit tests available. Running the Visual Studio Code task "test" will also produce a test coverage report.
