@@ -3,7 +3,7 @@
   "transform": {
     "header_frame_id": "object_base", 
     "translation": [
-      0.001,
+      0.01,
       0.0, 
       0.048
     ], 
