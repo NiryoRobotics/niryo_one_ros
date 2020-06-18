@@ -43,7 +43,7 @@ class SequenceActionServer:
 
     def __init__(self, sequence_manager):
         self.server = actionlib.ActionServer('niryo_one/sequences/execute',
-                SequenceAction, self.on_goal, self.on_cancel, auto_start=False)
+                                             SequenceAction, self.on_goal, self.on_cancel, auto_start=False)
 
         self.seq_code_executor = SequenceCodeExecutor()
 
@@ -51,7 +51,8 @@ class SequenceActionServer:
 
         self.seq_manager = sequence_manager
 
-        self.break_point_subscriber = rospy.Subscriber("/niryo_one/blockly/break_point", Int32, self.callback_break_point)
+        self.break_point_subscriber = rospy.Subscriber("/niryo_one/blockly/break_point", Int32,
+                                                       self.callback_break_point)
 
     def callback_break_point(self, msg):
         self.seq_code_executor.break_point()
@@ -60,12 +61,13 @@ class SequenceActionServer:
         self.server.start()
         rospy.loginfo("Action Server started (Sequence Action)")
 
-    def create_result(self, status, message):
+    @staticmethod
+    def create_result(status, message):
         result = SequenceResult()
         result.status = status
         result.message = message
         return result
-    
+
     def on_goal(self, goal_handle):
         rospy.loginfo("Sequence action server : Received goal. Check if exists")
         # print goal_handle.__dict__
@@ -79,10 +81,10 @@ class SequenceActionServer:
             # if goal is active and program not in pause, set rejected
             else:
                 result = self.create_result(CommandStatus.GOAL_STILL_ACTIVE,
-                        "Current command still active. Cancel it if you want to execute a new one")
+                                            "Current command still active. Cancel it if you want to execute a new one")
                 goal_handle.set_rejected(result)
             return
-      
+
         # set accepted
         self.current_goal_handle = goal_handle
         self.current_goal_handle.set_accepted()
@@ -92,7 +94,7 @@ class SequenceActionServer:
         w = threading.Thread(name="worker", target=self.execute_action)
         w.start()
         rospy.loginfo("Sequence server : Executing thread")
-    
+
     def on_cancel(self, goal_handle):
         rospy.loginfo("Received cancel command")
 
@@ -103,7 +105,7 @@ class SequenceActionServer:
 
     def cancel_current_command(self):
         self.seq_code_executor.cancel_execution()
-    
+
     def execute_action(self):
         cmd_type = self.current_goal_handle.goal.goal.cmd_type
         sequence_id = self.current_goal_handle.goal.goal.sequence_id
@@ -112,8 +114,9 @@ class SequenceActionServer:
         if cmd_type == SequenceActionType.EXECUTE_FROM_ID:
             # 1. Retrieve sequence from id
             sequence = self.seq_manager.get_sequence_from_id(sequence_id)
-            if sequence == None:
-                result = self.create_result(CommandStatus.SEQUENCE_FAILED, "No sequence found with id " + str(sequence_id))
+            if sequence is None:
+                result = self.create_result(CommandStatus.SEQUENCE_FAILED,
+                                            "No sequence found with id " + str(sequence_id))
                 self.current_goal_handle.set_aborted(result)
                 self.current_goal_handle = None
                 return
@@ -133,11 +136,11 @@ class SequenceActionServer:
             self.current_goal_handle.set_aborted(result)
             self.current_goal_handle = None
             return
-        
+
         code = response['code']
         rospy.loginfo("Generated code :")
         rospy.loginfo(code)
-      
+
         # 3. Save as last executed command (id : 0)
         # - Only sequences that are not previously stored
         if cmd_type != SequenceActionType.EXECUTE_FROM_ID:
@@ -146,7 +149,7 @@ class SequenceActionServer:
 
         # 4. Execute code
         exec_result = self.seq_code_executor.execute_generated_code(code)
-       
+
         # 5. Return exec result
         if exec_result['status'] == 300:
             result = self.create_result(CommandStatus.STOPPED, exec_result['message'])
@@ -162,10 +165,10 @@ class SequenceActionServer:
 
 
 if __name__ == '__main__':
-    #rospy.init_node('sequence_action_server')
-    #s = SequenceManager('/home/edouard/sequences_niryo')
-    #rospy.on_shutdown(s.shutdown)
-    #seq_action = SequenceActionServer(s)
-    #seq_action.start()
-    #rospy.spin()
+    # rospy.init_node('sequence_action_server')
+    # s = SequenceManager('/home/edouard/sequences_niryo')
+    # rospy.on_shutdown(s.shutdown)
+    # seq_action = SequenceActionServer(s)
+    # seq_action.start()
+    # rospy.spin()
     pass

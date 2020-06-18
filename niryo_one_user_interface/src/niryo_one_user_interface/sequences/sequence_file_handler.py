@@ -26,6 +26,7 @@ from threading import Lock
 from niryo_one_user_interface.sequences.niryo_one_file_exception import NiryoOneFileException
 from niryo_one_user_interface.sequences.sequence import Sequence
 
+
 class SequenceFileHandler:
 
     def __init__(self, sequences_dir):
@@ -38,12 +39,12 @@ class SequenceFileHandler:
             rospy.logwarn("Create sequences dir " + str(self.base_dir))
             os.makedirs(self.base_dir)
         self.lock = Lock()
-    
-    def read_sequence(self, id, read_info_only=False):
-        filename = self.filename_from_sequence_id(id)
+
+    def read_sequence(self, identif, read_info_only=False):
+        filename = self.filename_from_sequence_id(identif)
         # Check if exists
         if not self.does_file_exist(filename):
-            raise NiryoOneFileException('Sequence for id ' + str(id) + ' does not exist')
+            raise NiryoOneFileException('Sequence for id ' + str(identif) + ' does not exist')
         with self.lock:
             try:
                 with open(self.base_dir + filename, 'r') as f:
@@ -94,8 +95,8 @@ class SequenceFileHandler:
                                 except StopIteration:
                                     raise NiryoOneFileException("Malformed file - Python code")
                     return seq
-            except Exception as e :
-                raise NiryoOneFileException("Failed to open or read from file for sequence id : " + str(id) + str(e))
+            except Exception as e:
+                raise NiryoOneFileException("Failed to open or read from file for sequence id : " + str(identif) + str(e))
 
     def write_sequence(self, seq):
         filename = self.filename_from_sequence_id(seq.id)
@@ -122,7 +123,6 @@ class SequenceFileHandler:
             except Exception:
                 raise NiryoOneFileException("Failed to write on file for sequence id : " + str(seq.id))
 
-
     def get_all_filenames(self):
         filenames = []
         try:
@@ -143,12 +143,13 @@ class SequenceFileHandler:
             try:
                 os.remove(self.base_dir + filename)
             except OSError as e:
-                raise NiryoOneFileException("Could not remove sequence with id " 
-                        + str(seq_id) + " : " + str(e))
+                raise NiryoOneFileException("Could not remove sequence with id "
+                                            + str(seq_id) + " : " + str(e))
 
-    def sequence_id_from_filename(self, filename):
-        return int(filename.replace('sequence_', '')) 
+    @staticmethod
+    def sequence_id_from_filename(filename):
+        return int(filename.replace('sequence_', ''))
 
-    def filename_from_sequence_id(self, seq_id):
+    @staticmethod
+    def filename_from_sequence_id(seq_id):
         return 'sequence_' + str(seq_id)
-

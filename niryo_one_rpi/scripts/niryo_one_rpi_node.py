@@ -36,6 +36,7 @@ from niryo_one_modbus.modbus_server import ModbusServer
 from shutdown_manager import ShutdownManager
 from motor_debug import MotorDebug
 
+
 class NiryoOneRpi:
 
     def __init__(self):
@@ -45,15 +46,15 @@ class NiryoOneRpi:
         self.modbus_server_address = rospy.get_param("~modbus_server_address")
         self.modbus_server_port = rospy.get_param("~modbus_server_port")
         self.niryo_one_ros_setup = None
-    
+
         if self.launch_ros_processes:
             self.niryo_one_ros_setup = NiryoOneRosSetup()
-            rospy.sleep(10) # let some time for other processes to launch (does not affect total launch time)
-        
+            rospy.sleep(10)  # let some time for other processes to launch (does not affect total launch time)
+
         # Start wifi manager
         if self.wifi_manager_enabled:
             self.wifi_manager = WifiConnectionManager()
-      
+
         self.fans_manager = FansManager()
         self.ros_log_manager = RosLogManager()
         self.shutdown_manager = ShutdownManager()
@@ -67,8 +68,8 @@ class NiryoOneRpi:
             self.modbus_server = ModbusServer(self.modbus_server_address, self.modbus_server_port)
             rospy.on_shutdown(self.modbus_server.stop)
             self.modbus_server.start()
-        
-         
+
+
 if __name__ == '__main__':
     rospy.init_node('niryo_one_rpi')
     NiryoOneRpi()

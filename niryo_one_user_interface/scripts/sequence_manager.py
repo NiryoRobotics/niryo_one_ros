@@ -37,10 +37,10 @@ class SequenceManager:
         self.blockly_generator = BlocklyCodeGenerator()
 
         self.get_sequence_list_server = rospy.Service(
-                '/niryo_one/sequences/get_sequence_list', GetSequenceList, self.callback_get_sequence_list)
+            '/niryo_one/sequences/get_sequence_list', GetSequenceList, self.callback_get_sequence_list)
 
         self.manage_command_server = rospy.Service(
-                '/niryo_one/sequences/manage_sequence', ManageSequence, self.callback_manage_sequence)
+            '/niryo_one/sequences/manage_sequence', ManageSequence, self.callback_manage_sequence)
 
     def get_python_code_from_xml(self, xml):
         return self.blockly_generator.get_generated_python_code(xml)
@@ -48,7 +48,7 @@ class SequenceManager:
     # !! Need to call this with rospy.on_shutdown !!
     def shutdown(self):
         self.blockly_generator.shutdown()
-    
+
     def callback_get_sequence_list(self, req):
         read_info_only = req.info_header_only
         sequence_list = self.get_all_sequences(read_info_only=read_info_only)
@@ -63,11 +63,12 @@ class SequenceManager:
             msg.blockly_xml = seq.blockly_xml
             msg.python_code = seq.python_code
             msg_list.append(msg)
-        return { 'sequences': msg_list }
+        return {'sequences': msg_list}
 
-    def create_sequence_response(self, status, message, sequence=None):
+    @staticmethod
+    def create_sequence_response(status, message, sequence=None):
         seq_msg = SequenceMessage()
-        if sequence != None:
+        if sequence is not None:
             seq_msg.id = sequence.id
             seq_msg.name = sequence.name
             seq_msg.description = sequence.description
@@ -75,19 +76,19 @@ class SequenceManager:
             seq_msg.updated = sequence.updated
             seq_msg.blockly_xml = sequence.blockly_xml
             seq_msg.python_code = sequence.python_code
-        return { 'status': status, 'message': message, 'sequence': seq_msg }
-    
+        return {'status': status, 'message': message, 'sequence': seq_msg}
+
     def callback_manage_sequence(self, req):
         cmd_type = req.cmd_type
         seq_id = req.sequence_id
         seq_msg = req.sequence
         sequence_data = Sequence(id=0, name=seq_msg.name, description=seq_msg.description,
-                blockly_xml=seq_msg.blockly_xml, python_code=seq_msg.python_code)
+                                 blockly_xml=seq_msg.blockly_xml, python_code=seq_msg.python_code)
 
         # GET sequence from id
         if cmd_type == SequenceCommandType.GET:
             seq = self.get_sequence_from_id(seq_id)
-            if seq == None:
+            if seq is None:
                 return self.create_sequence_response(400, "No sequence found with id : " + str(seq_id))
             return self.create_sequence_response(200, "Sequence has been found", seq)
 
@@ -95,20 +96,20 @@ class SequenceManager:
         elif cmd_type == SequenceCommandType.CREATE:
             new_seq_id = self.save_new_sequence(sequence_data)
             new_seq = self.get_sequence_from_id(new_seq_id)
-            if new_seq == None:
+            if new_seq is None:
                 return self.create_sequence_response(400, "Failed to create sequence")
             return self.create_sequence_response(200, "Sequence has been created", new_seq)
 
         # UPDATE existing sequence
         elif cmd_type == SequenceCommandType.UPDATE:
             seq = self.get_sequence_from_id(seq_id)
-            if seq == None:
+            if seq is None:
                 return self.create_sequence_response(400, "No sequence found with id : " + str(seq_id))
             success = self.update_sequence(seq, sequence_data)
             if not success:
                 return self.create_sequence_response(400, "Could not update sequence with id : " + str(seq_id))
             return self.create_sequence_response(200, "Sequence has been updated", seq)
-        
+
         # DELETE sequence
         elif cmd_type == SequenceCommandType.DELETE:
             success = self.delete_sequence(seq_id)
@@ -119,7 +120,7 @@ class SequenceManager:
         # GET last executed
         elif cmd_type == SequenceCommandType.GET_LAST_EXECUTED:
             seq = self.get_last_executed_sequence()
-            if seq == None:
+            if seq is None:
                 return self.create_sequence_response(400, "No last executed sequence has been found")
             return self.create_sequence_response(200, "Sequence has been found", seq)
 
@@ -128,7 +129,7 @@ class SequenceManager:
             return self.create_sequence_response(400, "Wrong command type")
 
     def get_sequence_from_id(self, seq_id, read_info_only=False):
-        try: 
+        try:
             return self.fh.read_sequence(seq_id, read_info_only=read_info_only)
         except NiryoOneFileException as e:
             return None
@@ -140,24 +141,24 @@ class SequenceManager:
             try:
                 sequence_id = self.fh.sequence_id_from_filename(f)
                 sequence = self.get_sequence_from_id(sequence_id, read_info_only=read_info_only)
-                if sequence != None:
+                if sequence is not None:
                     sequence_list.append(sequence)
             except NiryoOneFileException as e:
                 pass
         return sequence_list
-    
+
     def save_new_sequence(self, sequence):
-        id = self.pick_new_id()
-        sequence.id = id
+        identif = self.pick_new_id()
+        sequence.id = identif
         if sequence.name == "":
-            sequence.name = self.fh.filename_from_sequence_id(id) 
+            sequence.name = self.fh.filename_from_sequence_id(identif)
         sequence.created = rospy.Time.now().secs
         sequence.updated = rospy.Time.now().secs
         try:
             self.fh.write_sequence(sequence)
         except NiryoOneFileException as e:
             return -1
-        return id
+        return identif
 
     # choose a non used, incremental id
     def pick_new_id(self):
@@ -168,7 +169,7 @@ class SequenceManager:
             if current_id > max_id:
                 max_id = current_id
         return max_id + 1
-    
+
     def update_sequence(self, sequence, sequence_data):
         sequence.name = sequence_data.name
         sequence.description = sequence_data.description
@@ -181,13 +182,13 @@ class SequenceManager:
             return False
         return True
 
-    def delete_sequence(self, id):
+    def delete_sequence(self, identif):
         try:
-            self.fh.remove_sequence(id)
+            self.fh.remove_sequence(identif)
         except NiryoOneFileException as e:
             return False
         return True
-    
+
     def get_last_executed_sequence(self, read_info_only=False):
         return self.get_sequence_from_id(0, read_info_only=read_info_only)
 
@@ -204,8 +205,8 @@ class SequenceManager:
 
 
 if __name__ == '__main__':
-    #rospy.init_node('niryo_one_sequence_manager')
-    #s = SequenceManager('/home/edouard/sequences_niryo')
-    #rospy.on_shutdown(s.on_shutdown);
-    #rospy.spin()
+    # rospy.init_node('niryo_one_sequence_manager')
+    # s = SequenceManager('/home/edouard/sequences_niryo')
+    # rospy.on_shutdown(s.on_shutdown);
+    # rospy.spin()
     pass

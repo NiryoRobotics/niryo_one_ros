@@ -30,7 +30,8 @@ from niryo_one_modbus.discrete_input_data_block import DiscreteInputDataBlock
 from niryo_one_modbus.input_register_data_block import InputRegisterDataBlock
 from niryo_one_modbus.holding_register_data_block import HoldingRegisterDataBlock
 
-class ModbusServer():
+
+class ModbusServer:
 
     def __init__(self, address, port):
         self.coil = CoilDataBlock()
@@ -38,20 +39,19 @@ class ModbusServer():
         self.input_register = InputRegisterDataBlock()
         self.holding_register = HoldingRegisterDataBlock()
         self.store = ModbusSlaveContext(di=self.discrete_input,
-                co=self.coil, hr=self.holding_register, ir=self.input_register)
+                                        co=self.coil, hr=self.holding_register, ir=self.input_register)
         self.context = ModbusServerContext(slaves=self.store, single=True)
 
         self.identity = ModbusDeviceIdentification()
-        self.identity.VendorName  = 'pymodbus'
-        self.identity.VendorName  = 'pymodbus'
-        self.identity.VendorUrl   = 'http://github.com/bashwork/pymodbus/'
+        self.identity.VendorName = 'pymodbus'
+        self.identity.VendorName = 'pymodbus'
+        self.identity.VendorUrl = 'http://github.com/bashwork/pymodbus/'
         self.identity.ProductName = 'pymodbus Server'
-        self.identity.ModelName   = 'pymodbus Server'
+        self.identity.ModelName = 'pymodbus Server'
         self.identity.MajorMinorRevision = '1.0'
-    
-        self.server = ModbusTcpServer(context=self.context,
-                framer=None, identity=self.identity, address=(address, port))
 
+        self.server = ModbusTcpServer(context=self.context,
+                                      framer=None, identity=self.identity, address=(address, port))
 
     def start(self):
         rospy.loginfo("Start Modbus Server")
@@ -70,4 +70,3 @@ class ModbusServer():
         rospy.sleep(0.1)
         self.server.server_close()
         self.server.shutdown()
-

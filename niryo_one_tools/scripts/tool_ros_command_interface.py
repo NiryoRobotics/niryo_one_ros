@@ -37,15 +37,18 @@ class ToolRosCommandInterface:
         rospy.wait_for_service('niryo_one/tools/push_air_vacuum_pump')
 
         self.service_ping_dxl_tool = rospy.ServiceProxy('niryo_one/tools/ping_and_set_dxl_tool', PingDxlTool)
-        
+
         self.service_open_gripper = rospy.ServiceProxy('niryo_one/tools/open_gripper', OpenGripper)
         self.service_close_gripper = rospy.ServiceProxy('niryo_one/tools/close_gripper', CloseGripper)
-        
-        self.service_pull_air_vacuum_pump = rospy.ServiceProxy('niryo_one/tools/pull_air_vacuum_pump', PullAirVacuumPump)
-        self.service_push_air_vacuum_pump = rospy.ServiceProxy('niryo_one/tools/push_air_vacuum_pump', PushAirVacuumPump)
-        
+
+        self.service_pull_air_vacuum_pump = rospy.ServiceProxy('niryo_one/tools/pull_air_vacuum_pump',
+                                                               PullAirVacuumPump)
+        self.service_push_air_vacuum_pump = rospy.ServiceProxy('niryo_one/tools/push_air_vacuum_pump',
+                                                               PushAirVacuumPump)
+
         self.service_setup_digital_output_tool = rospy.ServiceProxy('niryo_one/rpi/set_digital_io_mode', SetDigitalIO)
-        self.service_activate_digital_output_tool = rospy.ServiceProxy('niryo_one/rpi/set_digital_io_state', SetDigitalIO)
+        self.service_activate_digital_output_tool = rospy.ServiceProxy('niryo_one/rpi/set_digital_io_state',
+                                                                       SetDigitalIO)
 
         rospy.loginfo("Interface between Tools Controller and Ros Control has been started.")
 
@@ -64,10 +67,11 @@ class ToolRosCommandInterface:
             return resp.state
         except rospy.ServiceException, e:
             return ROS_COMMUNICATION_PROBLEM
-    
+
     def close_gripper(self, gripper_id, close_position, close_speed, close_hold_torque, close_max_torque):
         try:
-            resp = self.service_close_gripper(gripper_id, close_position, close_speed, close_hold_torque, close_max_torque)
+            resp = self.service_close_gripper(gripper_id, close_position, close_speed, close_hold_torque,
+                                              close_max_torque)
             return resp.state
         except rospy.ServiceException, e:
             return ROS_COMMUNICATION_PROBLEM
@@ -92,7 +96,7 @@ class ToolRosCommandInterface:
         except rospy.ROSException:
             return 400, "Digital IO panel service is not connected"
         try:
-            resp = self.service_setup_digital_output_tool(gpio_pin, 0) # set output
+            resp = self.service_setup_digital_output_tool(gpio_pin, 0)  # set output
             return resp.status, resp.message
         except rospy.ServiceException, e:
             return 400, "Digital IO panel service failed"
@@ -107,4 +111,3 @@ class ToolRosCommandInterface:
             return resp.status, resp.message
         except rospy.ServiceException, e:
             return 400, "Digital IO panel service failed"
-

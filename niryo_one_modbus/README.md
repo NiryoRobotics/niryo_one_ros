@@ -87,6 +87,13 @@ Accepted Modbus functions :
 | 511 | Close gripper with given id |
 | 512 | Pull air vacuum pump from given id |
 | 513 | Push air vacuum pump from given id |
+| 520 | Set /enable/ select  conveyor from a given id (conveyor id 1 = 1 , conveyor id 2 = 2)|
+| 521 | Detach or disable conveyor form a given id (conveyor id 1 = 1 , conveyor id 2 = 2)|
+| 522 | Control conveyor with a given id (conveyor id 1 = 1 , conveyor id 2 = 2)|
+| 523 | Conevyor direction (backward = -1 , forward = 1)|
+| 524 | Conveyor speed (0-100)(%)|
+| 525 | Update conveyor id to the given id (conveyor id 1 = 1, conveyor id 2 = 2)|
+| 526 | Stop conveyor with given id (conveyor id 1 = 1 , conveyor id 2 = 2)|
 
 \*The "Last command result" gives you more information about the last executed command :
 * 0 : no result yet
@@ -127,6 +134,16 @@ Accepted Modbus functions :
 | 407 | Niryo One RPI image version n.2 |
 | 408 | Niryo One RPI image version n.3 |
 | 409 | Hardware version (1 or 2) |
+| 530 | Conveyor 1 connection state (Connected = 1 , Not connected = 0)|
+| 531 | Conveyor 1 control status ( On = 0, Off = 1) |
+| 532 | Conveyor 1 Speed (0-100 (%))|
+| 533 | Conveyor 1 direction (Backward = -1, Forward = 1)|
+| 540 | Conveyor 2 connection state (Connected = 1 , Not connected = 0)|
+| 541 | Conveyor 2 control status ( On = 0, Off = 1) |
+| 542 | Conveyor 2 Speed (0-100 (%))|
+| 543 | Conveyor 2 direction (Backward = -1, Forward = 1)|
+
+\*\* For more information about the conevyor, please check user Manuel on the site
 
 ## Connect to the Modbus/TCP server with Python, as a client :
 
@@ -134,10 +151,11 @@ You can test the Modbus/TCP server, for example from a remote computer on the sa
 
 ```python
 #!/usr/bin/env python
-from pymodbus.client.sync import ModbusTcpClient # you need to "pip install pymodbus" 
+from pymodbus.client.sync import ModbusTcpClient  # you need to "pip install pymodbus" 
 
 # Positive number : 0 - 32767
 # Negative number : 32768 - 65535
+
 def number_to_raw_data(val):
     if val < 0:
         val = (1 << 15) - val
@@ -148,6 +166,7 @@ def raw_data_to_number(val):
         val = - (val & 0x7FFF)
     return val
 
+
 if __name__ == '__main__':
     address = 'insert the Modbus/TCP server IP address here'
     client = ModbusTcpClient(address, port=5020)
@@ -157,4 +176,5 @@ if __name__ == '__main__':
     # Check out the pymodbus documentation : http://pymodbus.readthedocs.io/en/latest/index.html
 
     client.close()
+
 ```

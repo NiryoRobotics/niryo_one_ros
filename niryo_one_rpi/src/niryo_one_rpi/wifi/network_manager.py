@@ -25,11 +25,14 @@ from uuid import getnode as get_mac
 
 HOTSPOT_MODE = False
 
-def is_hotspot_activated(): # wifi manager (ros side) can quickly query hotspot mode
+
+def is_hotspot_activated():  # wifi manager (ros side) can quickly query hotspot mode
     return HOTSPOT_MODE
 
+
 def get_mac_address():
-    return ':'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
+    return ':'.join(("%012X" % get_mac())[i:i + 2] for i in range(0, 12, 2))
+
 
 def deactivate_current_wlan0():
     """Deactivate the current wlan0 connection, if it exists"""
@@ -40,7 +43,7 @@ def deactivate_current_wlan0():
             output = subprocess.check_output([
                 'sudo', 'nmcli', 'device', 'disconnect', 'wlan0'])
             print "Successfully deactivated"
-            time.sleep(5) # needed delay
+            time.sleep(5)  # needed delay
             return True
         except subprocess.CalledProcessError:
             print "Fail to deactivate"
@@ -88,7 +91,7 @@ def delete_connection_with_ssid(ssid):
 
 def hard_enable_hotspot_with_ssid(ssid, passwd):
     """Create and start Hotspot with ssid and password"""
-    delete_connection_with_ssid(ssid) # will avoid duplicates
+    delete_connection_with_ssid(ssid)  # will avoid duplicates
     deactivate_current_wlan0()
     activate_current_wlan0()
     retries = 4
@@ -96,10 +99,10 @@ def hard_enable_hotspot_with_ssid(ssid, passwd):
         output1 = subprocess.check_output([
             'sudo', 'nmcli', 'connection', 'add',
             'type', 'wifi', 'ifname', 'wlan0', 'con-name', ssid,
-            'autoconnect', 'no', 'ssid', ssid, 'ip4', '10.10.10.10/24' 
+            'autoconnect', 'no', 'ssid', ssid, 'ip4', '10.10.10.10/24'
         ])
         # all user devices will use 10.10.10.10 when in hotspot mode
-        print "Hotspot created with ip: 10.10.10.10" 
+        print "Hotspot created with ip: 10.10.10.10"
 
         output2 = subprocess.check_output([
             'sudo', 'nmcli', 'connection', 'modify', ssid,
@@ -148,12 +151,13 @@ def delete_all_duplicates_connections(ssid):
 
 def connect_to_wifi(ssid, passwd):
     """Connect to the wifi"""
-    delete_all_duplicates_connections(ssid) # for each connection, network manager will create a new registered ssid with incremental number
+    delete_all_duplicates_connections(
+        ssid)  # for each connection, network manager will create a new registered ssid with incremental number
     deactivate_current_wlan0()
     count = 0
     print "Trying to connect to wifi" + ssid
     while count < 4:
-        print "Attempt number " + str(count+1)
+        print "Attempt number " + str(count + 1)
         try:
             output = subprocess.check_output([
                 'sudo', 'nmcli', 'device', 'wifi', 'connect', ssid,
@@ -213,7 +217,7 @@ def get_all_registered_wifi():
 def is_ssid_registered(ssid):
     """Test if a SSID is registered"""
     list_ssid = get_all_registered_wifi()
-    return (ssid in list_ssid)
+    return ssid in list_ssid
 
 
 def get_all_available_wifi():
@@ -228,18 +232,18 @@ def get_all_available_wifi():
         line = line[3:]
         if line != '':
             if (line.split('  ', 2)[0] != "SSID" and
-                        line.split('  ', 2)[0] != '--'):
+                    line.split('  ', 2)[0] != '--'):
                 # print line
                 list_available_wifi.append(line.split('  ', 2)[0])
-    #print list_available_wifi
-    list_available_wifi = list(set(list_available_wifi)) # remove duplicates
+    # print list_available_wifi
+    list_available_wifi = list(set(list_available_wifi))  # remove duplicates
     return list_available_wifi
 
 
 def is_ssid_available(ssid):
     """Check if the ssid is """
     list_available_wifi = get_all_available_wifi()
-    return (ssid in list_available_wifi)
+    return ssid in list_available_wifi
 
 
 def get_registered_and_available_connection():

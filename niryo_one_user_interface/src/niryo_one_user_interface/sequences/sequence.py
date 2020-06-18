@@ -19,10 +19,11 @@
 
 import rospy
 
+
 class Sequence:
 
-    def __init__(self, id=0, name="", description="", blockly_xml="", python_code=""):
-        self.id = id
+    def __init__(self, identif=0, name="", description="", blockly_xml="", python_code=""):
+        self.id = identif
         self.name = name
         self.description = description
         self.created = rospy.Time.now().secs

@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     # 1. Parse args
     parser = argparse.ArgumentParser(description='Send custom value to a Dynamixel motor during Niryo One runtime')
-    
+
     parser.add_argument('--type', type=int, required=True, help='Motor type (1 for XL-320, 2 for XL-430)')
     parser.add_argument('--id', type=int, required=True, help='Motor ID')
     parser.add_argument('--address', type=int, required=True, help='Register address')
@@ -45,7 +45,7 @@ if __name__ == '__main__':
         rospy.logwarn(e)
         rospy.logwarn("Check that Niryo One ROS stack is running")
         exit()
-    
+
     try:
         send_cmd = rospy.ServiceProxy(service_name, SendCustomDxlValue)
         response = send_cmd(args.type, args.id, args.value, args.address, args.size)
@@ -53,5 +53,3 @@ if __name__ == '__main__':
     except rospy.ServiceException, e:
         rospy.logwarn(e)
         exit()
-
-

@@ -33,4 +33,3 @@ print rr.bits
 client.close()
 print "Close connection to modbus server"
 print "--- END"
-

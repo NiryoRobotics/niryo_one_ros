@@ -22,15 +22,37 @@ import tf
 from niryo_one_commander.moveit_utils import get_rpy_from_quaternion
 from tf.transformations import quaternion_from_euler
 
-from std_msgs.msg import Float64
+# from std_msgs.msg import Float64
 from niryo_one_msgs.msg import RobotState
 from geometry_msgs.msg import Quaternion
 
 PI = 3.14159
 
+
 class NiryoRobotStatePublisher:
 
-    def get_orientation_from_angles(self, r, p, y):
+    def __init__(self):
+
+        # Tf listener (position + rpy) of end effector tool
+        self.position = [0, 0, 0]
+        self.rpy = [0, 0, 0]
+        self.tf_listener = tf.TransformListener()
+
+        # State publisher
+        self.niryo_one_robot_state_publisher = rospy.Publisher(
+            '/niryo_one/robot_state', RobotState, queue_size=5)
+
+        # Get params from rosparams
+        rate_tf_listener = rospy.get_param("/niryo_one/robot_state/rate_tf_listener")
+        rate_publish_state = rospy.get_param("/niryo_one/robot_state/rate_publish_state")
+
+        rospy.Timer(rospy.Duration(1.0 / rate_tf_listener), self.get_robot_pose)
+        rospy.Timer(rospy.Duration(1.0 / rate_publish_state), self.publish_state)
+
+        rospy.loginfo("Started Niryo One robot state publisher")
+
+    @staticmethod
+    def get_orientation_from_angles(r, p, y):
         quaternion = quaternion_from_euler(r, p, y)
         orientation = Quaternion()
         orientation.x = quaternion[0]
@@ -41,7 +63,7 @@ class NiryoRobotStatePublisher:
 
     def get_robot_pose(self, event):
         try:
-            (pos, rot) = self.tf_listener.lookupTransform('base_link', 'tool_link', rospy.Time(0))  
+            (pos, rot) = self.tf_listener.lookupTransform('base_link', 'tool_link', rospy.Time(0))
             self.position = pos
             self.rpy = get_rpy_from_quaternion(rot)
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
@@ -56,23 +78,3 @@ class NiryoRobotStatePublisher:
         msg.rpy.pitch = self.rpy[1]
         msg.rpy.yaw = self.rpy[2]
         self.niryo_one_robot_state_publisher.publish(msg)
-
-    def __init__(self):
-            
-        # Tf listener (position + rpy) of end effector tool
-        self.position = [0,0,0]
-        self.rpy = [0,0,0]
-        self.tf_listener = tf.TransformListener()
-
-        # State publisher
-        self.niryo_one_robot_state_publisher = rospy.Publisher(
-                '/niryo_one/robot_state', RobotState, queue_size=5)
-
-        # Get params from rosparams
-        rate_tf_listener = rospy.get_param("/niryo_one/robot_state/rate_tf_listener")
-        rate_publish_state = rospy.get_param("/niryo_one/robot_state/rate_publish_state")
-
-        rospy.Timer(rospy.Duration(1.0/rate_tf_listener), self.get_robot_pose)
-        rospy.Timer(rospy.Duration(1.0/rate_publish_state), self.publish_state)
-
-        rospy.loginfo("Started Niryo One robot state publisher")

@@ -59,6 +59,12 @@ class CommunicationBase {
 
         // tools
         virtual int pingAndSetDxlTool(uint8_t id, std::string name) = 0;
+
+        virtual int pingAndSetConveyor(uint8_t id, bool activate, std::string &message) = 0;
+        virtual int moveConveyor(uint8_t id, bool activate, int16_t speed, int8_t direction, std::string &message) = 0;
+        virtual int updateIdConveyor(uint8_t old_id, uint8_t new_id, std::string &message) = 0;
+
+        virtual void getConveyorFeedBack(uint8_t conveyor_id, bool* connection_state, bool* running, int16_t* speed, int8_t* direction) = 0;
         
         virtual int openGripper(uint8_t id, uint16_t open_position, uint16_t open_speed, uint16_t open_hold_torque) = 0;
         virtual int closeGripper(uint8_t id, uint16_t close_position, uint16_t close_speed, uint16_t close_hold_torque, uint16_t close_max_torque) = 0;

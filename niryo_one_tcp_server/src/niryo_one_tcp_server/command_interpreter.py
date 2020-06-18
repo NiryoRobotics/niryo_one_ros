@@ -51,27 +51,45 @@ class CommandInterpreter:
             "GET_POSE": self.__get_pose,
             "GET_HARDWARE_STATUS": self.__get_hardware_status,
             "GET_LEARNING_MODE": self.__get_learning_mode,
-            "GET_DIGITAL_IO_STATE": self.__get_digital_io_state
+            "GET_DIGITAL_IO_STATE": self.__get_digital_io_state,
+            "GET_IMAGE_COMPRESSED": self.__get_img_compressed,
+            "CREATE_WORKSPACE": self.__create_workspace,
+            "REMOVE_WORKSPACE": self.__remove_workspace,
+            "GET_TARGET_POSE_FROM_REL": self.__get_target_pose_from_rel,
+            "GET_TARGET_POSE_FROM_CAM": self.__get_target_pose_from_cam,
+            "DETECT_OBJECT": self.__detect_object,
+            "GET_CURRENT_TOOL_ID": self.__get_current_tool_id,
+            "GET_WORKSPACE_RATIO": self.__get_workspace_ratio,
+            "GET_WORKSPACE_LIST": self.__get_workspace_list,
+            "VISION_PICK": self.__vision_pick,
+            "MOVE_TO_OBJECT": self.__move_to_object,
+            "PICK_FROM_POSE": self.__pick_from_pose,
+            "PLACE_FROM_POSE": self.__place_from_pose,
+            "SET_CONVEYOR": self.__set_conveyor,
+            "CONTROL_CONVEYOR": self.__control_conveyor,
+            "UPDATE_CONVEYOR_ID": self.__update_conveyor_id,
+            "GET_CALIBRATION_OBJECT": self.__get_calibration_object,
+
         }
         self.__axis_string_dict_convertor = {"X": python_api.AXIS_X,
                                              "Y": python_api.AXIS_Y,
                                              "Z": python_api.AXIS_Z,
                                              "ROLL": python_api.ROT_ROLL,
                                              "PITCH": python_api.ROT_PITCH,
-                                             "YAW": python_api.ROT_YAW
+                                             "YAW": python_api.ROT_YAW,
                                              }
         self.__pin_nbr_string_dict_convertor = {"GPIO_1A": python_api.GPIO_1A,
                                                 "GPIO_1B": python_api.GPIO_1B,
                                                 "GPIO_1C": python_api.GPIO_1C,
                                                 "GPIO_2A": python_api.GPIO_2A,
                                                 "GPIO_2B": python_api.GPIO_2B,
-                                                "GPIO_2C": python_api.GPIO_2C
+                                                "GPIO_2C": python_api.GPIO_2C,
                                                 }
         self.__pin_mode_string_dict_convertor = {"OUTPUT": python_api.PIN_MODE_OUTPUT,
-                                                 "INPUT": python_api.PIN_MODE_INPUT
+                                                 "INPUT": python_api.PIN_MODE_INPUT,
                                                  }
         self.__digital_state_string_dict_convertor = {"HIGH": python_api.PIN_HIGH,
-                                                      "LOW": python_api.PIN_LOW
+                                                      "LOW": python_api.PIN_LOW,
                                                       }
         self.__boolean_string_dict_convertor = {"TRUE": True,
                                                 "FALSE": False
@@ -84,10 +102,12 @@ class CommandInterpreter:
                                                         "ELECTROMAGNET_1": python_api.TOOL_ELECTROMAGNET_1_ID,
                                                         "VACUUM_PUMP_1": python_api.TOOL_VACUUM_PUMP_1_ID,
                                                         }
+        self.__available_tools_string_dict_convertor_inv = {index: string for string, index
+                                                            in self.__available_tools_string_dict_convertor.iteritems()}
         self.__available_gripper_tools_string_dict_convertor = {"NONE": python_api.TOOL_NONE,
                                                                 "GRIPPER_1": python_api.TOOL_GRIPPER_1_ID,
                                                                 "GRIPPER_2": python_api.TOOL_GRIPPER_2_ID,
-                                                                "GRIPPER_3": python_api.TOOL_GRIPPER_3_ID
+                                                                "GRIPPER_3": python_api.TOOL_GRIPPER_3_ID,
                                                                 }
 
     def __raise_exception_expected_choice(self, expected_choice, given):
@@ -119,19 +139,20 @@ class CommandInterpreter:
                 else:
                     ret = self.__commands_dict[command_string_part]()
                 return ret_string + ret
-            except TypeError as e:
-                rospy.logwarn("Incorrect number of parameter(s) given. " + str(e))
-                return ret_string + "KO,\"" + "Incorrect number of parameter(s) given.\""
             except python_api.NiryoOneException as e:
                 rospy.logwarn(e)
                 return ret_string + "KO,\"" + str(e) + "\""
             except TcpCommandException as e:
                 rospy.logwarn("Incorrect parameter(s) given to : " + command_string_part + " function. " + str(e))
                 return ret_string + "KO,\"" + str(e) + "\""
+            except TypeError as e:
+                rospy.logwarn("Incorrect number of parameter(s) given. " + str(e))
+                return ret_string + "KO,\"" + "Incorrect number of parameter(s) given.\""
         else:
             return command_string_part + ": " + "KO,\"" + "Unknown command\""
 
-    def __successfull_answer(self, param_list=None):
+    @staticmethod
+    def __successfull_answer(param_list=None):
         string_answer = "OK"
         if param_list is not None:
             string_answer += ","
@@ -142,6 +163,19 @@ class CommandInterpreter:
                 if counter_param < len(param_list):
                     string_answer += ","
         return string_answer
+
+    @staticmethod
+    def __successfull_answer_long(param_list=None):
+        payload = ""
+        if param_list is not None:
+            counter_param = 0
+            for param in param_list:
+                payload += str(param)
+                counter_param += 1
+                if counter_param < len(param_list):
+                    payload += ","
+        payload_size = len(payload)  # The payload doesn't include the comma after the size!
+        return "OK," + str(payload_size) + "," + payload
 
     def __calibrate(self, param_string):
         calibrate_mode_string = param_string.rstrip('\r\n')
@@ -433,29 +467,16 @@ class CommandInterpreter:
 
     def __get_pose(self):
         arm_pose = self.__niryo_one.get_arm_pose()
-        data_answer = []
-        data_answer.append(arm_pose.position.x)
-        data_answer.append(arm_pose.position.y)
-        data_answer.append(arm_pose.position.z)
-        data_answer.append(arm_pose.rpy.roll)
-        data_answer.append(arm_pose.rpy.pitch)
-        data_answer.append(arm_pose.rpy.yaw)
+        data_answer = [arm_pose.position.x, arm_pose.position.y, arm_pose.position.z, arm_pose.rpy.roll,
+                       arm_pose.rpy.pitch, arm_pose.rpy.yaw]
         return self.__successfull_answer(data_answer)
 
     def __get_hardware_status(self):
         hw_status = self.__niryo_one.get_hardware_status()
-        data_answer = []
-        data_answer.append(hw_status.rpi_temperature)
-        data_answer.append(hw_status.hardware_version)
-        data_answer.append(hw_status.connection_up)
-        data_answer.append("\'" + hw_status.error_message + "\'")
-        data_answer.append(hw_status.calibration_needed)
-        data_answer.append(hw_status.calibration_in_progress)
-        data_answer.append(hw_status.motor_names)
-        data_answer.append(hw_status.motor_types)
-        data_answer.append(hw_status.temperatures)
-        data_answer.append(hw_status.voltages)
-        data_answer.append(hw_status.hardware_errors)
+        data_answer = [hw_status.rpi_temperature, hw_status.hardware_version, hw_status.connection_up,
+                       "\'" + hw_status.error_message + "\'", hw_status.calibration_needed,
+                       hw_status.calibration_in_progress, hw_status.motor_names, hw_status.motor_types,
+                       hw_status.temperatures, hw_status.voltages, hw_status.hardware_errors]
         return self.__successfull_answer(data_answer)
 
     def __get_learning_mode(self):
@@ -471,3 +492,241 @@ class CommandInterpreter:
                                 digital_io_state_array.modes[counter],
                                 digital_io_state_array.states[counter]])
         return self.__successfull_answer(data_answer)
+
+    def __get_img_compressed(self):
+        compressed_image = self.__niryo_one.get_compressed_image()
+        return self.__successfull_answer_long([compressed_image])
+
+    def __create_workspace(self, param_string):
+        parameters_string_array = param_string.split(',')
+        nbr_parameters = len(parameters_string_array)
+
+        if nbr_parameters != 25:
+            self.__raise_exception_expected_parameters_nbr(25, nbr_parameters)
+
+        name = parameters_string_array[0]
+        try:
+            pose_origin = map(float, parameters_string_array[1:7])
+            pose_1 = map(float, parameters_string_array[7:13])
+            pose_2 = map(float, parameters_string_array[13:19])
+            pose_3 = map(float, parameters_string_array[19:25])
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("float", parameters_string_array)
+
+        self.__niryo_one.create_workspace(
+            name,
+            self.__niryo_one.list_to_robot_state_msg(pose_origin),
+            self.__niryo_one.list_to_robot_state_msg(pose_1),
+            self.__niryo_one.list_to_robot_state_msg(pose_2),
+            self.__niryo_one.list_to_robot_state_msg(pose_3))
+        return self.__successfull_answer()
+
+    def __remove_workspace(self, name):
+        self.__niryo_one.remove_workspace(name)
+        return self.__successfull_answer()
+
+    def __get_target_pose_from_rel(self, param_string):
+        parameters_string_array = param_string.split(',')
+        nbr_parameters = len(parameters_string_array)
+
+        if nbr_parameters != 5:
+            self.__raise_exception_expected_parameters_nbr(5, nbr_parameters)
+        workspace = parameters_string_array[0]
+        try:
+            height_offset, x_rel, y_rel, yaw_rel = map(float, parameters_string_array[1:5])
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("float", parameters_string_array)
+        target_msg = self.__niryo_one.get_target_pose_from_rel(
+            workspace, height_offset, x_rel, y_rel, yaw_rel)
+        pose_list = self.__niryo_one.robot_state_msg_to_list(target_msg)
+        return self.__successfull_answer(pose_list)
+
+    def __get_target_pose_from_cam(self, param_string):
+        parameters_string_array = param_string.split(',')
+        nbr_parameters = len(parameters_string_array)
+        if nbr_parameters != 4:
+            self.__raise_exception_expected_parameters_nbr(4, nbr_parameters)
+        try:
+            parameters_string_array[1] = float(parameters_string_array[1])
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("float", parameters_string_array[1])
+        parameters_string_array[3] = parameters_string_array[3].rstrip('\r\n')
+        obj_found, target_msg, obj_shape, obj_color = self.__niryo_one.get_target_pose_from_cam(
+            *parameters_string_array)
+        if obj_found:
+            pose_list = self.__niryo_one.robot_state_msg_to_list(target_msg)
+        else:
+            pose_list = []
+        data_list = [obj_found]
+        data_list.extend(pose_list)
+        data_list.extend([obj_shape, obj_color])
+        return self.__successfull_answer(data_list)
+
+    def __detect_object(self, param_string):
+        parameters_string_array = param_string.split(',')
+        nbr_parameters = len(parameters_string_array)
+        if nbr_parameters != 3:
+            self.__raise_exception_expected_parameters_nbr(3, nbr_parameters)
+        parameters_string_array[2] = parameters_string_array[2].rstrip('\r\n')
+        object_found, rel_pose, shape, color = self.__niryo_one.detect_object(
+            *parameters_string_array)
+        if not object_found:
+            return self.__successfull_answer(
+                [object_found, 0, 0, 0, shape, color])
+        return self.__successfull_answer(
+            [object_found, rel_pose.x, rel_pose.y, rel_pose.yaw, shape, color])
+
+    def __set_conveyor(self, param_string):
+        parameters_string_array = param_string.split(",")
+        nbr_parameters = len(parameters_string_array)
+
+        if len(parameters_string_array) != 2:
+            self.__raise_exception_expected_parameters_nbr(2, nbr_parameters)
+        try:
+            conveyor_id = int(parameters_string_array[0])
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("int", parameters_string_array[0])
+        if conveyor_id not in [6, 7]:
+            self.__raise_exception_expected_choice("[6, 7]", conveyor_id)
+        activate_string = parameters_string_array[1].rstrip('\r\n')
+        if activate_string not in self.__boolean_string_dict_convertor:
+            self.__raise_exception_expected_choice("[TRUE, FALSE]", activate_string)
+        activate = self.__boolean_string_dict_convertor[activate_string]
+
+        status, message = self.__niryo_one.set_conveyor(conveyor_id, activate)
+        return self.__successfull_answer([status, message])
+
+    def __control_conveyor(self, param_string):
+        parameters_string_array = param_string.split(",")
+        nbr_parameters = len(parameters_string_array)
+
+        if len(parameters_string_array) != 4:
+            self.__raise_exception_expected_parameters_nbr(4, nbr_parameters)
+
+        try:
+            conveyor_id = int(parameters_string_array[0])
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("int", parameters_string_array[0])
+        if conveyor_id not in [6, 7]:
+            self.__raise_exception_expected_choice("[6, 7]", conveyor_id)
+
+        control_on_string = parameters_string_array[1].rstrip('\r\n')
+        if control_on_string not in self.__boolean_string_dict_convertor:
+            self.__raise_exception_expected_choice("[TRUE, FALSE]", control_on_string)
+        control_on = self.__boolean_string_dict_convertor[control_on_string]
+
+        try:
+            speed = int(parameters_string_array[2])
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("int", parameters_string_array[2])
+        if speed < 0 or speed > 100:
+            self.__raise_exception_expected_choice("[0 => 100]", speed)
+
+        try:
+            direction = int(parameters_string_array[3])
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("int", parameters_string_array[2])
+        if direction not in [-1, 1]:
+            self.__raise_exception_expected_choice("[-1, 1]", direction)
+
+        status, message = self.__niryo_one.control_conveyor(conveyor_id, control_on, speed, direction)
+        return self.__successfull_answer([status, message])
+
+    def __update_conveyor_id(self, param_string):
+        parameters_string_array = param_string.split(",")
+        nbr_parameters = len(parameters_string_array)
+
+        if len(parameters_string_array) != 2:
+            self.__raise_exception_expected_parameters_nbr(2, nbr_parameters)
+        try:
+            parameters_value_array = map(int, parameters_string_array)
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("int", parameters_string_array)
+        if parameters_value_array[0] not in [6, 7]:
+            self.__raise_exception_expected_choice("[6, 7]", parameters_value_array[0])
+        if parameters_value_array[1] not in [6, 7]:
+            self.__raise_exception_expected_choice("[6, 7]", parameters_value_array[1])
+        status, message = self.__niryo_one.update_conveyor_id(*parameters_value_array)
+        return self.__successfull_answer([status, message])
+
+    def __get_current_tool_id(self):
+        tool_id = self.__niryo_one.get_current_tool_id()
+        data_answer = [self.__available_tools_string_dict_convertor_inv[tool_id]]
+        return self.__successfull_answer(data_answer)
+
+    def __get_workspace_ratio(self, param_string):
+        workspace_name = param_string.rstrip('\r\n')
+        ratio = self.__niryo_one.get_workspace_ratio(workspace_name)
+        return self.__successfull_answer([ratio])
+
+    def __get_workspace_list(self):
+        workspaces = self.__niryo_one.get_workspace_list()
+        return self.__successfull_answer_long(workspaces)
+
+    def __vision_pick(self, param_string):
+        parameters_string_array = param_string.split(',')
+        nbr_parameters = len(parameters_string_array)
+        if nbr_parameters != 4:
+            self.__raise_exception_expected_parameters_nbr(4, nbr_parameters)
+        try:
+            parameters_string_array[1] = float(parameters_string_array[1])
+        except ValueError as e:
+            self.__raise_exception_expected_type("float", parameters_string_array[1])
+        data_list = self.__niryo_one.vision_pick(
+            *parameters_string_array)
+        return self.__successfull_answer(data_list)
+
+    def __move_to_object(self, param_string):
+        parameters_string_array = param_string.split(',')
+        nbr_parameters = len(parameters_string_array)
+        if nbr_parameters != 4:
+            self.__raise_exception_expected_parameters_nbr(4, nbr_parameters)
+        try:
+            parameters_string_array[1] = float(parameters_string_array[1])
+        except ValueError as e:
+            self.__raise_exception_expected_type("float", parameters_string_array[1])
+        data_list = self.__niryo_one.move_to_object(
+            *parameters_string_array)
+        return self.__successfull_answer(data_list)
+
+    def __pick_from_pose(self, param_string):
+        parameters_string_array = param_string.split(',')
+        nbr_parameters = len(parameters_string_array)
+
+        if nbr_parameters != 6:
+            self.__raise_exception_expected_parameters_nbr(6, nbr_parameters)
+        try:
+            parameters_value_array = map(float, parameters_string_array)
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("float", parameters_string_array)
+        self.__niryo_one.pick_from_pose(*parameters_value_array)
+        return self.__successfull_answer()
+
+    def __place_from_pose(self, param_string):
+        parameters_string_array = param_string.split(',')
+        nbr_parameters = len(parameters_string_array)
+
+        if nbr_parameters != 6:
+            self.__raise_exception_expected_parameters_nbr(6, nbr_parameters)
+        try:
+            parameters_value_array = map(float, parameters_string_array)
+        except ValueError as e:
+            rospy.logwarn(str(e))
+            self.__raise_exception_expected_type("float", parameters_string_array)
+        self.__niryo_one.place_from_pose(*parameters_value_array)
+        return self.__successfull_answer()
+
+    def __get_calibration_object(self):
+        is_set, K, D = self.__niryo_one.get_calibration_object()
+        if not is_set:
+            K = D = [0, 0]
+        return self.__successfull_answer_long([is_set, K, D])

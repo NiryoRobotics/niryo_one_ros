@@ -1,0 +1,16 @@
+string obj_type
+string obj_color
+float32 workspace_ratio
+bool ret_image
+---
+int32 status
+int32 SUCCESSFUL = 0
+int32 OBJECT_NOT_FOUND = -1
+int32 MARKERS_NOT_FOUND = -2
+
+niryo_one_msgs/ObjectPose obj_pose
+
+string obj_type
+string obj_color
+
+sensor_msgs/CompressedImage img

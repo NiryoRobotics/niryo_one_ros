@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#position_command_type.py
+# position_command_type.py
 # Copyright (C) 2018 Niryo
 # All rights reserved.
 #
@@ -17,7 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 class PositionCommandType:
+    def __init__(self):
+        pass
+
     GET = 1
     CREATE = 2
     UPDATE = 3

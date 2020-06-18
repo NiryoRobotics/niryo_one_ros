@@ -45,6 +45,23 @@ class Command(Enum):
     GET_HARDWARE_STATUS = 20
     GET_LEARNING_MODE = 21
     GET_DIGITAL_IO_STATE = 22
+    GET_IMAGE_COMPRESSED = 23
+    CREATE_WORKSPACE = 24
+    REMOVE_WORKSPACE = 25
+    GET_TARGET_POSE_FROM_REL = 26
+    GET_TARGET_POSE_FROM_CAM = 27
+    DETECT_OBJECT = 28
+    GET_CURRENT_TOOL_ID = 29
+    GET_WORKSPACE_RATIO = 30
+    GET_WORKSPACE_LIST = 31
+    VISION_PICK = 32
+    MOVE_TO_OBJECT = 33
+    PICK_FROM_POSE = 34
+    PLACE_FROM_POSE = 35
+    SET_CONVEYOR = 36
+    CONTROL_CONVEYOR = 37
+    UPDATE_CONVEYOR_ID = 38
+    GET_CALIBRATION_OBJECT = 39
 
 
 @unique
@@ -93,3 +110,30 @@ class RobotTool(Enum):
     GRIPPER_3 = 3
     ELECTROMAGNET_1 = 20
     VACUUM_PUMP_1 = 30
+
+
+@unique
+class Color(Enum):
+    RED = "RED"
+    BLUE = "BLUE"
+    GREEN = "GREEN"
+    ANY = "ANY"
+
+
+@unique
+class Shape(Enum):
+    SQUARE = "SQUARE"
+    CIRCLE = "CIRCLE"
+    ANY = "ANY"
+
+
+@unique
+class ConveyorDirection(Enum):
+    FORWARD = 1
+    BACKWARD = -1
+
+
+@unique
+class ConveyorID(Enum):
+    ID_1 = 6
+    ID_2 = 7

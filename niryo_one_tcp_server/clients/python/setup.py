@@ -7,4 +7,4 @@ setup(name='niryo_one_tcp_client',
       author_email='c.ducatez@niryo.com',
       license='GPLv3',
       packages=['niryo_one_tcp_client'],
-      zip_safe=False)
+      zip_safe=False, install_requires=['rospkg', 'PyYAML'])

@@ -35,6 +35,7 @@
 #define CAN_CMD_MOVE_REL     0x18
 #define CAN_CMD_RESET        0x19 // not yet implemented
 
+#define CAN_DATA_CONVEYOR_STATE 0x07
 #define CAN_DATA_POSITION    0x03
 #define CAN_DATA_DIAGNOSTICS 0x08
 #define CAN_DATA_CALIBRATION_RESULT 0x09
@@ -42,7 +43,10 @@
 
 #define STEPPER_CONTROL_MODE_RELAX    0
 #define STEPPER_CONTROL_MODE_STANDARD 1
-#define STEPPER_CONTROL_MODE_PID_POS  2 
+#define STEPPER_CONVEYOR_OFF 20
+#define STEPPER_CONVEYOR_ON 21
+#define CAN_UPDATE_CONVEYOR_ID 23
+#define STEPPER_CONTROL_MODE_PID_POS  2
 #define STEPPER_CONTROL_MODE_TORQUE   3
 
 #define CAN_MODEL_NUMBER 10000
@@ -62,7 +66,7 @@ class NiryoCanDriver
         INT8U init();
         bool canReadData();
         INT8U readMsgBuf(INT32U *id, INT8U *len, INT8U *buf);
-         
+
 
         INT8U sendPositionCommand(int id, int cmd);
         INT8U sendRelativeMoveCommand(int id, int steps, int delay);
@@ -72,7 +76,10 @@ class NiryoCanDriver
         INT8U sendSynchronizePositionCommand(int id, bool begin_traj);
         INT8U sendMicroStepsCommand(int id, int micro_steps);
         INT8U sendMaxEffortCommand(int id, int effort);
-      
+        // Conveyor functions
+        INT8U sendConveyoOnCommand(int id, bool conveyor_on, int conveyor_speed, int8_t direction) ;
+        INT8U sendUpdateConveyorId(uint8_t old_id, uint8_t new_id);
+
 };
 
 #endif

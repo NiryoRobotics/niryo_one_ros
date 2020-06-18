@@ -26,6 +26,7 @@ from niryo_one_commander.command_status import CommandStatus
 from niryo_one_commander.robot_commander_exception import RobotCommanderException
 from actionlib_msgs.msg import GoalStatus
 
+
 class ToolCommander:
 
     def __init__(self):
@@ -43,7 +44,7 @@ class ToolCommander:
         rospy.loginfo("Tool command sent")
 
         # wait for goal transition to DONE
-        self.action_client.wait_for_result() 
+        self.action_client.wait_for_result()
 
         # if goal has been rejected/aborted, stop tracking it and return error
         if self.has_problem():
@@ -53,9 +54,10 @@ class ToolCommander:
 
     def stop_tool_command(self):
         pass
-        #todo cancel goal
+        # todo cancel goal
 
-    def create_goal(self, cmd):
+    @staticmethod
+    def create_goal(cmd):
         goal = ToolGoal()
         goal.cmd = cmd
         return goal
@@ -67,6 +69,5 @@ class ToolCommander:
 
     def has_problem(self):
         status = self.get_command_status()
-        #rospy.loginfo("STATUS : " + str(status))
-        return (status == GoalStatus.ABORTED or status == GoalStatus.REJECTED)
-
+        # rospy.loginfo("STATUS : " + str(status))
+        return status == GoalStatus.ABORTED or status == GoalStatus.REJECTED

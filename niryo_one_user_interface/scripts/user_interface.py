@@ -31,11 +31,10 @@ from niryo_one_tcp_server.tcp_server import TcpServer
 class UserInterface:
 
     def __init__(self):
-        
         # Joystick
         self.joy = JoystickInterface()
         self.joy.disable_joy()
-    
+
         # Sequence Manager
         sequences_dir = rospy.get_param("~sequences_dir")
         self.sequence_manager = SequenceManager(sequences_dir)
@@ -47,8 +46,8 @@ class UserInterface:
         # Sequence Autorun
         self.sequence_autorun = SequenceAutorun()
 
-        #Matlab node manager 
-        self.matlab_manager=MatlabManager()
+        # Matlab node manager
+        self.matlab_manager = MatlabManager()
 
         self.tcp_server = TcpServer()
         self.tcp_server.start()
@@ -56,6 +55,7 @@ class UserInterface:
     def shutdown(self):
         self.sequence_manager.shutdown()
         self.tcp_server.quit()
+
 
 if __name__ == '__main__':
     rospy.init_node('user_interface')

@@ -18,7 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class SequenceActionType:
-    
-    EXECUTE_FROM_ID     = 1
-    EXECUTE_FROM_XML    = 2
-    EXECUTE_FROM_PYTHON = 3 # Not yet implemented
+    def __init__(self):
+        pass
+
+    EXECUTE_FROM_ID = 1
+    EXECUTE_FROM_XML = 2
+    EXECUTE_FROM_PYTHON = 3  # Not yet implemented

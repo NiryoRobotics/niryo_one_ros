@@ -24,11 +24,11 @@ joint_limits:
     max_acceleration: 1.3
   joint_5:
     has_velocity_limits: true
-    max_velocity: 2.0
+    max_velocity: 2.5
     has_acceleration_limits: true
-    max_acceleration: 1.5
+    max_acceleration: 1.8
   joint_6:
     has_velocity_limits: true
-    max_velocity: 2.0
+    max_velocity: 3.14
     has_acceleration_limits: true
-    max_acceleration: 1.0
+    max_acceleration: 2.6

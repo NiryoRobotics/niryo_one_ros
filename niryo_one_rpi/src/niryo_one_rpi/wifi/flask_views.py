@@ -24,7 +24,6 @@ from niryo_one_rpi.wifi.robot_name_handler import *
 import network_manager as niryo_one_wifi
 import json
 
-
 # This id will be useful to recognize robot type (Niryo One),
 ID_NIRYO_ONE = 1
 
@@ -37,9 +36,11 @@ def set_hotspot_ssid(ssid):
     global HOTSPOT_SSID
     HOTSPOT_SSID = ssid
 
+
 def set_hotspot_password(password):
     global HOTSPOT_PASSWORD
     HOTSPOT_PASSWORD = password
+
 
 def standard_response(status, message):
     response = jsonify({
@@ -59,27 +60,29 @@ def index():
     })
     return response
 
+
 @app.route('/availableConnections', methods=['GET'])
 def get_available_connections():
     connection_list = niryo_one_wifi.get_all_available_wifi()
-    connection_list = filter(lambda c : c != HOTSPOT_SSID, connection_list)
-    #print connection_list
+    connection_list = filter(lambda c: c != HOTSPOT_SSID, connection_list)
+    # print connection_list
     response = jsonify({
         'connections': connection_list
     })
     response.status_code = 200
     return response
 
+
 @app.route('/registeredConnections', methods=['GET'])
 def get_registered_connections():
     connection_list = niryo_one_wifi.get_all_registered_wifi()
-    connection_list = filter(lambda c : c != HOTSPOT_SSID, connection_list)
+    connection_list = filter(lambda c: c != HOTSPOT_SSID, connection_list)
     response = jsonify({
         'connections': connection_list
     })
     response.status_code = 200
     return response
-    
+
 
 @app.route('/restartWifi', methods=['POST'])
 def restart_wifi():
@@ -87,10 +90,11 @@ def restart_wifi():
     niryo_one_wifi.activate_current_wlan0()
     return standard_response(200, "Wifi has been restarted")
 
+
 @app.route('/removeConnection', methods=['POST'])
 def delete_connection():
     params = request.get_json()
-    #print params
+    # print params
     if not params:
         return standard_response(400, "No ssid given")
     ssid = params.get('ssid', None)
@@ -99,9 +103,10 @@ def delete_connection():
 
     # Check if ssid = current ssid
     current_ssid = niryo_one_wifi.get_current_ssid()
-    #print current_ssid
+    # print current_ssid
     if current_ssid == ssid:
-        return standard_response(400, "Niryo One is currently connected to this ssid. Please connect the robot to another ssid, or switch to 'hotspot mode', and retry")
+        return standard_response(400,
+                                 "Niryo One is currently connected to this ssid. Please connect the robot to another ssid, or switch to 'hotspot mode', and retry")
 
     if niryo_one_wifi.delete_connection_with_ssid(ssid):
         return standard_response(200, "Connection has been removed")
@@ -122,7 +127,7 @@ def switch_to_hotspot_mode():
 @app.route('/addWifi', methods=['POST'])
 def add_Wifi():
     params = request.get_json()
-    #print params
+    # print params
     if not params:
         response = "Ssid or password empty"
         resp = jsonify({
@@ -133,8 +138,8 @@ def add_Wifi():
     ssid = params.get('ssid', None)
     password = params.get('password', None)
     name = params.get('name', '')
-    
-    #print ssid, password, name
+
+    # print ssid, password, name
     if ssid is None or password is None:
         response = "Ssid or password empty"
         resp = jsonify({
@@ -142,7 +147,7 @@ def add_Wifi():
         })
         resp.status_code = 400
         return resp
-    
+
     if niryo_one_wifi.connect_to_wifi(ssid, password):
         write_robot_name(str(name))
     else:

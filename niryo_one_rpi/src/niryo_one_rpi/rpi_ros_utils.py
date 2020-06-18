@@ -24,21 +24,26 @@ import re
 
 from niryo_one_msgs.srv import SetInt
 
-ENABLE_BUS_MOTORS_SUCCESS    = 1
-ENABLE_BUS_MOTORS_READ_FAIL  = -1
-ENABLE_BUS_MOTORS_WRITE_FAIL = -2 
+ENABLE_BUS_MOTORS_SUCCESS = 1
+ENABLE_BUS_MOTORS_READ_FAIL = -1
+ENABLE_BUS_MOTORS_WRITE_FAIL = -2
 
-CHANGE_MOTOR_CONFIG_SUCCESS       = 1
-CHANGE_MOTOR_CONFIG_READ_FAIL     = -1
-CHANGE_MOTOR_CONFIG_WRITE_FAIL    = -2
+CHANGE_MOTOR_CONFIG_SUCCESS = 1
+CHANGE_MOTOR_CONFIG_READ_FAIL = -1
+CHANGE_MOTOR_CONFIG_WRITE_FAIL = -2
 CHANGE_MOTOR_CONFIG_WRONG_VERSION = -3
 
+
 class LedState:
-    SHUTDOWN  = 1
-    HOTSPOT   = 2
-    HW_ERROR  = 3
-    OK        = 4
+    def __init__(self):
+        pass
+
+    SHUTDOWN = 1
+    HOTSPOT = 2
+    HW_ERROR = 3
+    OK = 4
     WAIT_HOTSPOT = 5
+
 
 def send_hotspot_command():
     rospy.loginfo("HOTSPOT")
@@ -50,14 +55,16 @@ def send_hotspot_command():
     except rospy.ServiceException, e:
         rospy.logwarn("Could not call set_hotspot service")
 
+
 def send_trigger_sequence_autorun():
     rospy.loginfo("Trigger sequence autorun from button")
     try:
         rospy.wait_for_service('/niryo_one/sequences/trigger_sequence_autorun', 0.1)
         trigger = rospy.ServiceProxy('/niryo_one/sequences/trigger_sequence_autorun', SetInt)
-        trigger(1) # value doesn't matter, it will switch state on the server
+        trigger(1)  # value doesn't matter, it will switch state on the server
     except (rospy.ServiceException, rospy.ROSException), e:
         return
+
 
 def send_reboot_motors_command():
     rospy.loginfo("Send reboot motor command")
@@ -70,6 +77,7 @@ def send_reboot_motors_command():
         reboot_motors(1)
     except rospy.ServiceException, e:
         pass
+
 
 def send_shutdown_command():
     rospy.loginfo("SHUTDOWN")
@@ -87,10 +95,11 @@ def send_shutdown_command():
     send_reboot_motors_command()
     rospy.sleep(0.2)
     rospy.loginfo("Command 'sudo shutdown now'")
-    try: 
+    try:
         output = subprocess.check_output(['sudo', 'shutdown', 'now'])
     except subprocess.CalledProcessError:
         rospy.loginfo("Can't exec shutdown cmd")
+
 
 def send_reboot_command():
     rospy.loginfo("REBOOT")
@@ -108,10 +117,11 @@ def send_reboot_command():
     send_reboot_motors_command()
     rospy.sleep(0.2)
     rospy.loginfo("Command 'sudo reboot'")
-    try: 
+    try:
         output = subprocess.check_output(['sudo', 'reboot'])
     except subprocess.CalledProcessError:
         rospy.loginfo("Can't exec reboot cmd")
+
 
 def send_led_state(state):
     rospy.wait_for_service('/niryo_one/rpi/set_led_state')
@@ -121,6 +131,7 @@ def send_led_state(state):
     except rospy.ServiceException, e:
         rospy.logwarn("Could not call set_led_state service")
 
+
 def enable_bus_motors_in_config_file(enable_can_bus=True, enable_dxl_bus=True):
     rospack = rospkg.RosPack()
     folder_path = rospack.get_path('niryo_one_bringup')
@@ -129,7 +140,7 @@ def enable_bus_motors_in_config_file(enable_can_bus=True, enable_dxl_bus=True):
     rospy.loginfo("Change launch file (for debug purposes): " + str(file_path))
     rospy.loginfo("Enable can_bus: " + str(enable_can_bus))
     rospy.loginfo("Enable dxl bus: " + str(enable_dxl_bus))
-  
+
     # Open file and get text
     try:
         with open(file_path, 'r') as f:
@@ -141,7 +152,7 @@ def enable_bus_motors_in_config_file(enable_can_bus=True, enable_dxl_bus=True):
     # Change disable_can
     new_line_can_bus = "<arg name=\"disable_can_for_debug\" default=\"false\""
     if not enable_can_bus:
-        new_line_can_bus = "<arg name=\"disable_can_for_debug\" default=\"true\"" 
+        new_line_can_bus = "<arg name=\"disable_can_for_debug\" default=\"true\""
     text = re.sub(r"\<arg name=\"disable_can_for_debug\" default=\"\w+\"", new_line_can_bus, text)
 
     # Change disable_dxl
@@ -158,6 +169,7 @@ def enable_bus_motors_in_config_file(enable_can_bus=True, enable_dxl_bus=True):
         rospy.logerr(e)
         return ENABLE_BUS_MOTORS_WRITE_FAIL
     return ENABLE_BUS_MOTORS_SUCCESS
+
 
 def change_motor_config_file(hw_version, can_id_list, dxl_id_list):
     rospack = rospkg.RosPack()
@@ -181,8 +193,8 @@ def change_motor_config_file(hw_version, can_id_list, dxl_id_list):
     except EnvironmentError as e:
         rospy.logerr(e)
         return CHANGE_MOTOR_CONFIG_READ_FAIL
-  
-    text_begin_lines = [] 
+
+    text_begin_lines = []
     text_can_lines = []
     text_dxl_lines = []
     text_end_lines = []
@@ -202,11 +214,15 @@ def change_motor_config_file(hw_version, can_id_list, dxl_id_list):
     # Fill CAN motor IDs depending on given ID array
     # If CAN bus is already disabled, then don't disable motors here
     if hw_version == 1:
-        text_can_lines.append('can_required_motors: # Axis 1-4 of Niryo One (stepper 1 -> id 1, stepper 2 -> id 2, ...)')
+        text_can_lines.append(
+            'can_required_motors: # Axis 1-4 of Niryo One (stepper 1 -> id 1, stepper 2 -> id 2, ...)')
     else:
-        text_can_lines.append('can_required_motors: # Axis 1-3 of Niryo One (stepper 1 -> id 1, stepper 2 -> id 2, ...)')
-    text_can_lines.append('    # Edit only for debug purposes (ex : you want to test some motors separately and detached from the robot)')
-    text_can_lines.append('    # --> Commented ids will make associated motor disable (and thus not trigger an error if not connected)')
+        text_can_lines.append(
+            'can_required_motors: # Axis 1-3 of Niryo One (stepper 1 -> id 1, stepper 2 -> id 2, ...)')
+    text_can_lines.append(
+        '    # Edit only for debug purposes (ex : you want to test some motors separately and detached from the robot)')
+    text_can_lines.append(
+        '    # --> Commented ids will make associated motor disable (and thus not trigger an error if not connected)')
     text_can_lines.append('    # Before editing, please be sure that you know what you\'re doing')
     if 1 in can_id_list or not can_bus_enabled:
         text_can_lines.append('    - 1 # Axis 1 enabled if not commented')
@@ -232,11 +248,14 @@ def change_motor_config_file(hw_version, can_id_list, dxl_id_list):
         text_dxl_lines.append('dxl_required_motors: # axis 5 and 6 of Niryo One.')
     else:
         text_dxl_lines.append('dxl_required_motors: # axis 4, 5 and 6 of Niryo One.')
-    text_dxl_lines.append('    # Edit only for debug purposes (ex : you want to test some motors separately and detached from the robot)')
-    text_dxl_lines.append('    # --> Commented ids will make associated motor disable (and thus not trigger an error if not connected)')
+    text_dxl_lines.append(
+        '    # Edit only for debug purposes (ex : you want to test some motors separately and detached from the robot)')
+    text_dxl_lines.append(
+        '    # --> Commented ids will make associated motor disable (and thus not trigger an error if not connected)')
     text_dxl_lines.append('    # Before editing, please be sure that you know what you\'re doing')
     if hw_version == 1:
-        text_dxl_lines.append('    # - Note : Axis 5 has 2 motors, but you can use only one motor for this axis when debugging')
+        text_dxl_lines.append(
+            '    # - Note : Axis 5 has 2 motors, but you can use only one motor for this axis when debugging')
     if hw_version == 1:
         if 4 in dxl_id_list or not dxl_bus_enabled:
             text_dxl_lines.append('    - 4 # -> id of Axis 5_1')
@@ -264,7 +283,8 @@ def change_motor_config_file(hw_version, can_id_list, dxl_id_list):
         else:
             text_dxl_lines.append('    #- 6 # -> id of Axis 6')
 
-    new_text = '\n'.join(text_begin_lines + [''] + text_can_lines + [''] + text_dxl_lines + [''] + text_end_lines + [''])
+    new_text = '\n'.join(
+        text_begin_lines + [''] + text_can_lines + [''] + text_dxl_lines + [''] + text_end_lines + [''])
 
     # Rewrite file with new text
     try:
@@ -274,5 +294,3 @@ def change_motor_config_file(hw_version, can_id_list, dxl_id_list):
         rospy.logerr(e)
         return CHANGE_MOTOR_CONFIG_WRITE_FAIL
     return CHANGE_MOTOR_CONFIG_SUCCESS
-
-

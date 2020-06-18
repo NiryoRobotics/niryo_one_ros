@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#niryo_one_commander_node.py 
+# niryo_one_commander_node.py
 # Copyright (C) 2018 Niryo
 # All rights reserved.
 #
@@ -22,26 +22,27 @@ import rospy
 from position_manager import PositionManager
 from trajectory_manager import TrajectoryManager
 from niryo_one_robot_state_publisher import NiryoRobotStatePublisher
-from robot_commander import RobotCommander 
+from robot_commander import RobotCommander
 
-class NiryoOneCommanderNode(): 
 
-    def __init__(self): 
+class NiryoOneCommanderNode:
+
+    def __init__(self):
         # Publish robot state (position, orientation, tool)
         self.niryo_one_robot_state_publisher = NiryoRobotStatePublisher()
 
-        # Position Manager  
+        # Position Manager
         positions_dir = rospy.get_param("~positions_dir")
         self.pos_manager = PositionManager(positions_dir)
-        #trajectory_manager 
+        # trajectory_manager
         trajectories_dir = rospy.get_param("~trajectories_dir")
         self.traj_manager = TrajectoryManager(trajectories_dir)
-        # robot commander 
+        # robot commander
         self.robot_commander = RobotCommander(self.pos_manager, self.traj_manager)
         self.robot_commander.start()
-        
+
+
 if __name__ == '__main__':
     rospy.init_node('niryo_one_commander')
     niryo_one_commander_node = NiryoOneCommanderNode()
     rospy.spin()
-

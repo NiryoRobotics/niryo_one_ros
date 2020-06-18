@@ -1,35 +1,39 @@
 #!/usr/bin/env python
 
-# pose_object.py
-# Copyright (C) 2019 Niryo
-# All rights reserved.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 
 class PoseObject:
     def __init__(self, x, y, z, roll, pitch, yaw):
         # X (meter)
-        self.x = x
+        self.x = float(x)
         # Y (meter)
-        self.y = y
+        self.y = float(y)
         # Z (meter)
-        self.z = z
+        self.z = float(z)
         # Roll (radian)
-        self.roll = roll
+        self.roll = float(roll)
         # Pitch (radian)
-        self.pitch = pitch
+        self.pitch = float(pitch)
         # Yaw (radian)
-        self.yaw = yaw
+        self.yaw = float(yaw)
 
+    def __str__(self):
+        return "x = {:.3f}, y = {:.3f}, z = {:.3f},\nroll = {:.3f}, pitch = {:.3f}, yaw = {:.3f}".format(self.x, self.y,
+                                                                                                         self.z,
+                                                                                                         self.roll,
+                                                                                                         self.pitch,
+                                                                                                         self.yaw)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def copy_with_offsets(self, x_offset=0, y_offset=0, z_offset=0, roll_offset=0, pitch_offset=0, yaw_offset=0):
+        return PoseObject(self.x + x_offset,
+                          self.y + y_offset,
+                          self.z + z_offset,
+                          self.roll + roll_offset,
+                          self.pitch + pitch_offset,
+                          self.yaw + yaw_offset)
+
+    def to_list(self):
+        list_pos = [self.x, self.y, self.z, self.roll, self.pitch, self.yaw]
+        return list(map(float, list_pos))

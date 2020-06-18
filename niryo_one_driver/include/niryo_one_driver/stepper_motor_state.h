@@ -20,6 +20,14 @@
 #ifndef NIRYO_STEPPER_MOTOR_STATE_H
 #define NIRYO_STEPPER_MOTOR_STATE_H
 
+
+#define CONVEYOR_STATE_SET_OK       200
+#define CONVEYOR_STATE_SET_ERROR       400
+#define CONVEYOR_UPDATE_ID_OK       200
+#define CONVEYOR_UPDATE_ID_ERROR       400
+#define CONVEYOR_CONTROL_OK       200
+#define CONVEYOR_CONTROL_ERROR       400
+
 class StepperMotorState {
 
     public:
@@ -42,7 +50,7 @@ class StepperMotorState {
             time_last_read = 0.0;
 
             firmware_version = "0.0.0";
-
+            conveyor_state = 0; 
             resetState();
             resetCommand();
         }
@@ -109,7 +117,21 @@ class StepperMotorState {
         void setTorqueCommand(int32_t torque)    { cmd_torque = torque; }
         void setMicroStepsCommand(uint8_t micro) { cmd_micro_steps = micro; }
         void setMaxEffortCommand(uint8_t max)    { cmd_max_effort = max; }
-    
+        
+        // Getter - Conveyor 
+        int getConveyorState()      { return conveyor_state; }
+
+        bool getConveyorControlState() { return conveyor_running;}
+        int16_t getConveyorSpeed(){ return conveyor_speed;}
+        int8_t getConveyorDirection(){ return conveyor_direction;}
+        // setter - conveyor 
+         void setConeyorState(int state)     { conveyor_state = state; }
+         void setConveyorFeedback(bool running, int16_t speed, int8_t direction)
+         {
+             conveyor_running= running;
+             conveyor_speed = speed; 
+             conveyor_direction = direction; 
+         }
     private:
     
         std::string name;
@@ -136,6 +158,11 @@ class StepperMotorState {
 
         uint8_t cmd_micro_steps;
         uint8_t cmd_max_effort;
+        
+        int conveyor_state;  
+        bool conveyor_running = false; 
+        int16_t conveyor_speed = 0;
+        int8_t conveyor_direction = 1;  
 };
 
 #endif

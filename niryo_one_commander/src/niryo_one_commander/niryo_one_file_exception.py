@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#niryo_one_file_exception.py
+# niryo_one_file_exception.py
 # Copyright (C) 2018 Niryo
 # All rights reserved.
 #
@@ -15,6 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 class NiryoOneFileException(Exception):
     pass

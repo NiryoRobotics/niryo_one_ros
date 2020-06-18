@@ -65,9 +65,16 @@ class NiryoOneCommunication : public CommunicationBase {
         void requestNewCalibration();
         bool isCalibrationInProgress();
         
+        // conveyor belt 
+        int pingAndSetConveyor(uint8_t id, bool activate, std::string &message);
+        int moveConveyor(uint8_t id, bool activate, int16_t speed, int8_t direction, std::string &message);
+        int updateIdConveyor(uint8_t old_id, uint8_t new_id, std::string &message);
+        void geCurrentConveyorStatus(int* status_conveyor_1 ,int* status_conveyor_2); 
+        void getConveyorFeedBack(uint8_t conveyor_id, bool* connection_state, bool* running, int16_t* speed, int8_t* direction);
+
         // tools
         int pingAndSetDxlTool(uint8_t id, std::string name);
-        
+
         int openGripper(uint8_t id, uint16_t open_position, uint16_t open_speed, uint16_t open_hold_torque);
         int closeGripper(uint8_t id, uint16_t close_position, uint16_t close_speed, uint16_t close_hold_torque, uint16_t close_max_torque);
         

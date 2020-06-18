@@ -28,7 +28,9 @@ add_message_files(
   TrajectoryPlan.msg
   MatlabMoveResult.msg
   Position.msg
-  Trajectory.msg 
+  Trajectory.msg
+  ObjectPose.msg
+  ConveyorFeedback.msg
 )
 
 add_service_files(
@@ -52,16 +54,31 @@ add_service_files(
   ManagePosition.srv
   GetPositionList.srv
   ManageTrajectory.srv
-  GetTrajectoryList.srv  
+  GetTrajectoryList.srv
   ChangeHardwareVersion.srv
   SendCustomDxlValue.srv
   ChangeMotorConfig.srv
   SetString.srv
+  SetCalibrationCam.srv
+  GetCalibrationCam.srv
+  ObjDetection.srv
+  EditGrip.srv
+  EditWorkspace.srv
+  GetTargetPose.srv
+  GetWorkspaceRatio.srv
+  GetWorkspaceList.srv
+  TakePicture.srv
+  SetConveyor.srv
+  ControlConveyor.srv
+  UpdateConveyorId.srv
+  GetWorkspaceRobotPoses.srv
+  DebugMarkers.srv
+  DebugColorDetection.srv
 )
 
 add_action_files(
   DIRECTORY action
-  FILES 
+  FILES
   JoystickJoints.action
   RobotMove.action
   Tool.action
@@ -74,6 +91,7 @@ generate_messages(
   geometry_msgs
   actionlib_msgs
   moveit_msgs
+  sensor_msgs
 )
 
 catkin_package(

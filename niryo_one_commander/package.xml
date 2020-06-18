@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package>
   <name>niryo_one_commander</name>
-  <version>2.2.0</version>
+  <version>2.3.0</version>
   <description>Interface between user and Moveit! to easily control Niryo One (arm + tools). Validates params, checks if previous trajectory has not finished, ...</description>
   <author>Edouard Renard</author>
-  <maintainer email="e.renard@niryo.com">Edouard Renard</maintainer>
+  <maintainer email="r.lux@niryo.com">Rémi Lux</maintainer>
   <license>GPLv3</license>
 
   <buildtool_depend>catkin</buildtool_depend>

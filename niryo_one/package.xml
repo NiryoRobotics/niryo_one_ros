@@ -1,9 +1,10 @@
 <package>
     <name>niryo_one</name>
-    <version>2.2.0</version>
+    <version>2.3.0</version>
     <description>Niryo One metapackage</description>
     <author>Edouard Renard</author>
-    <maintainer email="e.renard@niryo.com">Edouard Renard</maintainer>
+    <maintainer email="r.lux@niryo.com">Rémi Lux</maintainer>
+    <maintainer email="c.ducatez@niryo.com">Corentin Ducatez</maintainer>
     <license>GPLv3</license>
     <url type="website">https://niryo.com</url>
     <url type="repository">https://github.com/niryorobotics/niryo_one_ros</url>

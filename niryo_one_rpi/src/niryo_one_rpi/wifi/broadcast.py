@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
-from threading import Thread
 from socket import *
+
 from robot_name_handler import *
+
 
 #
 # Will broadcast own IP address, so users can find the robot on a Wi-Fi network
 #
 
 def start_broadcast_ip_publisher():
-    
-    ##s.bind(('', 1664))
+    # s.bind(('', 1664))
     robot_name = read_robot_name()
 
     while True:
@@ -36,7 +36,7 @@ def start_broadcast_ip_publisher():
         s = None
         try:
             s = socket(AF_INET, SOCK_DGRAM)
-        except Exception: 
+        except Exception:
             continue
 
         try:
@@ -45,8 +45,9 @@ def start_broadcast_ip_publisher():
             s.sendto(robot_name, ('255.255.255.255', 1665))
         except Exception:
             s.close()
-        #print "Send broadcast"
+        # print "Send broadcast"
         s.close()
+
 
 if __name__ == "__main__":
     start_broadcast_ip_publisher()

@@ -18,9 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class SequenceCommandType:
-    
-    GET               = 1
-    CREATE            = 2
-    UPDATE            = 3
-    DELETE            = 4
+    def __init__(self):
+        pass
+
+    GET = 1
+    CREATE = 2
+    UPDATE = 3
+    DELETE = 4
     GET_LAST_EXECUTED = 5

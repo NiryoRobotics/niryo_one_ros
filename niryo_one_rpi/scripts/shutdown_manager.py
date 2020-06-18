@@ -18,34 +18,31 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 import rospy
-import threading 
+import threading
 
-from niryo_one_rpi.rpi_ros_utils import send_shutdown_command 
+from niryo_one_rpi.rpi_ros_utils import send_shutdown_command
 from niryo_one_rpi.rpi_ros_utils import send_reboot_command
 
 from niryo_one_msgs.srv import SetInt
 
 
-class ShutdownManager: 
-    
-    def callback_shutdown_rpi(self, req):
-        if req.value == 1:  
+class ShutdownManager:
+    def __init__(self):
+        self.shutdown_rpi_sever = rospy.Service('/niryo_one/rpi/shutdown_rpi',
+                                                SetInt, self.callback_shutdown_rpi)
+        rospy.loginfo("Shutdown Manager OK")
+
+    @staticmethod
+    def callback_shutdown_rpi(req):
+        if req.value == 1:
             send_shutdown_command_thread = threading.Timer(1.0, send_shutdown_command)
             send_shutdown_command_thread.start()
-            return { 'status': 200, 'message': 'Robot is shutting down' }
+            return {'status': 200, 'message': 'Robot is shutting down'}
         elif req.value == 2:
             send_reboot_command_thread = threading.Timer(1.0, send_reboot_command)
             send_reboot_command_thread.start()
-            return { 'status': 200, 'message': 'Robot is rebooting' }
+            return {'status': 200, 'message': 'Robot is rebooting'}
         else:
-            return { 'status': 400, 
-                    'message': 'Incorrect value: 1 for shutdown, 2 for reboot' }
-
-    def __init__(self):
-        self.shutdown_rpi_sever = rospy.Service('/niryo_one/rpi/shutdown_rpi', 
-                SetInt, self.callback_shutdown_rpi) 
-        rospy.loginfo("Shutdown Manager OK")
-
-
+            return {'status': 400,
+                    'message': 'Incorrect value: 1 for shutdown, 2 for reboot'}

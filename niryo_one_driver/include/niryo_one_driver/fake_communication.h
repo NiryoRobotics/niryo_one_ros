@@ -77,6 +77,12 @@ class FakeCommunication : public CommunicationBase {
                 uint32_t reg_address, uint32_t byte_number);
 
         void rebootMotors();
+        // conveyor belt
+        int pingAndSetConveyor(uint8_t id, bool activate, std::string &message);
+        int moveConveyor(uint8_t id, bool activate, int16_t speed, int8_t direction, std::string &message);
+        int updateIdConveyor(uint8_t old_id, uint8_t new_id, std::string &message);
+        void geCurrentConveyorStatus(int* status_conveyor_1 ,int* status_conveyor_2); 
+        void getConveyorFeedBack(uint8_t conveyor_id, bool* connection_state, bool* running, int16_t* speed, int8_t* direction);
 
     private:
 

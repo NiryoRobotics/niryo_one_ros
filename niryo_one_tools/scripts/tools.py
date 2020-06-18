@@ -19,24 +19,26 @@
 
 class ToolValidationException(Exception): pass
 
-TOOL_STATE_PING_OK    = 0x01
+
+TOOL_STATE_PING_OK = 0x01
 TOOL_STATE_PING_ERROR = 0x02
-TOOL_STATE_WRONG_ID   = 0x03
-TOOL_STATE_TIMEOUT    = 0x04
+TOOL_STATE_WRONG_ID = 0x03
+TOOL_STATE_TIMEOUT = 0x04
 
-GRIPPER_STATE_OPEN        = 0x10
-GRIPPER_STATE_CLOSE       = 0x11
+GRIPPER_STATE_OPEN = 0x10
+GRIPPER_STATE_CLOSE = 0x11
 
-VACUUM_PUMP_STATE_PULLED     = 0x20
-VACUUM_PUMP_STATE_PUSHED     = 0x21
+VACUUM_PUMP_STATE_PULLED = 0x20
+VACUUM_PUMP_STATE_PUSHED = 0x21
 
 ROS_COMMUNICATION_PROBLEM = 0xA0
+
 
 #
 # Base class for any tool
 #
 class ToolBase(object):
-   
+
     # To override
     def get_type(self):
         pass
@@ -49,7 +51,7 @@ class ToolBase(object):
         self.is_active = True
 
     def set_as_non_active(self):
-        self.is_active = False;
+        self.is_active = False
 
     def get_id(self):
         return self.id
@@ -67,17 +69,19 @@ class ToolBase(object):
         self.is_active = False
         self.available_commands = []
 
+
 class Gripper(ToolBase):
 
     def get_type(self):
         return "gripper"
-    
+
     def validate_command(self, cmd):
         if (cmd.gripper_open_speed < 0 or cmd.gripper_open_speed > 1023 or
-            cmd.gripper_close_speed < 0 or cmd.gripper_close_speed > 1023):
+                cmd.gripper_close_speed < 0 or cmd.gripper_close_speed > 1023):
             raise ToolValidationException("Gripper open/close speed must be in ( 0 , 1023 )")
 
-    def return_gripper_status(self, state):
+    @staticmethod
+    def return_gripper_status(state):
         if state == GRIPPER_STATE_OPEN:
             return True, "Successfully opened gripper"
         if state == GRIPPER_STATE_CLOSE:
@@ -105,10 +109,10 @@ class Gripper(ToolBase):
 
     def is_connected(self):
         state = self.ros_command_interface.ping_dxl_tool(self.id, self.name)
-        return (state == TOOL_STATE_PING_OK)
+        return state == TOOL_STATE_PING_OK
 
     def __init__(self, tool_id, tool_name, ros_command_interface, open_position, open_hold_torque,
-                    close_position, close_hold_torque, close_max_torque):
+                 close_position, close_hold_torque, close_max_torque):
         super(Gripper, self).__init__(tool_id, tool_name, ros_command_interface)
         self.open_position = open_position
         self.open_hold_torque = open_hold_torque
@@ -117,7 +121,7 @@ class Gripper(ToolBase):
         self.close_max_torque = close_max_torque
 
     def update_params(self, open_position, open_hold_torque, close_position,
-                        close_hold_torque, close_max_torque):
+                      close_hold_torque, close_max_torque):
         self.open_position = open_position
         self.open_hold_torque = open_hold_torque
         self.close_position = close_position
@@ -126,13 +130,13 @@ class Gripper(ToolBase):
 
 
 class Electromagnet(ToolBase):
-    
+
     def get_type(self):
         return "electromagnet"
 
     def validate_command(self, cmd):
         pass
-    
+
     def setup_digital_io(self, cmd):
         status, message = self.ros_command_interface.digital_output_tool_setup(cmd.gpio)
         if status == 200:
@@ -157,19 +161,21 @@ class Electromagnet(ToolBase):
     def __init__(self, tool_id, tool_name, ros_command_interface):
         super(Electromagnet, self).__init__(tool_id, tool_name, ros_command_interface)
 
+
 class VacuumPump(ToolBase):
-    
+
     def get_type(self):
         return "vacuum_pump"
-    
+
     def validate_command(self, cmd):
-        pass # activate True/False
+        pass  # activate True/False
 
     def is_connected(self):
         state = self.ros_command_interface.ping_dxl_tool(self.id, self.name)
-        return (state == TOOL_STATE_PING_OK)
+        return state == TOOL_STATE_PING_OK
 
-    def return_vaccump_pump_state(self, state):
+    @staticmethod
+    def return_vaccump_pump_state(state):
         if state == VACUUM_PUMP_STATE_PULLED:
             return True, 'Successfully pulled air'
         elif state == VACUUM_PUMP_STATE_PUSHED:
@@ -189,16 +195,16 @@ class VacuumPump(ToolBase):
 
     def pull_air_vacuum_pump(self, cmd):
         state = self.ros_command_interface.pull_air_vacuum_pump(
-                self.id, self.pull_air_position, self.pull_air_hold_torque)
+            self.id, self.pull_air_position, self.pull_air_hold_torque)
         return self.return_vaccump_pump_state(state)
-    
+
     def push_air_vacuum_pump(self, cmd):
         state = self.ros_command_interface.push_air_vacuum_pump(
-                self.id, self.push_air_position)
+            self.id, self.push_air_position)
         return self.return_vaccump_pump_state(state)
-    
+
     def __init__(self, tool_id, tool_name, ros_command_interface, pull_air_position,
-            pull_air_hold_torque, push_air_position):
+                 pull_air_hold_torque, push_air_position):
         super(VacuumPump, self).__init__(tool_id, tool_name, ros_command_interface)
         self.pull_air_position = pull_air_position
         self.pull_air_hold_torque = pull_air_hold_torque
@@ -208,4 +214,3 @@ class VacuumPump(ToolBase):
         self.pull_air_position = pull_air_position
         self.pull_air_hold_torque = pull_air_hold_torque
         self.push_air_position = self.push_air_position
-

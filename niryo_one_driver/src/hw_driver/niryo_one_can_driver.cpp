@@ -93,6 +93,31 @@ INT8U NiryoCanDriver::sendTorqueOnCommand(int id, int torque_on)
     data[1] = (torque_on) ? STEPPER_CONTROL_MODE_STANDARD : STEPPER_CONTROL_MODE_RELAX; 
     return mcp_can->sendMsgBuf(id, 0, 2, data);
 }
+INT8U NiryoCanDriver::sendConveyoOnCommand(int id, bool conveyor_on, int conveyor_speed, int8_t direction)
+{
+    uint8_t data[3] = {0};
+    data[0] = CAN_CMD_MODE;
+    if(conveyor_on){
+    data[1] = STEPPER_CONVEYOR_ON;
+    }
+    else
+    {
+    data[1] = STEPPER_CONVEYOR_OFF;
+    }
+    data[2] = conveyor_speed;
+    data[3] = direction;
+
+    return mcp_can->sendMsgBuf(id, 0, 4, data);
+}
+INT8U NiryoCanDriver::sendUpdateConveyorId(uint8_t old_id, uint8_t new_id)
+{
+    ROS_ERROR("new id : %d", new_id);
+    uint8_t data[3] = {0};
+    data[0] = CAN_CMD_MODE;
+    data[1] = CAN_UPDATE_CONVEYOR_ID;
+    data[2] = new_id;
+    return mcp_can->sendMsgBuf(old_id, 0, 3, data);
+}
 
 INT8U NiryoCanDriver::sendPositionOffsetCommand(int id, int cmd, int absolute_steps_at_offset_position) 
 {

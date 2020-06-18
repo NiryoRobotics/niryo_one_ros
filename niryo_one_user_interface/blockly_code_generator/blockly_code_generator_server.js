@@ -51,6 +51,7 @@ const generateCode = (dirPath) => {
         Blockly.Xml.domToWorkspace(xml, workspace);
     }
     catch (e) {
+        console.log(e);
         return { status: 400, message: 'Failed to parse given Xml' };
     }
     

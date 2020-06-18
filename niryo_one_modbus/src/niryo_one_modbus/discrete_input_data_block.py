@@ -29,16 +29,19 @@ from niryo_one_modbus.niryo_one_data_block import NiryoOneDataBlock
  --> State of the robot
 """
 
-DI_DIGITAL_IO_MODE  = 0
+DI_DIGITAL_IO_MODE = 0
 DI_DIGITAL_IO_STATE = 100
+
 
 class DiscreteInputDataBlock(NiryoOneDataBlock):
 
     def __init__(self):
         super(DiscreteInputDataBlock, self).__init__()
+        self.digital_io_state_sub = None
 
     def start_ros_subscribers(self):
-        self.digital_io_state_sub = rospy.Subscriber('/niryo_one/rpi/digital_io_state', DigitalIOState, self.sub_digital_io_state)
+        self.digital_io_state_sub = rospy.Subscriber('/niryo_one/rpi/digital_io_state', DigitalIOState,
+                                                     self.sub_digital_io_state)
 
     def stop_ros_subscribers(self):
         self.digital_io_state_sub.unregister()
@@ -46,4 +49,3 @@ class DiscreteInputDataBlock(NiryoOneDataBlock):
     def sub_digital_io_state(self, msg):
         self.setValuesOffset(DI_DIGITAL_IO_MODE, list(msg.modes))
         self.setValuesOffset(DI_DIGITAL_IO_STATE, list(msg.states))
-

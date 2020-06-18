@@ -21,37 +21,37 @@ import rospy
 import moveit_commander
 
 
-class MoveGroupArm: 
-   
-    def __init__(self): 
+class MoveGroupArm:
+
+    def __init__(self):
         # Get params from rosparams
-        reference_frame            = rospy.get_param("~reference_frame")
-        move_group_commander_name  = rospy.get_param("~move_group_commander_name")
-        allow_replanning           = rospy.get_param("~allow_replanning")
-        goal_joint_tolerance       = rospy.get_param("~goal_joint_tolerance")
-        goal_position_tolerance    = rospy.get_param("~goal_position_tolerance")
+        reference_frame = rospy.get_param("~reference_frame")
+        move_group_commander_name = rospy.get_param("~move_group_commander_name")
+        allow_replanning = rospy.get_param("~allow_replanning")
+        goal_joint_tolerance = rospy.get_param("~goal_joint_tolerance")
+        goal_position_tolerance = rospy.get_param("~goal_position_tolerance")
         goal_orientation_tolerance = rospy.get_param("~goal_orientation_tolerance")
 
         # Set reference_frame
         self.reference_frame = reference_frame
-        
+
         # Get Arm MoveGroupCommander
         move_group_arm_ok = False
-        while (not move_group_arm_ok):
+        while not move_group_arm_ok:
             try:
                 rospy.loginfo("Trying to get 'arm' group from moveit...")
                 self.arm = moveit_commander.MoveGroupCommander(move_group_commander_name)
                 move_group_arm_ok = True
             except RuntimeError as e:
                 rospy.loginfo(e)
-                rospy.sleep(1.0)       
-    
+                rospy.sleep(1.0)
+
         # Get end effector link
         self.end_effector_link = self.arm.get_end_effector_link()
-        
+
         # Set pose reference frame
         self.arm.set_pose_reference_frame(self.reference_frame)
-       
+
         # Set planning parameters
         self.arm.allow_replanning(allow_replanning)
         self.arm.set_goal_joint_tolerance(goal_joint_tolerance)
@@ -59,11 +59,11 @@ class MoveGroupArm:
         self.arm.set_goal_orientation_tolerance(goal_orientation_tolerance)
 
         rospy.loginfo("Successfully connected to move_group." +
-                "\n" + "Started group     : " + str(self.arm.get_name()) + 
-                "\n" + "Planning_frame    : " + str(self.arm.get_planning_frame()) + 
-                "\n" + "Reference frame   : " + str(self.reference_frame) + 
-                "\n" + "End effector link : " + str(self.end_effector_link))
-        
+                      "\n" + "Started group     : " + str(self.arm.get_name()) +
+                      "\n" + "Planning_frame    : " + str(self.arm.get_planning_frame()) +
+                      "\n" + "Reference frame   : " + str(self.reference_frame) +
+                      "\n" + "End effector link : " + str(self.end_effector_link))
+
         rospy.loginfo("Arm Moveit Commander has been started")
 
     """
@@ -71,7 +71,7 @@ class MoveGroupArm:
     http://docs.ros.org/indigo/api/moveit_commander/html/classmoveit__commander_1_1move__group_1_1MoveGroupCommander.html#a63bbf526cd62983ca44536ed6dd16813
 
     """
-    
+
     def compute_plan(self):
         plan = self.arm.plan()
 
@@ -93,10 +93,10 @@ class MoveGroupArm:
 
     def set_rpy_target(self, roll, pitch, yaw):
         self.arm.set_rpy_target([roll, pitch, yaw], self.end_effector_link)
- 
+
     def set_pose_target(self, x, y, z, roll, pitch, yaw):
         self.arm.set_pose_target([x, y, z, roll, pitch, yaw], self.end_effector_link)
-        
+
     def set_pose_quat_target(self, pose):
         self.arm.set_pose_target(pose, self.end_effector_link)
 
@@ -105,4 +105,3 @@ class MoveGroupArm:
 
     def set_max_velocity_scaling_factor(self, percentage):
         self.arm.set_max_velocity_scaling_factor(percentage)
-

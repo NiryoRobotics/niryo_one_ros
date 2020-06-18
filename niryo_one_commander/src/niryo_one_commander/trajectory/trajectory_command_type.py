@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 class TrajectoryCommandType:
+    def __init__(self):
+        pass
+
     GET = 1
     CREATE = 2
     UPDATE = 3
     DELETE = 4
-    

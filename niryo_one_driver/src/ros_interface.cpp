@@ -138,6 +138,25 @@ bool RosInterface::callbackPingAndSetDxlTool(niryo_one_msgs::PingDxlTool::Reques
     return true;
 }
 
+bool RosInterface::callbackPingAndSetConveyor(niryo_one_msgs::SetConveyor::Request &req, niryo_one_msgs::SetConveyor::Response &res) {
+    std::string message = "";
+    res.status = comm->pingAndSetConveyor(req.id, req.activate, message);
+    res.message = message; 
+    return true;
+}
+bool RosInterface::callbackControlConveyor(niryo_one_msgs::ControlConveyor::Request &req, niryo_one_msgs::ControlConveyor::Response &res){
+    std::string message = "";
+    res.status = comm->moveConveyor(req.id, req.control_on, req.speed, req.direction, message);
+    res.message = message; 
+    return true;
+}
+bool  RosInterface::callbackUpdateIdConveyor(niryo_one_msgs::UpdateConveyorId::Request &req, niryo_one_msgs::UpdateConveyorId::Response &res){
+    std::string message = "";
+    res.status = comm->updateIdConveyor(req.old_id, req.new_id, message);
+    res.message = message;
+    return true;
+}
+
 bool RosInterface::callbackOpenGripper(niryo_one_msgs::OpenGripper::Request &req, niryo_one_msgs::OpenGripper::Response &res)
 {
     res.state = comm->openGripper(req.id, req.open_position, req.open_speed, req.open_hold_torque);
@@ -192,7 +211,7 @@ bool RosInterface::callbackSendCustomDxlValue(niryo_one_msgs::SendCustomDxlValue
     }
 
     comm->addCustomDxlCommand(req.motor_type, req.id, req.value, req.reg_address, req.byte_number);
-    
+
     res.status = 200;
     res.message = "OK";
     return true;
@@ -215,6 +234,12 @@ void RosInterface::startServiceServers()
     activate_leds_server = nh_.advertiseService("niryo_one/set_dxl_leds", &RosInterface::callbackActivateLeds, this);
 
     ping_and_set_dxl_tool_server = nh_.advertiseService("niryo_one/tools/ping_and_set_dxl_tool", &RosInterface::callbackPingAndSetDxlTool, this);
+
+    // steppers service test
+    ping_and_set_stepper_server = nh_.advertiseService("niryo_one/kits/ping_and_set_conveyor", &RosInterface::callbackPingAndSetConveyor, this);
+    control_conveyor_server = nh_.advertiseService("niryo_one/kits/control_conveyor", &RosInterface::callbackControlConveyor, this);
+    update_conveyor_id_server = nh_.advertiseService("niryo_one/kits/update_conveyor_id", &RosInterface::callbackUpdateIdConveyor, this);
+
     open_gripper_server = nh_.advertiseService("niryo_one/tools/open_gripper", &RosInterface::callbackOpenGripper, this);
     close_gripper_server = nh_.advertiseService("niryo_one/tools/close_gripper", &RosInterface::callbackCloseGripper, this);
     pull_air_vacuum_pump_server = nh_.advertiseService("niryo_one/tools/pull_air_vacuum_pump", &RosInterface::callbackPullAirVacuumPump, this);
@@ -313,6 +338,52 @@ void RosInterface::publishLearningMode()
     }
 }
 
+void RosInterface::publishConveyor1Feedback()
+{   
+    double publish_conveyor_feedback_frequency = 2.0;
+    ros::Rate publish_conveyor_feedback_rate = ros::Rate(publish_conveyor_feedback_frequency);
+
+    while (ros::ok()) {
+        niryo_one_msgs::ConveyorFeedback msg;
+        bool connection_state;
+        bool running;
+        int16_t speed;
+        int8_t direction; 
+        comm->getConveyorFeedBack (6, &connection_state, &running, &speed, &direction); 
+        msg.conveyor_id  = 6;
+        msg.connection_state = connection_state; 
+        msg.running = running;
+        msg.speed = speed; 
+        msg.direction = direction;  
+
+        conveyor_1_feedback_publisher.publish(msg);
+        publish_conveyor_feedback_rate.sleep();
+    }
+}
+
+void RosInterface::publishConveyor2Feedback()
+{   
+    double publish_conveyor_feedback_frequency = 2.0;
+    ros::Rate publish_conveyor_feedback_rate = ros::Rate(publish_conveyor_feedback_frequency);
+
+    while (ros::ok()) {
+        niryo_one_msgs::ConveyorFeedback msg;
+        bool connection_state;
+        bool running;
+        int16_t speed;
+        int8_t direction; 
+        comm->getConveyorFeedBack (7, &connection_state, &running, &speed, &direction); 
+        msg.conveyor_id  = 7;
+        msg.connection_state = connection_state; 
+        msg.running = running;
+        msg.speed = speed; 
+        msg.direction = direction;  
+
+        conveyor_2_feedback_publisher.publish(msg);
+        publish_conveyor_feedback_rate.sleep();
+    }
+}
+
 void RosInterface::startPublishers()
 {
     hardware_status_publisher = nh_.advertise<niryo_one_msgs::HardwareStatus>("niryo_one/hardware_status", 10);
@@ -323,6 +394,12 @@ void RosInterface::startPublishers()
 
     learning_mode_publisher = nh_.advertise<std_msgs::Bool>("niryo_one/learning_mode", 10);
     publish_learning_mode_thread.reset(new std::thread(boost::bind(&RosInterface::publishLearningMode, this)));
+    
+    conveyor_1_feedback_publisher = nh_.advertise<niryo_one_msgs::ConveyorFeedback>("niryo_one/kits/conveyor_1_feedback", 10);
+    publish_conveyor_1_feedback_thread.reset(new std::thread(boost::bind(&RosInterface::publishConveyor1Feedback, this)));
+
+    conveyor_2_feedback_publisher = nh_.advertise<niryo_one_msgs::ConveyorFeedback>("niryo_one/kits/conveyor_2_feedback", 10);
+    publish_conveyor_2_feedback_thread.reset(new std::thread(boost::bind(&RosInterface::publishConveyor2Feedback, this)));  
 }
 
 

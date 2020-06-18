@@ -1,13 +1,15 @@
 # Niryo One Tcp Server
-This a Tcp server built on top of the [Niryo Python API](../niryo_one_python_api).
-<br><br>Programs can communicate through network TCP with the robots in any language available. (see [clients](clients) folder for available clients)
-<br>It offers a simple way for developers to create programs for robot to control them via remote communication on a computer, on a mobile or any device with network facilities.
+This a TCP server built on top of the [Niryo Python API](../niryo_one_python_api).
+
+<br>Programs can communicate through network TCP with the robots in any language available. (see [clients](clients) folder for available clients)
+
+It offers a simple way for developers to create programs for robot to control them via remote communication on a computer, on a mobile or any device with network facilities.
 
 ## Documentation
 
 ### Architecture
 
-![Niryo One TCP architecture](img/Niryo&#32;One&#32;TCP&#32;Architecture.jpg)
+![Niryo One TCP architecture](img/Niryo_One_TCP_Architecture.jpg)
 
 ### Connection
 
@@ -20,7 +22,7 @@ Port of the server: 40001
 
 ### Format
 
-For easier usage and easier debugging, the communication is in ascii format.
+For easier usage and easier debugging, the communication is in ASCII format.
 
 #### General format
 
@@ -77,6 +79,24 @@ For already existing clients, please go to the [clients](clients) folder and che
 * "GET_HARDWARE_STATUS"
 * "GET_LEARNING_MODE"
 * "GET_DIGITAL_IO_STATE"
+* "GET_DIGITAL_IO_STATE"
+* "GET_IMAGE_COMPRESSED"
+* "CREATE_WORKSPACE"
+* "REMOVE_WORKSPACE"
+* "GET_TARGET_POSE_FROM_REL"
+* "GET_TARGET_POSE_FROM_CAM"
+* "DETECT_OBJECT"
+* "GET_CURRENT_TOOL_ID"
+* "GET_WORKSPACE_RATIO"
+* "GET_WORKSPACE_LIST"
+* "VISION_PICK"
+* "MOVE_TO_OBJECT"
+* "PICK_FROM_POSE"
+* "PLACE_FROM_POSE"
+* "SET_CONVEYOR"
+* "CONTROL_CONVEYOR"
+* "UPDATE_CONVEYOR_ID"
+* "GET_CALIBRATION_OBJECT"
 
 #### CALIBRATE
 
@@ -317,10 +337,227 @@ No parameters
 
 #### GET_DIGITAL_IO_STATE
 
-No parameters
+No parameter
 
 **Example:**
     `GET_DIGITAL_IO_STATE`
 <br>**Answers:**
 * On success the format is `GET_DIGITAL_IO_STATE:OK,[pin_id, name, mode, state],...` ('...' means that the `[pin_id, name, mode, state]` block is repeated for each pin)
     * ex: `GET_DIGITAL_IO_STATE:OK,[2, '1A', 1, 1],[3, '1B', 1, 1],[16, '1C', 1, 1],[26, '2A', 1, 1],[19, '2B', 1, 1],[6, '2C', 1, 1],[12, 'SW1', 0, 0],[13, 'SW2', 0, 0]`
+
+#### GET_IMAGE_COMPRESSED
+
+No parameters
+
+**IMPORTANT** Due to the large and variable image size, a new answer format is needed, see the examples below. The client is expected to first receive the Command:OK and the image size. Then it should continue receiving until the size of the received image equals image size.
+**Example:**
+    `GET_IMAGE_COMPRESSED`
+<br>**Answers:**
+* On success the format is `GET_IMAGE_COMPRESSED:OK,IMAGE_SIZE,IMAGE`
+* ex: `GET_IMAGE_COMPRESSED:OK,12345,...`
+
+#### CREATE_WORKSPACE
+
+Parameters:
+* name of the workspace: WORKSPACE_NAME
+    * Notes: Needs to be one of the available workspaces
+* robot pose when pointing at marker 0: POSE_0 (e.g. `[0.2, 0.2, 0.0, 0.0, 0.0, 0.0]`)
+* robot pose when pointing at marker 1: POSE_1 (e.g. `[0.2, 0.1, 0.0, 0.0, 0.0, 0.0]`)
+* robot pose when pointing at marker 2: POSE_2 (e.g. `[0.1, 0.1, 0.0, 0.0, 0.0, 0.0]`)
+* robot pose when pointing at marker 3: POSE_3 (e.g. `[0.1, 0.2, 0.0, 0.0, 0.0, 0.0]`)
+
+**Example:**
+    `CREATE_WORKSPACE,WORKSPACE_NAME,[0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.2, 0.1, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.1, 0.2, 0.0, 0.0, 0.0, 0.0]`
+<br>**Answers:** See [answer format section](#answer-format)
+
+#### REMOVE_WORKSPACE
+Parameters:
+* name of the workspace: WORKSPACE_NAME
+
+**Example:**
+    `REMOVE_WORKSPACE,WORKSPACE_NAME`
+<br>**Answers:** See [answer format section](#answer-format)
+
+#### GET_TARGET_POSE_FROM_REL
+Parameters:
+* name of the workspace: WORKSPACE_NAME
+* height offset: HEIGHT_OFFSET
+    * expressed in meters
+* workspace relative pose: X_REL (in [0,1]), Y_REL (in [0,1]), YAW_REL (in [-π,π])
+
+**Example:**
+    `GET_TARGET_POSE_FROM_REL,WORKSPACE_NAME,0.1,0.2,0.753`
+<br>**Answers:**
+* On success the format is `GET_TARGET_POSE_FROM_REL:OK,x,y,z,roll,pitch,yaw
+    * ex: `GET_TARGET_POSE_FROM_REL:OK,0.0695735635306,1.31094787803e-12,0.200777981243,-5.10302119597e-12,0.757298,5.10351727471e-12`
+    * x, y, z values are expressed in meters
+    * roll, pitch, yaw are expressed in radians
+
+#### GET_TARGET_POSE_FROM_CAM
+
+Parameters:
+* name of the workspace: WORKSPACE_NAME
+* height offset: HEIGHT_OFFSET
+    * expressed in meters
+* object shape to detect: SHAPE
+    * must be one of: SQUARE CIRCLE ANY
+* object color to detect: COLOR
+    * must be one of: RED BLUE GREEN ANY
+
+**Example:**
+    `GET_TARGET_POSE_FROM_CAM,WORKSPACE_NAME,0.02,ANY,RED`
+<br>**Answers:**
+* On success the format is `GET_TARGET_POSE_FROM_CAM:OK,OBJECT_FOUND,x,y,z,roll,pitch,yaw,SHAPE,COLOR`
+    * where SHAPE, COLOR are the same as the input unless the input is ANY
+* ex: `GET_TARGET_POSE_FROM_CAM:OK,True,,0.0695735635306,1.31094787803e-12,0.200777981243,-5.10302119597e-12,0.757298,5.10351727471e-12,CIRCLE,RED`
+
+#### DETECT_OBJECT
+Parameters:
+* name of the workspace: WORKSPACE_NAME
+* object shape to detect: SHAPE
+    * must be one of: SQUARE CIRCLE ANY
+* object color to detect: COLOR
+    * must be one of: RED BLUE GREEN ANY
+
+**Example:**
+    `DETECT_OBJECT,WORKSPACE_NAME,CIRCLE,ANY`
+<br>**Answers:**
+* On success the format is `DETECT_OBJECT:OK,OBJECT_FOUND,X_REL,Y_REL,YAW_REL,SHAPE,COLOR`
+    * where SHAPE, COLOR are the same as the input unless the input is ANY
+* ex: `DETECT_OBJECT:OK,True,0.2421, 0.121, 0.731,CIRCLE,RED`
+
+#### GET_CURRENT_TOOL_ID
+
+No parameter
+
+**Example:**
+    `GET_CURRENT_TOOL_ID`
+<br>**Answers:**
+* On success the format is `GET_CURRENT_TOOL_ID:OK,TOOL_NAME`
+* ex: `GET_CURRENT_TOOL_ID:OK,GRIPPER_1`
+
+#### GET_WORKSPACE_RATIO
+Parameters:
+* name of the workspace: WORKSPACE_NAME
+
+**Example:**
+    `GET_WORKSPACE_RATIO,WORKSPACE_NAME`
+<br>**Answers:**
+* On success the format is `GET_WORKSPACE_RATIO:OK,RATIO`
+* ex: `GET_WORKSPACE_RATIO:OK,0.937263`
+
+#### GET_WORKSPACE_LIST
+
+No parameter
+
+**Example:**
+    `GET_WORKSPACE_LIST`
+<br>**Answers:**
+* On success the format is `GET_WORKSPACE_LIST:OK,list_size,[workspaces]`
+* ex: `GET_WORKSPACE_LIST:OK,21,Conveyor,Large_1,Wall`
+
+#### VISION_PICK
+
+Parameters:
+* name of the workspace: WORKSPACE_NAME
+* height offset: HEIGHT_OFFSET
+    * expressed in m
+* object shape to detect: SHAPE
+    * must be one of: SQUARE CIRCLE ANY
+* object color to detect: COLOR
+    * must be one of: RED BLUE GREEN ANY
+
+**Example:**
+    `VISION_PICK,WORKSPACE_NAME,HEIGHT_OFFSET,CIRCLE,ANY`
+<br>>**Answers:**
+* On success the format is `VISION_PICK:OK,OBJECT_PICKED,SHAPE,COLOR`
+* ex: `VISION_PICK:OK,True,CIRCLE,GREEN`
+
+#### MOVE_TO_OBJECT
+
+Parameters:
+* name of the workspace: WORKSPACE_NAME
+* height offset: HEIGHT_OFFSET
+    * expressed in m
+* object shape to detect: SHAPE
+    * must be one of: SQUARE CIRCLE ANY
+* object color to detect: COLOR
+    * must be one of: RED BLUE GREEN ANY
+
+**Example:**
+    `MOVE_TO_OBJECT,WORKSPACE_NAME,HEIGHT_OFFSET,CIRCLE,ANY`
+<br>**Answers:**
+* On success the format is `MOVE_TO_OBJECT:OK,OBJECT_FOUND,SHAPE,COLOR`
+* ex: `MOVE_TO_OBJECT:OK,True,CIRCLE,GREEN`
+
+#### PICK_FROM_POSE
+
+Parameters:
+* x: value of x position **(m)** in **float**
+* y: value of y position **(m)** in **float**
+* z: value of z position **(m)** in **float**
+* roll: value of roll rotation **(rad)** in **float**
+* pitch: value of pitch rotation **(rad)** in **float**
+* yaw: value of yaw rotation **(rad)** in **float**
+
+**Example:**
+    `PICK_FROM_POSE:0.03,0.0123,0.456,0.987,0.654,0.321`
+<br>**Answers:** See [answer format section](#answer-format)
+
+#### PLACE_FROM_POSE
+
+Parameters:
+* x: value of x position **(m)** in **float**
+* y: value of y position **(m)** in **float**
+* z: value of z position **(m)** in **float**
+* roll: value of roll rotation **(rad)** in **float**
+* pitch: value of pitch rotation **(rad)** in **float**
+* yaw: value of yaw rotation **(rad)** in **float**
+
+**Example:**
+    `PLACE_FROM_POSE:0.03,0.0123,0.456,0.987,0.654,0.321`
+<br>**Answers:** See [answer format section](#answer-format)
+
+#### SET_CONVEYOR
+
+Parameters:
+* conveyor_id: id of the conveyor 6 (conveyor 1) or 7 (conveyor 2)
+* equipped: TRUE to use the conveyor / FALSE to unused
+
+**Example:**
+    `SET_CONVEYOR:6,TRUE`
+<br>**Answers:** See [answer format section](#answer-format)
+
+#### CONTROL_CONVEYOR
+
+Parameters:
+* conveyor_id: id of the conveyor 6 (conveyor 1) or 7 (conveyor 2)
+* control_on: TRUE to activate the conveyor / FALSE to stop the conveyor
+* speed: percentage of speed wanted (between 0 and 100)
+* direction: indicates in which direction the conveyor should run: -1 (BACKWARD) or 1 (FORWARD)
+
+**Example:**
+    `CONTROL_CONVEYOR:6,TRUE,80,1`
+<br>**Answers:** See [answer format section](#answer-format)
+
+#### UPDATE_CONVEYOR_ID
+
+Parameters:
+* current_conveyor_id: current conveyor id: 6 (conveyor 1) or 7 (conveyor 2)
+* new_conveyor_id: id wanted for the conveyor: 6 (conveyor 1) or 7 (conveyor 2)
+
+**Example:**
+    `UPDATE_CONVEYOR_ID:6,7`
+<br>**Answers:** See [answer format section](#answer-format)
+
+#### GET_CALIBRATION_OBJECT
+
+No parameters
+
+**Example:**
+    `GET_CALIBRATION_OBJECT`
+<br>**Answers:**
+* On success the format is `GET_CALIBRATION_OBJECT:OK,tuple_mtx,tuple_dist
+    * ex: `GET_CALIBRATION_OBJECT:OK,(450,0,320,0,400,240,0,0,1),(20.1,1.5674,0.498,0.249)`
+    * tuple_mtx is a flatten 3x3 matrix which represent camera intrinsics parameters
+    * tuple_dist is a vector which can have different length, representing distortion factors 

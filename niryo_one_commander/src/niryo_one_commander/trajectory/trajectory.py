@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#trajectory.py
+# trajectory.py
 # Copyright (C) 2018 Niryo
 # All rights reserved.
 #
@@ -18,15 +18,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from niryo_one_msgs.msg import TrajectoryPlan
 
-class Trajectory: 
 
-    def __init__(self, id = 0 , name = "", description = "", 
-            trajectory_plan = TrajectoryPlan() ):
-        self.id = id
+class Trajectory:
+
+    def __init__(self, identif=0, name="", description="",
+                 trajectory_plan=TrajectoryPlan()):
+        self.id = identif
         self.name = name
         self.description = description
-        self.trajectory_plan = trajectory_plan 
-
-
-
-
+        self.trajectory_plan = trajectory_plan

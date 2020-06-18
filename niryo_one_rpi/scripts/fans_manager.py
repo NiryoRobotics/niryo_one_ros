@@ -25,23 +25,8 @@ import RPi.GPIO as GPIO
 FAN_1_GPIO = 27
 FAN_2_GPIO = 23
 
-class FansManager:
 
-    def setup_fans(self):
-        GPIO.setwarnings(False) 
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(FAN_1_GPIO, GPIO.OUT)
-        GPIO.setup(FAN_2_GPIO, GPIO.OUT)
-        rospy.sleep(0.05)
-        rospy.loginfo("------ RPI FANS SETUP OK ------")
-    
-    def set_fans(self, activate):
-        if activate:
-            GPIO.output(FAN_1_GPIO, GPIO.HIGH)
-            GPIO.output(FAN_2_GPIO, GPIO.HIGH)
-        else:
-            GPIO.output(FAN_1_GPIO, GPIO.LOW)
-            GPIO.output(FAN_2_GPIO, GPIO.LOW)
+class FansManager:
 
     def __init__(self):
         self.setup_fans()
@@ -52,12 +37,27 @@ class FansManager:
         self.set_fans(not self.learning_mode_on)
 
         self.learning_mode_subscriber = rospy.Subscriber(
-                '/niryo_one/learning_mode', Bool, self.callback_learning_mode)
+            '/niryo_one/learning_mode', Bool, self.callback_learning_mode)
 
+    @staticmethod
+    def setup_fans():
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(FAN_1_GPIO, GPIO.OUT)
+        GPIO.setup(FAN_2_GPIO, GPIO.OUT)
+        rospy.sleep(0.05)
+        rospy.loginfo("------ RPI FANS SETUP OK ------")
+
+    @staticmethod
+    def set_fans(activate):
+        if activate:
+            GPIO.output(FAN_1_GPIO, GPIO.HIGH)
+            GPIO.output(FAN_2_GPIO, GPIO.HIGH)
+        else:
+            GPIO.output(FAN_1_GPIO, GPIO.LOW)
+            GPIO.output(FAN_2_GPIO, GPIO.LOW)
 
     def callback_learning_mode(self, msg):
         if msg.data != self.learning_mode_on:
             self.learning_mode_on = msg.data
             self.set_fans(not self.learning_mode_on)
-
-

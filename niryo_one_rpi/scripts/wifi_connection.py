@@ -32,66 +32,15 @@ from niryo_one_rpi.wifi.flask_views import set_hotspot_ssid
 from niryo_one_rpi.wifi.flask_views import set_hotspot_password
 import niryo_one_rpi.wifi.network_manager as niryo_one_wifi
 
+
 class WifiConnectionManager:
-
-    def send_hotspot_state(self, event):
-        activated = niryo_one_wifi.is_hotspot_activated() # would be better to call get_current_ssid, but takes 0.3 sec
-        self.publish_hotspot_state(activated)
-
-    def publish_hotspot_state(self, activated):
-        msg = Bool()
-        msg.data = activated
-        self.hotspot_state_publisher.publish(msg)
-    
-    def service_response(self, status, message):
-        return {'status': status, 'message': message}
-
-    def callback_activate_hotspot(self, req):
-        rospy.loginfo("Switch to hotspot mode")
-        if niryo_one_wifi.get_current_ssid() == self.hotspot_ssid:
-            return self.service_response(200, "Hotspot mode already activated")
-        success = niryo_one_wifi.hard_enable_hotspot_with_ssid(self.hotspot_ssid, self.hotspot_password)
-        if success:
-            return self.service_response(200, "Hotspot mode activated")
-        return self.service_response(400, "Failed to activate hotspot mode")
-
-    def start_broadcast(self):
-        start_broadcast_ip_publisher()
-    
-    def run_flask_server(self):
-        app.run(host='0.0.0.0')
-
-    def get_robot_unique_identifier(self):
-        identifier = ''
-        with open('/proc/cpuinfo', 'r') as f:
-            rpi_serial = ''
-            for line in f:
-                if line[0:6] == 'Serial':
-                    rpi_serial = line[10:26]
-                    break
-            if rpi_serial != '':
-                # Build something readable and not too long
-                identifier = str(rpi_serial[8:10]) + '-' + str(rpi_serial[10:13]) + '-' + str(rpi_serial[13:16])
-        return identifier
-
-    def callback_set_robot_name(self, req):
-        name = req.value
-        rospy.loginfo("Setting robot name to: " + str(name))
-        if len(name) > 32 or len(name) < 3:
-            rospy.loginfo('Invalid name: length must be between 3-32 characters')
-            return self.service_response(400, 'Name length must be between 3-32 characters')
-        if not write_robot_name(name):
-            return self.service_response(400, 'Could not write robot name to file')
-        self.robot_name = read_robot_name()
-        return self.service_response(200, 'Successfully saved robot name')
-
     def __init__(self):
         rospy.loginfo("Starting wifi manager...")
-        
+
         self.hotspot_ssid = rospy.get_param("~hotspot_ssid")
         # add robot unique identifier to ssid to make it unique and recognizable
         self.hotspot_ssid += " "
-        self.hotspot_ssid += str(self.get_robot_unique_identifier()) 
+        self.hotspot_ssid += str(self.get_robot_unique_identifier())
         self.hotspot_password = rospy.get_param("~hotspot_password")
         self.filename_robot_name = rospy.get_param("~filename_robot_name")
 
@@ -104,8 +53,8 @@ class WifiConnectionManager:
             self.hotspot_ssid = self.robot_name
 
         # Start set robot name service server
-        self.set_robot_name_server = rospy.Service('/niryo_one/wifi/set_robot_name', 
-                SetString, self.callback_set_robot_name)
+        self.set_robot_name_server = rospy.Service('/niryo_one/wifi/set_robot_name',
+                                                   SetString, self.callback_set_robot_name)
 
         # Set Niryo One hotspot ssid and password
         set_hotspot_ssid(self.hotspot_ssid)
@@ -134,14 +83,69 @@ class WifiConnectionManager:
         rospy.Timer(rospy.Duration(1), self.send_hotspot_state)
 
         # Start hotspot subscriber (from button)
-        self.activate_hotspot_server = rospy.Service('/niryo_one/wifi/set_hotspot', 
-                SetInt, self.callback_activate_hotspot)
-        
+        self.activate_hotspot_server = rospy.Service('/niryo_one/wifi/set_hotspot',
+                                                     SetInt, self.callback_activate_hotspot)
+
         rospy.loginfo("Wifi manager started")
+
+    def send_hotspot_state(self, event):
+        activated = niryo_one_wifi.is_hotspot_activated()  # would be better to call get_current_ssid, but takes 0.3 sec
+        self.publish_hotspot_state(activated)
+
+    def publish_hotspot_state(self, activated):
+        msg = Bool()
+        msg.data = activated
+        self.hotspot_state_publisher.publish(msg)
+
+    @staticmethod
+    def service_response(status, message):
+        return {'status': status, 'message': message}
+
+    def callback_activate_hotspot(self, req):
+        rospy.loginfo("Switch to hotspot mode")
+        if niryo_one_wifi.get_current_ssid() == self.hotspot_ssid:
+            return self.service_response(200, "Hotspot mode already activated")
+        success = niryo_one_wifi.hard_enable_hotspot_with_ssid(self.hotspot_ssid, self.hotspot_password)
+        if success:
+            return self.service_response(200, "Hotspot mode activated")
+        return self.service_response(400, "Failed to activate hotspot mode")
+
+    @staticmethod
+    def start_broadcast():
+        start_broadcast_ip_publisher()
+
+    @staticmethod
+    def run_flask_server():
+        app.run(host='0.0.0.0')
+
+    @staticmethod
+    def get_robot_unique_identifier():
+        identifier = ''
+        with open('/proc/cpuinfo', 'r') as f:
+            rpi_serial = ''
+            for line in f:
+                if line[0:6] == 'Serial':
+                    rpi_serial = line[10:26]
+                    break
+            if rpi_serial != '':
+                # Build something readable and not too long
+                identifier = str(rpi_serial[8:10]) + '-' + str(rpi_serial[10:13]) + '-' + str(rpi_serial[13:16])
+        return identifier
+
+    def callback_set_robot_name(self, req):
+        name = req.value
+        rospy.loginfo("Setting robot name to: " + str(name))
+        if len(name) > 32 or len(name) < 3:
+            rospy.loginfo('Invalid name: length must be between 3-32 characters')
+            return self.service_response(400, 'Name length must be between 3-32 characters')
+        if not write_robot_name(name):
+            return self.service_response(400, 'Could not write robot name to file')
+        self.robot_name = read_robot_name()
+        return self.service_response(200, 'Successfully saved robot name')
 
 
 if __name__ == '__main__':
-    #rospy.init_node('niryo_one_wifi_connection_manager')
-    #WifiConnectionManager()
-    #rospy.spin()
+    # rospy.init_node('niryo_one_wifi_connection_manager')
+    # WifiConnectionManager()
+    # rospy.spin()
     pass

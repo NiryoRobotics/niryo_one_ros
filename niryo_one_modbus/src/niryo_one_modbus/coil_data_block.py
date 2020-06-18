@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import rospy
 from niryo_one_msgs.srv import SetDigitalIO
 
 from niryo_one_modbus.niryo_one_data_block import NiryoOneDataBlock
@@ -31,7 +30,7 @@ from niryo_one_modbus.niryo_one_data_block import NiryoOneDataBlock
  not the current robot state !)
 """
 
-CO_DIGITAL_IO_MODE  = 0
+CO_DIGITAL_IO_MODE = 0
 CO_DIGITAL_IO_STATE = 100
 
 GPIO_1_A = 2
@@ -41,11 +40,12 @@ GPIO_2_A = 26
 GPIO_2_B = 19
 GPIO_2_C = 6
 
+
 class CoilDataBlock(NiryoOneDataBlock):
 
     def __init__(self):
         super(CoilDataBlock, self).__init__()
-    
+
     # Override
     def setValues(self, address, values):
         self.process_command(address, values)
@@ -72,16 +72,13 @@ class CoilDataBlock(NiryoOneDataBlock):
         elif address == 5 or address == 105:
             pin = GPIO_2_C
 
-        if address >= 0 and address < 100:
+        if 0 <= address < 100:
             self.set_pin_mode(pin, value)
-        elif address >= 100 and address < 200:
+        elif 100 <= address < 200:
             self.set_pin_state(pin, value)
-
 
     def set_pin_mode(self, pin, mode):
         self.call_ros_service('/niryo_one/rpi/set_digital_io_mode', SetDigitalIO, [pin, mode])
 
     def set_pin_state(self, pin, state):
         self.call_ros_service('/niryo_one/rpi/set_digital_io_state', SetDigitalIO, [pin, state])
-
-

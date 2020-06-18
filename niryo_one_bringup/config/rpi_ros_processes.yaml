@@ -9,7 +9,7 @@ processes:
       launch_on_startup: true
       delay_before_start: 0.0
       cmd: 'roslaunch niryo_one_bringup controllers.launch'
-      args: 
+      args:
           []
       dependencies:
           []
@@ -17,7 +17,7 @@ processes:
       launch_on_startup: true
       delay_before_start: 4.0 # Additional delay for Moveit to load controllers
       cmd: 'roslaunch niryo_one_bringup robot_commander.launch'
-      args: 
+      args:
           []
       dependencies:
           - controllers
@@ -25,7 +25,16 @@ processes:
       launch_on_startup: true
       delay_before_start: 0.0
       cmd: 'roslaunch niryo_one_bringup user_interface.launch'
-      args: 
+      args:
+        []
+      dependencies:
+          - controllers
+          - robot_commander
+    - name: 'vision_node'
+      launch_on_startup: true
+      delay_before_start: 5.0
+      cmd: 'roslaunch niryo_one_bringup vision.launch'
+      args:
         []
       dependencies:
           - controllers

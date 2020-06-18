@@ -21,7 +21,7 @@ import socket
 import select
 import rospy
 import Queue
-from threading import Thread
+from threading import Thread, Lock
 from command_interpreter import CommandInterpreter
 
 
@@ -36,7 +36,7 @@ class TcpServer:
         self.__loop_thread = Thread(target=self.__loop)
         self.__command_executor_thread = Thread(target=self.__command_executor_loop)
         self.__is_running = True
-        self.__is_busy = False
+        self.__is_busy_lock = Lock()
         self.__client = None
         self.__interpreter = CommandInterpreter()
         self.__queue = Queue.Queue(1)
@@ -59,33 +59,29 @@ class TcpServer:
         self.__server.close()
 
     def __treat_command(self, command):
-        result = self.__interpreter.interpret_command(command)
-        self.__send(result)
+        try:
+            result = self.__interpreter.interpret_command(command)
+            self.__send(result)
+        except Exception as e:
+            command_name = command.split(":")[0]
+            self.__answer_error(command_name, e)
 
     def __command_executor_loop(self):
         while self.__is_running is True:
             try:
                 command_received = self.__queue.get(block=True, timeout=0.5)
-                self.__is_busy = True
-                self.__treat_command(command_received)
-                self.__is_busy = False
-            except Queue.Empty as e:
+                with self.__is_busy_lock:
+                    self.__treat_command(command_received)
+            except Queue.Empty as _:
                 pass
 
-    def __answer_client_robot_busy(self, command_received):
-        command_received_split = command_received.split(':', 1)
-        if len(command_received_split) != 2:
-            command_name = command_received
-        else:
-            command_name = command_received_split[0]
-        self.__send(command_name + ":KO,Robot is busy right now, command ignored.")
+    def __answer_error(self, command_name, error):
+        self.__send(command_name + ":KO,An error occured while executing the last command. Error: {}".format(error))
 
     def __client_socket_event(self, inputs):
         command_received = self.__read_command()
         if command_received is not None:
-            if self.__is_busy:
-                self.__answer_client_robot_busy(command_received)
-            else:
+            with self.__is_busy_lock:
                 self.__queue.put(command_received)
         else:
             rospy.loginfo("Client disconnect")
@@ -109,7 +105,7 @@ class TcpServer:
         if self.__client is not None:
             try:
                 self.__client.shutdown(socket.SHUT_RDWR)
-            except socket.error as e:
+            except socket.error as _:
                 pass
             self.__client.close()
 
@@ -132,6 +128,6 @@ class TcpServer:
     def __send(self, content):
         if self.__client is not None:
             try:
-                self.__client.send(content)
+                self.__client.sendall(content)
             except socket.error as e:
                 rospy.logwarn("Error while sending answer to client: " + str(e))

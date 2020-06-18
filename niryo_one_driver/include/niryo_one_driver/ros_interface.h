@@ -41,10 +41,15 @@
 
 #include "niryo_one_msgs/ChangeHardwareVersion.h"
 #include "niryo_one_msgs/SendCustomDxlValue.h"
+#include "niryo_one_msgs/SetConveyor.h"
+#include "niryo_one_msgs/ControlConveyor.h"
+#include "niryo_one_msgs/UpdateConveyorId.h"
 
 #include "niryo_one_msgs/HardwareStatus.h"
 #include "niryo_one_msgs/SoftwareVersion.h"
 #include "std_msgs/Bool.h"
+#include "std_msgs/Int8MultiArray.h"
+#include "niryo_one_msgs/ConveyorFeedback.h"
 
 class RosInterface {
 
@@ -68,10 +73,10 @@ class RosInterface {
         bool learning_mode_on;
         int calibration_needed;
         bool last_connection_up_flag;
-        
+
         std::string rpi_image_version;
         std::string ros_niryo_one_version;
-    
+
         // publishers
 
         ros::Publisher hardware_status_publisher;
@@ -83,12 +88,24 @@ class RosInterface {
         ros::Publisher learning_mode_publisher;
         boost::shared_ptr<std::thread> publish_learning_mode_thread;
 
-        // publish methods
+
+        ros::Publisher conveyor_status_publisher;
+        boost::shared_ptr<std::thread> publish_conveyor_status_thread;
         
+        ros::Publisher conveyor_1_feedback_publisher;
+        boost::shared_ptr<std::thread> publish_conveyor_1_feedback_thread;
+
+        ros::Publisher conveyor_2_feedback_publisher;
+        boost::shared_ptr<std::thread> publish_conveyor_2_feedback_thread;
+
+        // publish methods
+
         void publishHardwareStatus();
         void publishSoftwareVersion();
-        void publishLearningMode();
-        
+        void publishLearningMode(); 
+        void publishConveyor1Feedback();
+        void publishConveyor2Feedback(); 
+
         // services
 
         ros::ServiceServer calibrate_motors_server;
@@ -98,6 +115,7 @@ class RosInterface {
         ros::ServiceServer activate_leds_server;
 
         ros::ServiceServer ping_and_set_dxl_tool_server;
+
         ros::ServiceServer open_gripper_server;
         ros::ServiceServer close_gripper_server;
         ros::ServiceServer pull_air_vacuum_pump_server;
@@ -107,15 +125,24 @@ class RosInterface {
         ros::ServiceServer send_custom_dxl_value_server;
         ros::ServiceServer reboot_motors_server;
 
+        // Conveyor services
+        ros::ServiceServer ping_and_set_stepper_server;
+        ros::ServiceServer control_conveyor_server;
+        ros::ServiceServer update_conveyor_id_server;
+
         // callbacks
-        
+
         bool callbackCalibrateMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
         bool callbackRequestNewCalibration(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
 
         bool callbackActivateLearningMode(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
         bool callbackActivateLeds(niryo_one_msgs::SetLeds::Request &req, niryo_one_msgs::SetLeds::Response &res);
-        
+
         bool callbackPingAndSetDxlTool(niryo_one_msgs::PingDxlTool::Request &req, niryo_one_msgs::PingDxlTool::Response &res);
+
+        bool callbackPingAndSetConveyor(niryo_one_msgs::SetConveyor::Request &req, niryo_one_msgs::SetConveyor::Response &res);
+        bool callbackControlConveyor(niryo_one_msgs::ControlConveyor::Request &req, niryo_one_msgs::ControlConveyor::Response &res);
+        bool callbackUpdateIdConveyor(niryo_one_msgs::UpdateConveyorId::Request &req, niryo_one_msgs::UpdateConveyorId::Response &res);
 
         bool callbackOpenGripper(niryo_one_msgs::OpenGripper::Request &req, niryo_one_msgs::OpenGripper::Response &res);
         bool callbackCloseGripper(niryo_one_msgs::CloseGripper::Request &req, niryo_one_msgs::CloseGripper::Response &res);
