@@ -18,16 +18,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import rospy
+from niryo_one_modbus.niryo_one_data_block import NiryoOneDataBlock
+
 from std_msgs.msg import Bool
 from std_msgs.msg import Int32
 from sensor_msgs.msg import JointState
-from niryo_one_msgs.msg import RobotState
+
+from niryo_one_msgs.msg import ConveyorFeedback
 from niryo_one_msgs.msg import HardwareStatus
 from niryo_one_msgs.msg import LogStatus
+from niryo_one_msgs.msg import RobotState
 from niryo_one_msgs.msg import SoftwareVersion
-from niryo_one_msgs.msg import ConveyorFeedback
 
-from niryo_one_modbus.niryo_one_data_block import NiryoOneDataBlock
 
 """
  - Each address contains a 16 bits value
@@ -61,19 +63,21 @@ IR_RPI_VERSION_N3 = 408
 IR_HARDWARE_VERSION = 409
 
 IR_CONVEYOR_1_CONNECTION_STATE = 530
-IR_CONVEYOR_1_CONTROL_STATUS= 531
-IR_CONVEYOR_1_SPEED= 532
+IR_CONVEYOR_1_CONTROL_STATUS = 531
+IR_CONVEYOR_1_SPEED = 532
 IR_CONVEYOR_1_DIRECTION = 533
 
 IR_CONVEYOR_2_CONNECTION_STATE = 540
-IR_CONVEYOR_2_CONTROL_STATUS= 541
-IR_CONVEYOR_2_SPEED= 542
+IR_CONVEYOR_2_CONTROL_STATUS = 541
+IR_CONVEYOR_2_SPEED = 542
 IR_CONVEYOR_2_DIRECTION = 543
 
 
-# Positive number : 0 - 32767
-# Negative number : 32768 - 65535
 def handle_negative(val):
+    """
+    Positive number : 0 - 32767
+    Negative number : 32768 - 65535
+    """
     if val < 0:
         val = (1 << 15) - val
     return val
@@ -105,12 +109,10 @@ class InputRegisterDataBlock(NiryoOneDataBlock):
         self.software_version_sub = rospy.Subscriber('/niryo_one/software_version', SoftwareVersion,
                                                      self.sub_software_version)
 
-        self.conveyor_1_feedback_sub = rospy.Subscriber('/niryo_one/kits/conveyor_1_feedback', ConveyorFeedback,
-                                                        self.sub_conveyor_1_feedback)
-        self.conveyor_2_feedback_sub = rospy.Subscriber('/niryo_one/kits/conveyor_2_feedback', ConveyorFeedback,
-                                                        self.sub_conveyor_2_feedback)
-
-
+        rospy.Subscriber('/niryo_one/kits/conveyor_1_feedback', ConveyorFeedback,
+                         self.sub_conveyor_1_feedback)
+        rospy.Subscriber('/niryo_one/kits/conveyor_2_feedback', ConveyorFeedback,
+                         self.sub_conveyor_2_feedback)
 
     def stop_ros_subscribers(self):
         self.joint_state_sub.unregister()
@@ -171,12 +173,12 @@ class InputRegisterDataBlock(NiryoOneDataBlock):
             self.setValuesOffset(IR_RPI_VERSION_N1, [int(v_maj)])
             self.setValuesOffset(IR_RPI_VERSION_N2, [int(v_min)])
             self.setValuesOffset(IR_RPI_VERSION_N3, [int(v_patch)])
-    
+
     def sub_conveyor_1_feedback(self, conveyor_feedback):
         self.setValuesOffset(IR_CONVEYOR_1_CONNECTION_STATE, int(conveyor_feedback.connection_state))
         self.setValuesOffset(IR_CONVEYOR_1_CONTROL_STATUS, int(conveyor_feedback.running))
         self.setValuesOffset(IR_CONVEYOR_1_SPEED, int(conveyor_feedback.speed))
-        self.setValuesOffset(IR_CONVEYOR_1_DIRECTION, int(conveyor_feedback.direction))
+        self.setValuesOffset(IR_CONVEYOR_1_DIRECTION, handle_negative(int(conveyor_feedback.direction)))
 
     def sub_conveyor_2_feedback(self, conveyor_feedback):
         self.setValuesOffset(IR_CONVEYOR_2_CONNECTION_STATE, int(conveyor_feedback.connection_state))
