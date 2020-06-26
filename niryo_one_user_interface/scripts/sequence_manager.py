@@ -82,7 +82,7 @@ class SequenceManager:
         cmd_type = req.cmd_type
         seq_id = req.sequence_id
         seq_msg = req.sequence
-        sequence_data = Sequence(id=0, name=seq_msg.name, description=seq_msg.description,
+        sequence_data = SequenceMessage(id=0, name=seq_msg.name, description=seq_msg.description,
                                  blockly_xml=seq_msg.blockly_xml, python_code=seq_msg.python_code)
 
         # GET sequence from id
