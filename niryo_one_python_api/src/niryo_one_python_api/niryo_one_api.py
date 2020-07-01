@@ -943,13 +943,13 @@ class NiryoOne:
             ratio = self.get_workspace_ratio(workspace)
             response = self.call_service("/niryo_one_vision/obj_detection_rel", ObjDetection,
                                          [shape, color, ratio, False])
-            if response.status == ObjDetectionResponse.MARKERS_NOT_FOUND:
-                # raise NiryoOneException("Could not detect object: no markers found!")
-                return False, None, "", ""
             if response.status == ObjDetectionResponse.SUCCESSFUL:
                 return True, response.obj_pose, response.obj_type, response.obj_color
-            else:
-                return False, None, "", ""
+            elif response.status == ObjDetectionResponse.MARKERS_NOT_FOUND:
+                rospy.logwarn_throttle(1, 'Markers Not Found')
+            elif response.status == ObjDetectionResponse.VIDEO_STREAM_NOT_RUNNING:
+                rospy.logwarn_throttle(1, 'Video Stream not running')
+            return False, None, "", ""
 
         # Camera image
 

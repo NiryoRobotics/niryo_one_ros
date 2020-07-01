@@ -15,7 +15,7 @@ from std_srvs.srv import SetBool, SetBoolResponse
 from niryo_one_msgs.msg import ObjectPose
 
 from niryo_one_msgs.srv import GetCalibrationCam, GetCalibrationCamResponse
-from niryo_one_msgs.srv import ObjDetection
+from niryo_one_msgs.srv import ObjDetection, ObjDetectionResponse
 from niryo_one_msgs.srv import DebugColorDetection
 from niryo_one_msgs.srv import DebugMarkers, DebugMarkersResponse
 from niryo_one_msgs.srv import SetCalibrationCam, SetCalibrationCamResponse
@@ -208,7 +208,7 @@ class VisionPublisher:
         # Reading last image
         img = self.read_undistorted()
         if img is None:
-            return False, ObjectPose(), "", "", CompressedImage()
+            return ObjDetectionResponse.VIDEO_STREAM_NOT_RUNNING, ObjectPose(), "", "", CompressedImage()
 
         # Extracting parameters from request
         obj_type = ObjectType[req.obj_type]
