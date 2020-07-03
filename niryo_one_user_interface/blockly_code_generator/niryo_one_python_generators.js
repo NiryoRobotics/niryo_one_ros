@@ -966,14 +966,14 @@ Blockly.Python['niryo_one_move_joints'] = function (block) {
   Blockly.Python['niryo_one_pull_air_vacuum_pump'] = function (block) {
     var value_vacuum_pump_id = Blockly.Python.valueToCode(block, 'PULL_AIR_VACUUM_PUMP_ID', Blockly.Python.ORDER_ATOMIC) || '(TOOL_NONE)';
     value_vacuum_pump_id = value_vacuum_pump_id.replace('(', '').replace(')', '');
-    var code = 'n.pull_air_vacuum_pump' + value_vacuum_pump_id + '\n';
+    var code = 'n.pull_air_vacuum_pump(' + value_vacuum_pump_id + ')\n';
     return code;
   };
   
   Blockly.Python['niryo_one_push_air_vacuum_pump'] = function (block) {
     var value_vacuum_pump_id = Blockly.Python.valueToCode(block, 'PUSH_AIR_VACUUM_PUMP_ID', Blockly.Python.ORDER_ATOMIC) || '(TOOL_NONE)';
     value_vacuum_pump_id = value_vacuum_pump_id.replace('(', '').replace(')', '');
-    var code = 'n.push_air_vacuum_pump' + value_vacuum_pump_id + '\n';
+    var code = 'n.push_air_vacuum_pump(' + value_vacuum_pump_id + ')\n';
     return code;
   };
   
