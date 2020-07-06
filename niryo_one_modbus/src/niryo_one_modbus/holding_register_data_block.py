@@ -94,7 +94,6 @@ def handle_negative_hr(val):
         val = - (val & 0x7FFF)
     return val
 
-
 class HoldingRegisterDataBlock(NiryoOneDataBlock):
 
     def __init__(self):
@@ -345,6 +344,7 @@ class HoldingRegisterDataBlock(NiryoOneDataBlock):
             conveyor_speed = 0
         
         conveyor_direction = self.getValuesOffset(HR_CONTROL_CONVEYOR_DIRECTION, 1)[0]
+        conveyor_direction = handle_negative_hr(conveyor_direction)
         
         if conveyor_id == 1: 
             conveyor_id = CONVEYOR_ID_ONE
