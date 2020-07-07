@@ -41,10 +41,21 @@ if __name__ == '__main__':
 
     print "start conveyor 1"
     client.write_register(522, 1)
+    time.sleep(3)
+
+
+    print "stop conveyor 1"
+    client.write_register(526, 1)
     time.sleep(1)
 
+    print "set direction to backward"
+    client.write_register(523, number_to_raw_data(-1))
+    time.sleep(1)
 
-    time.sleep(10)
+    print "start conveyor 1"
+    client.write_register(522, 1)
+    time.sleep(3)
+
     print "stop conveyor 1"
     client.write_register(526, 1)
 
