@@ -25,12 +25,30 @@ class Position:
             self.pitch = pitch
             self.yaw = yaw
 
+        def __str__(self):
+            msg = str(self.roll) + "\n"
+            msg += str(self.pitch) + "\n"
+            msg += str(self.yaw) + "\n"
+            return msg
+
+        def __repr__(self):
+            return self.__str__()
+
     class Point:
 
         def __init__(self, x=0, y=0, z=0):
             self.x = x
             self.y = y
             self.z = z
+
+        def __str__(self):
+            msg = str(self.x) + "\n"
+            msg += str(self.y) + "\n"
+            msg += str(self.z) + "\n"
+            return msg
+
+        def __repr__(self):
+            return self.__str__()
 
     class Quaternion:
 
@@ -40,9 +58,30 @@ class Position:
             self.z = z
             self.w = w
 
-    def __init__(self, name="", joints=None, rpy=RPY(), point=Point(), quaternion=Quaternion()):
+        def __str__(self):
+            msg = str(self.x) + "\n"
+            msg += str(self.y) + "\n"
+            msg += str(self.z) + "\n"
+            msg += str(self.w) + "\n"
+            return msg
+
+        def __repr__(self):
+            return self.__str__()
+
+    def __init__(self, name="", joints=None, rpy=None, point=None, quaternion=None):
         self.name = name
         self.joints = joints if joints is not None else [0, 0, 0, 0, 0, 0]
-        self.rpy = rpy
-        self.point = point
-        self.quaternion = quaternion
+        self.rpy = rpy if rpy is not None else self.RPY()
+        self.point = point if point is not None else self.Point()
+        self.quaternion = quaternion if quaternion is not None else self.Quaternion()
+
+    def __str__(self):
+        msg = self.name + "\n"
+        msg += str(self.joints) + "\n"
+        msg += str(self.rpy) + "\n"
+        msg += str(self.point) + "\n"
+        msg += str(self.quaternion) + "\n"
+        return msg
+
+    def __repr__(self):
+        return self.__str__()
