@@ -95,7 +95,7 @@ INT8U NiryoCanDriver::sendTorqueOnCommand(int id, int torque_on)
 }
 INT8U NiryoCanDriver::sendConveyoOnCommand(int id, bool conveyor_on, int conveyor_speed, int8_t direction)
 {
-    uint8_t data[3] = {0};
+    uint8_t data[4] = {0};
     data[0] = CAN_CMD_MODE;
     if(conveyor_on){
     data[1] = STEPPER_CONVEYOR_ON;
