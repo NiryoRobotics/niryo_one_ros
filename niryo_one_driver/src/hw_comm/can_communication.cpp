@@ -1246,8 +1246,8 @@ int CanCommunication::scanAndCheck()
     bool m3_ok = !m3.isEnabled();
     bool m4_ok = !m4.isEnabled();
 
-    bool m6_ok = !m6.isEnabled();
-    bool m7_ok = !m7.isEnabled();
+    bool m6_ok = true;//!m6.isEnabled();
+    bool m7_ok = true; //!m7.isEnabled();
     double time_begin_scan = ros::Time::now().toSec();
     double min_time_to_wait = 0.25;
     double timeout = 0.5;
@@ -1272,23 +1272,6 @@ int CanCommunication::scanAndCheck()
             else if (motor_id == m3.getId()) {
                 m3_ok = true;
             }
-
-           else if (is_conveyor_id_1_connected){
-               if(motor_id = m6.getId()){
-                m6_ok = true;
-                }
-                }
-            else if (!is_conveyor_id_1_connected){
-                m6_ok = true; // hardcode this part for this moment ( thiiiink )
-                }
-            else if (is_conveyor_id_2_connected){
-                if(motor_id = m7.getId()){
-                    m7_ok = true;
-                }
-            }
-            else if (!is_conveyor_id_2_connected){
-                m7_ok = true; // hardcode this part for this moment ( thiiiink )
-                }
             else if (hardware_version == 1 && motor_id == m4.getId()) { // m4 only for Niryo One V1
                 m4_ok = true;
             }
