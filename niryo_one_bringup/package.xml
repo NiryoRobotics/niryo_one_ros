@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>niryo_one_bringup</name>
-  <version>2.3.0</version>
+  <version>2.3.1</version>
   <description>Provides roslaunch scripts to start Niryo One packages and ros params</description>
   <author>Edouard Renard</author>
     <maintainer email="r.lux@niryo.com">Rémi Lux</maintainer>

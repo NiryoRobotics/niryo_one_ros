@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>niryo_one_debug</name>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <description>Niryo One debug tools</description>
     <author>Edouard Renard</author>
     <maintainer email="e.rey-coquais@niryo.com">Etienne Rey-Coquais</maintainer>

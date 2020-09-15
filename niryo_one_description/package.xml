@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>niryo_one_description</name>
-  <version>2.3.0</version>
+  <version>2.3.1</version>
   <description>Provides URDF files for Moveit! and IKfast plugin</description>
   <author>Edouard Renard</author>
   <maintainer email="r.lux@niryo.com">Rémi Lux</maintainer>
