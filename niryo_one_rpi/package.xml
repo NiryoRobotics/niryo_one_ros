@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>niryo_one_rpi</name>
-    <version>2.3.1</version>
+    <version>2.3.2</version>
     <description>Specific utilities for Niryo One's RPI3 + custom Niryo One shield</description>
     <author>Edouard Renard</author>
     <author>Maxime Catrice</author>
