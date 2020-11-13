@@ -50,6 +50,7 @@ class SequenceAutorunMode:
     LOOP = 0
     ONE_SHOT = 1
 
+NB_TEST_MOTORS_LOOPS = 3
 
 class SequenceAutorun:
 
@@ -242,8 +243,22 @@ class SequenceAutorun:
         return self.create_response(200, 'Sequence Autorun has been set')
 
     def callback_trigger_sequence_autorun(self, req):
+        from datetime import datetime
+        rospy.loginfo("Server sequence autorun enabled {}".format(self.enabled))
         if not self.enabled:
-            return self.create_response(400, 'Sequence Autorun is not enabled')
+            try:
+                rospy.loginfo("Wait for motor test service")
+                rospy.wait_for_service('/niryo_one/test_motors', 0.1)
+                service_test = rospy.ServiceProxy('/niryo_one/test_motors', SetInt)
+
+                now = datetime.now()
+                test_motor_thread = Thread(name="test_motor_"+now.strftime("%H%M%S"), target=service_test, args=(NB_TEST_MOTORS_LOOPS, ))
+                test_motor_thread.setDaemon(True)
+                test_motor_thread.start()
+
+                return self.create_response(200, "Sequence motor test sent")
+            except (rospy.ServiceException, rospy.ROSException), e:
+                return self.create_response(400, 'Sequence Autorun is not enabled, and /niryo_one/test_motors not up')
         self.activated = not self.activated
         if self.activated:
             self.cancel_sequence = False

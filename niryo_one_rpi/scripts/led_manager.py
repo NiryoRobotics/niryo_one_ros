@@ -141,7 +141,7 @@ class LEDManager:
             self.set_led_from_state(dxl_leds=True)
 
     def callback_hardware_status(self, msg):
-        if not msg.connection_up:
+        if not msg.connection_up or msg.error_message != '':
             self.set_led(LED_RED, dxl_leds=True)  # blink red
             rospy.sleep(0.05)
             self.set_led_from_state(dxl_leds=True)

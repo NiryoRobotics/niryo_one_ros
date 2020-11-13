@@ -29,6 +29,7 @@
 #include "niryo_one_driver/communication_base.h"
 #include "niryo_one_driver/rpi_diagnostics.h"
 #include "niryo_one_driver/change_hardware_version.h"
+#include "niryo_one_driver/test_motors.h"
 
 #include "niryo_one_msgs/SetInt.h"
 #include "niryo_one_msgs/SetLeds.h"
@@ -68,11 +69,15 @@ class RosInterface {
         RpiDiagnostics* rpi_diagnostics;
         ros::NodeHandle nh_;
 
+        NiryoOneTestMotor test_motor; 
+
         bool* flag_reset_controllers;
         int hardware_version;
         bool learning_mode_on;
         int calibration_needed;
+        bool calibration_in_progress;
         bool last_connection_up_flag;
+        int motor_test_status;
 
         std::string rpi_image_version;
         std::string ros_niryo_one_version;
@@ -111,6 +116,8 @@ class RosInterface {
         ros::ServiceServer calibrate_motors_server;
         ros::ServiceServer request_new_calibration_server;
 
+        ros::ServiceServer test_motors_server;
+
         ros::ServiceServer activate_learning_mode_server;
         ros::ServiceServer activate_leds_server;
 
@@ -131,6 +138,7 @@ class RosInterface {
         ros::ServiceServer update_conveyor_id_server;
 
         // callbacks
+        bool callbackTestMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
 
         bool callbackCalibrateMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);
         bool callbackRequestNewCalibration(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res);

@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   niryo_one_msgs
   mcp_can_rpi
   dynamixel_sdk
+  urdf
 )
  
 find_package(Boost REQUIRED COMPONENTS system)
@@ -37,7 +38,7 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(niryo_one_driver
+add_executable(${PROJECT_NAME}
     src/utils/change_hardware_version.cpp
     src/utils/motor_offset_file_handler.cpp
     src/hw_driver/niryo_one_can_driver.cpp
@@ -48,6 +49,7 @@ add_executable(niryo_one_driver
     src/hw_comm/can_communication.cpp
     src/hw_comm/niryo_one_communication.cpp
     src/hw_comm/fake_communication.cpp
+    src/test_motors.cpp
     src/ros_interface.cpp
     src/rpi_diagnostics.cpp
     src/niryo_one_hardware_interface.cpp
@@ -74,5 +76,6 @@ else()
     )
 endif()
 
-add_dependencies(niryo_one_driver niryo_one_msgs_gencpp)
-
+add_dependencies(${PROJECT_NAME}
+  ${catkin_EXPORTED_TARGETS}
+)

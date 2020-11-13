@@ -45,6 +45,49 @@ RosInterface::RosInterface(CommunicationBase* niryo_one_comm, RpiDiagnostics* rp
     calibration_needed = 0;
 }
 
+bool RosInterface::callbackTestMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res) 
+{    
+    if (motor_test_status==1)
+    {
+        test_motor.stopTest();
+        learning_mode_on = true;
+        comm->activateLearningMode(learning_mode_on);
+        return true;
+    }
+    
+    motor_test_status = 1;
+    if (calibration_needed)
+    {
+        learning_mode_on = false;
+        comm->activateLearningMode(learning_mode_on);
+        
+        int calibration_mode = 1; 
+        std::string result_message = "";
+        int result = comm->allowMotorsCalibrationToStart(calibration_mode, result_message);
+
+        ros::Duration(1).sleep();
+        while (calibration_in_progress) { ros::Duration(0.05).sleep();}
+
+        learning_mode_on = true;
+        ros::Duration(1).sleep();
+    }
+    
+    learning_mode_on = false;
+    comm->activateLearningMode(learning_mode_on);
+
+    bool status = test_motor.runTest(req.value);
+
+    learning_mode_on = true;
+    comm->activateLearningMode(learning_mode_on);
+
+    motor_test_status = status ? 0 : -1; 
+    res.status = status ? 200 : 400; 
+    res.message = status ? "Success" : "Fail";
+
+    return true;
+}
+
+
 bool RosInterface::callbackCalibrateMotors(niryo_one_msgs::SetInt::Request &req, niryo_one_msgs::SetInt::Response &res) 
 {
     int calibration_mode = req.value; 
@@ -230,6 +273,8 @@ void RosInterface::startServiceServers()
     calibrate_motors_server = nh_.advertiseService("niryo_one/calibrate_motors", &RosInterface::callbackCalibrateMotors, this);
     request_new_calibration_server = nh_.advertiseService("niryo_one/request_new_calibration", &RosInterface::callbackRequestNewCalibration, this);
 
+    test_motors_server = nh_.advertiseService("niryo_one/test_motors", &RosInterface::callbackTestMotors, this);
+
     activate_learning_mode_server = nh_.advertiseService("niryo_one/activate_learning_mode", &RosInterface::callbackActivateLearningMode, this);
     activate_leds_server = nh_.advertiseService("niryo_one/set_dxl_leds", &RosInterface::callbackActivateLeds, this);
 
@@ -260,7 +305,7 @@ void RosInterface::publishHardwareStatus()
         ros::Time time_now = ros::Time::now();
 
         bool connection_up = false;
-        bool calibration_in_progress = false;
+        
         std::string error_message;
         std::vector<std::string> motor_names;
         std::vector<std::string> motor_types;
@@ -287,6 +332,10 @@ void RosInterface::publishHardwareStatus()
         msg.rpi_temperature = rpi_diagnostics->getRpiCpuTemperature();
         msg.hardware_version = hardware_version;
         msg.connection_up = connection_up;
+        if (motor_test_status<0)
+        {
+            error_message += " motor test error";
+        }
         msg.error_message = error_message;
         msg.calibration_needed = calibration_needed;
         msg.calibration_in_progress = calibration_in_progress;
