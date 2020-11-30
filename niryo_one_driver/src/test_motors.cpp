@@ -112,8 +112,8 @@ bool NiryoOneTestMotor::getJointsLimits()
         {
             if (urdf_joint->type != urdf::Joint::CONTINUOUS)
             {
-                _joint_upper_limits[i] = urdf_joint->limits->upper;
-                _joint_lower_limits[i] = urdf_joint->limits->lower;
+                _joint_upper_limits[i] = urdf_joint->limits->upper - 0.2;
+                _joint_lower_limits[i] = urdf_joint->limits->lower + 0.2;
                 _joint_has_position_limits[i] = true;
             }
             else

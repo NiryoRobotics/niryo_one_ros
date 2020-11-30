@@ -39,7 +39,7 @@ class NiryoOneTestMotor {
 
         TrajClient* traj_client_;
 
-        std::vector<double> pose_start{0.0, 0.0, 0.3, 0.0, 0.0, 0.0};
+        std::vector<double> pose_start{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
         bool enable_test;
         int _n_joints = 6;

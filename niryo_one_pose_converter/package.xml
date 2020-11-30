@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>niryo_one_pose_converter</name>
-    <version>2.3.2</version>
+    <version>2.3.3</version>
     <description>Handles the convertion of workspace-relative poses to robot poses</description>
     <author email="a.voigt@niryo.com">Andreas Voigt</author>
     <maintainer email="r.lux@niryo.com">Rémi Lux</maintainer>

@@ -80,10 +80,20 @@ bool RosInterface::callbackTestMotors(niryo_one_msgs::SetInt::Request &req, niry
     learning_mode_on = true;
     comm->activateLearningMode(learning_mode_on);
 
-    motor_test_status = status ? 0 : -1; 
-    res.status = status ? 200 : 400; 
-    res.message = status ? "Success" : "Fail";
-
+    if (status)
+    {
+        motor_test_status = 0;
+        res.status = 200;
+        res.message = "Success";
+        ROS_INFO("Motor debug has ended with success");
+    }
+    else
+    {
+        motor_test_status = -1;
+        res.status = 400;
+        res.message = "Fail";
+        ROS_ERROR("Motor debug has ended with failure");
+    }
     return true;
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>niryo_one_driver</name>
-    <version>2.3.2</version>
+    <version>2.3.3</version>
     <description>Niryo One driver. Provides a hardware interface between ros_control and RPI3 hardware. Also provides
         user interface to directly interact with hardware
     </description>
