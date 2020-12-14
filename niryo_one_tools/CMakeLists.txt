@@ -9,3 +9,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+catkin_install_python(
+	PROGRAMS
+	  scripts/tool_controller.py
+	  scripts/tool_ros_command_interface.py
+	  scripts/tools.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
