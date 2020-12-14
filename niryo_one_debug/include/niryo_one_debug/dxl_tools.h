@@ -38,6 +38,8 @@ class DxlTools {
         void broadcastPing();
         void ping(int id);
         void setRegister(int id, int reg_address, int value, int size);
+        void getRegister(int id, int reg_address, int size);
+        void factoryReset(int id);
 
         void closePort();
 
