@@ -67,7 +67,7 @@ PortHandlerLinux::PortHandlerLinux(const char *port_name)
 }
 
 #include <fcntl.h>
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
 #include <wiringPi.h>
 #endif
 #include <time.h>
@@ -76,7 +76,7 @@ PortHandlerLinux::PortHandlerLinux(const char *port_name)
 
 bool PortHandlerLinux::setupGpio()
 {
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
   int result = wiringPiSetupGpio();
   if (!result) {
       //printf("Gpio started\n");
@@ -98,14 +98,14 @@ bool PortHandlerLinux::setupGpio()
 
 void PortHandlerLinux::gpioHigh()
 {
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
   digitalWrite(GPIO_HALF_DUPLEX_DIRECTION, HIGH);
 #endif
 }
 
 void PortHandlerLinux::gpioLow()
 {
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
   digitalWrite(GPIO_HALF_DUPLEX_DIRECTION, LOW);
 #endif
 }

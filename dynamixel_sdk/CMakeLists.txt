@@ -55,7 +55,7 @@ add_dependencies(dynamixel_sdk ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPO
 EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 message( STATUS "Architecture: ${ARCHITECTURE}" )
 
-if (${ARCHITECTURE} MATCHES "arm")
+if (${ARCHITECTURE} MATCHES "arm|aarch64")
     message(STATUS "wiringPi library is required - arm processor")
     target_link_libraries(dynamixel_sdk
         ${catkin_LIBRARIES} 

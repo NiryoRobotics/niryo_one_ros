@@ -43,7 +43,7 @@
 #ifndef MCP_CAN_RPI_H
 #define MCP_CAN_RPI_H
 
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 #endif

@@ -21,7 +21,7 @@
 
 int change_hardware_version_and_reboot(int old_version, int new_version)
 {
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
     
     std::ostringstream text;
     
