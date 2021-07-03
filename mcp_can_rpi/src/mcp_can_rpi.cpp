@@ -47,7 +47,7 @@
 *********************************************************************************************************/
 void MCP_CAN::spiTransfer(uint8_t byte_number, unsigned char *buf)
 {
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
     wiringPiSPIDataRW(spi_channel, buf, byte_number);
     nanosleep(&delay_spi_can, (struct timespec *)NULL); 
 #endif
@@ -59,7 +59,7 @@ void MCP_CAN::spiTransfer(uint8_t byte_number, unsigned char *buf)
 *********************************************************************************************************/
 bool MCP_CAN::setupInterruptGpio()
 {
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
     int result = wiringPiSetupGpio();
     if (!result) {
         printf("Gpio started\n");
@@ -84,7 +84,7 @@ bool MCP_CAN::setupInterruptGpio()
 *********************************************************************************************************/
 bool MCP_CAN::setupSpi()
 {
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
 	int result_spi = wiringPiSPISetup(spi_channel, spi_baudrate);
     printf("Started SPI : %d\n", result_spi);
     if (result_spi < 0) {
@@ -104,7 +104,7 @@ bool MCP_CAN::setupSpi()
 *********************************************************************************************************/
 bool MCP_CAN::canReadData()
 {
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
     return !digitalRead(gpio_can_interrupt);
 #else
     return false;
