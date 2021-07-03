@@ -63,7 +63,7 @@ add_executable(${PROJECT_NAME}
 EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 message( STATUS "Architecture: ${ARCHITECTURE}" )
 
-if (${ARCHITECTURE} MATCHES "arm|aarch64")
+if (${ARCHITECTURE} MATCHES "(arm|aarch64)")
     message(STATUS "wiringPi library is required - arm processor")
     target_link_libraries(niryo_one_driver
         ${catkin_LIBRARIES} 

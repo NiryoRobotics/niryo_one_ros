@@ -31,7 +31,7 @@ add_dependencies(mcp_can_rpi ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORT
 EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 message( STATUS "Architecture: ${ARCHITECTURE}" )
 
-if (${ARCHITECTURE} MATCHES "arm|aarch64")
+if (${ARCHITECTURE} MATCHES "(arm|aarch64)")
     message(STATUS "wiringPi library is required for mcp_can_rpi (ARM processor)")
     target_link_libraries(mcp_can_rpi
         ${catkin_LIBRARIES} 

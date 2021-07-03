@@ -38,7 +38,7 @@ add_executable(dxl_debug_tools
 EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 message( STATUS "Architecture: ${ARCHITECTURE}" )
 
-if (${ARCHITECTURE} MATCHES "arm|aarch64")
+if (${ARCHITECTURE} MATCHES "(arm|aarch64)")
     message(STATUS "wiringPi library is required - arm processor")
     target_link_libraries(dxl_debug_tools
         ${catkin_LIBRARIES} 
