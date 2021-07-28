@@ -5,7 +5,7 @@
 
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/empty.world"/>
+    <arg name="world_name" value="$(find niryo_one_gazebo)/worlds/empty.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
@@ -17,9 +17,6 @@
     <param name="tf_prefix" value="niryo_one_tf" />
     <arg name="hardware_version" default="2" />
 
-    <!-- <arg name="execute_on_niryo_one_raspberry_pi_image" value="false"/>
-    <arg name="urdf_without_meshes" default="false" />
-    <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/> -->
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro"/>
 
     <include file="$(find niryo_one_bringup)/launch/controllers.launch">
