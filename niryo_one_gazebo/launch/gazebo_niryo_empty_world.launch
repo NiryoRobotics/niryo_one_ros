@@ -4,7 +4,31 @@
   <arg name="z_pos" default="0.0"/>
 
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  
+
+    <!-- <param name="tf_prefix" value="niryo_one_tf" /> -->
+    
+
+    <arg name="execute_on_niryo_one_raspberry_pi_image" value="false"/>
+    <arg name="urdf_without_meshes" default="false" />
+    <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/>
+
+
+
+    <include file="$(find niryo_one_bringup)/launch/controllers.launch">
+        <arg name="simulation_mode" value="true" />
+    </include>
+
+    <include file="$(find niryo_one_bringup)/launch/robot_commander.launch">
+        <arg name="simulation_mode" value="true" />
+    </include>
+
+    <!-- <include file="$(find niryo_one_bringup)/launch/user_interface.launch">
+        <arg name="simulation_mode" value="true" />
+    </include> -->
+
+    
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find niryo_one_gazebo)/worlds/empty.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
@@ -12,19 +36,5 @@
     <arg name="headless" value="false"/>
     <arg name="debug" value="false"/>
   </include>
-
-  <group ns="niryo_one">
-    <param name="tf_prefix" value="niryo_one_tf" />
-    <arg name="hardware_version" default="2" />
-
-    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro"/>
-
-    <include file="$(find niryo_one_bringup)/launch/controllers.launch">
-          <arg name="simulation_mode" value="true" />
-      </include>
-
-
     <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" output="screen" args="-urdf -model niryo -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
-  </group>
-
 </launch>
