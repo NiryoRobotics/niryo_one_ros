@@ -1,4 +1,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="gripper">
+
+    <xacro:include filename="$(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro"/>
+
     <xacro:property name="PI" value="3.14159265359"/>
 
     <!-- Transmission macro -->
@@ -27,12 +30,12 @@
     </gazebo>
 
 
-    <link name="world" />
+    <!-- <link name="world" /> -->
     <!-- <link name="base_link"> -->
 
     <!-- Joint from tool_link to base_gripper -->
     <joint name="joint_to_gripper" type="fixed">
-        <parent link="world"/>
+        <parent link="tool_link"/>
         <child link="base_gripper_1"/>
         <origin
                 xyz="0 0 0"
