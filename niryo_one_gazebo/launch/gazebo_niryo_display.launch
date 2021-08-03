@@ -1,0 +1,46 @@
+<!-- This launch file allows to run simulation on Gazebo
+Warning : Some errors are present in Gazebo
+-> It will log some errors because it cannot unload joint_controller (It's because ROS does it before Gazebo)
+-> Gazebo GUI is kinda bad on closing. It will always run into SIGTERM. So, what you should do is
+to change _TIMEOUT_SIGINT value in the file /opt/ros/melodic/lib/python2.7/dist-packages/roslaunch/nodeprocess.py
+This will reduce the amount of time spent waiting during program shutdown
+-->
+<launch>
+    <!-- Arguments definition -->
+    <arg name="gui" default="true"/>
+    <arg name="hardware_version" value="2"/>
+
+    <!-- Load URDF -->
+    <arg name="urdf_path" value="urdf/v2/niryo_one_gazebo.urdf.xacro"/>
+
+    <param name="robot_description" command="$(find xacro)/xacro $(find niryo_one_description)/$(arg urdf_path)"/>
+
+    <param name="robot_description_tf2" command="$(find xacro)/xacro $(find niryo_one_description)/$(arg urdf_path)"/>
+
+    <!-- Define most of ROS parameters -->
+    <arg name="execute_on_niryo_one_raspberry_pi_image" value="false"/>
+    <arg name="urdf_without_meshes" default="false" />
+    <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/>
+
+
+    <!-- Launching Gazebo World -->
+    <arg name="use_sim_time" default="true"/>
+    <!-- <arg name="gui" default="true"/> -->
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find niryo_one_gazebo)/worlds/empty.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="headless" value="$(arg headless)"/>
+        <arg name="output" value="log"/>
+    </include>
+
+    <!-- Spawn URDF in Gazebo -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" respawn="false" args="-urdf -model niryo_robot -param robot_description" output="log"/>
+
+
+</launch>

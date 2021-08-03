@@ -30,6 +30,11 @@ This is the main package for simulation mode. It launches _niryo\_one\_base_, _c
 
 Note that you need to launch this file on your computer, with 3D packages installed. This will not work on the Niryo One RPI3 image.
 
+### niryo_one_bringup_minimal
+
+This is essentially just a loader for _niryo\_one\_base_ specifically for Gazebo simulations. This package might other be removed or updated to include all other necessary packages
+
+
 ---
 
 You can find more info about what the packages do in each package's README.
