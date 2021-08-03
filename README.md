@@ -58,6 +58,24 @@ The main differences between this launch file and the launch file executed on Ra
 
 Note that Niryo One ROS packages have been developed with **ROS kinetic, on Ubuntu 16.04**. Other ROS versions and OS distributions are not supported.
 
+
+## :sparkles: How to use Niryo One with Gazebo
+You'll need to install some additional ROS packages :
+```
+sudo apt-get install ros-kinetic-gazebo-ros-control
+```
+
+You can now launch Gazebo with Niryo One:
+```
+roslaunch niryo_one_gazebo gazebo_niryo_one.launch
+```
+
+
+
+
+
+
+
 ---
 
 (Optional) After you install ROS packages and execute catkin_make you still have some installation steps if you want to use Blockly ("Niryo Blocks" on Niryo One Studio).
