@@ -1,3 +1,4 @@
+.gitignore
 *.pyc
 *.swp
 urdf.rviz
@@ -9,3 +10,12 @@ tmp_code_to_execute/
 /CMakeLists.txt
 *.egg-info
 *__pycache__
+
+
+
+niryo_one_moveit_config/config/controllers.yaml
+
+niryo_one_moveit_config/launch/niryo_one_moveit_controller_manager.launch.xml
+niryo_one_description/urdf/v2/niryo_one.transmission.xacro
+niryo_one_description/urdf/v2/niryo_one_gazebo.urdf.xacro
+niryo_one_driver/config/.gitignore
