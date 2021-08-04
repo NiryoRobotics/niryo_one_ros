@@ -238,7 +238,7 @@
     <gazebo>
         <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
             <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-            <robotNamespace>/</robotNamespace>
+            <!-- <robotNamespace>/</robotNamespace> -->
         </plugin>
     </gazebo>
     <gazebo reference="base_link">
