@@ -8,6 +8,7 @@
     <arg name="urdf_without_meshes" default="false" />
     <!-- <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/> -->
     <arg name="hardware_version" default="2" /> 
+    <arg name="without_gripper" default="true"/>
     <arg name="niryo_one_sim_mode" default="true" />
     
 
