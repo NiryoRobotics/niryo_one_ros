@@ -1,4 +1,7 @@
 <launch>
+    <!-- This launch file is mainly for simulations, intergrating all necessary drivers and controllers in the "niryo_one" namespace 
+    -->
+
     <!-- Will not work on Raspberry Pi, to use on a non-ARM computer only 
         Hardware communication is disabled with simulation_mode flag
         The hardware interface will just follow the command given by the chosen controller (ros_controllers)
@@ -6,7 +9,6 @@
     
     <arg name="execute_on_niryo_one_raspberry_pi_image" value="false"/>
     <arg name="urdf_without_meshes" default="false" />
-    <!-- <include file="$(find niryo_one_bringup)/launch/niryo_one_base.launch" pass_all_args="true"/> -->
     <arg name="hardware_version" default="2" /> 
     <arg name="without_gripper" default="true"/>
     <arg name="niryo_one_sim_mode" default="true" />
@@ -41,10 +43,10 @@
                 textfile="/home/niryo/niryo_one_saved_values/niryo_one_image_version_do_not_edit.txt" />
         </group>
             
-        <!-- <group ns="niryo_one/robot_state">
+        <group ns="robot_state">
             <param name="rate_tf_listener" type="double" value="5.0" />
             <param name="rate_publish_state" type="double" value="20.0" />
-        </group> -->
+        </group>
 
         <param name="urdf_without_meshes" value="$(arg urdf_without_meshes)" />
         <group if="$(eval hardware_version == 1)">
@@ -53,19 +55,45 @@
             <param name="robot_description_tf2" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/niryo_one.urdf.xacro" />
         </group>
         <group if="$(eval hardware_version == 2)">
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/without_mesh_niryo_one.urdf.xacro" if="$(arg urdf_without_meshes)"/>
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro" unless="$(arg urdf_without_meshes)"/>
-            <param name="robot_description_tf2" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro" />
+            <group if="$(arg without_gripper)">
+                <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/without_mesh_niryo_one.urdf.xacro" if="$(arg urdf_without_meshes)"/>
+                <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro" unless="$(arg urdf_without_meshes)"/>
+                <param name="robot_description_tf2" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro" />
+            </group>
+
+            <group unless="$(arg without_gripper)">
+                <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/without_mesh_niryo_one.urdf.xacro" if="$(arg urdf_without_meshes)"/>
+                <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gripper.urdf.xacro" unless="$(arg urdf_without_meshes)"/>
+                <param name="robot_description_tf2" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gripper.urdf.xacro" />
+            </group>
         </group>
+
+        <!-- Mainly for launching move groups -->
+        <include file="$(find niryo_one_bringup)/launch/robot_commander.launch">
+            <arg name="simulation_mode" value="$(arg niryo_one_sim_mode)" />
+        </include>
+    
+        <!-- Load controller settings -->
+        <rosparam file="$(find niryo_one_driver)/config/niryo_one_controllers.yaml" command="load" if="$(arg without_gripper)"/>
+
+        <rosparam file="$(find niryo_one_driver)/config/niryo_gripper_controllers.yaml" command="load" unless="$(arg without_gripper)"/>
+
+        <!-- spawn controllers -->
+        <node name="arm_controller_spawner" pkg="controller_manager" type="spawner"  args="--namespace=/niryo_one joint_state_controller niryo_one_follow_joint_trajectory_controller" respawn="false" output="screen" if="$(arg without_gripper)"/>
+
+        <node name="arm_controller_spawner" pkg="controller_manager" type="spawner"  args="--namespace=/niryo_one joint_state_controller niryo_one_follow_joint_trajectory_controller gazebo_tool_controller" respawn="false" output="screen" unless="$(arg without_gripper)"/>
+
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+            <param name="publish_frequency" type="double" value="20.0" />
+			<remap from="joint_states" to="/niryo_one/joint_states" />
+	    </node>
 
     </group>
 
-
-
-    <!-- Robot commander requires tool end effectors, so commented out for now -->
-    <!-- <include file="$(find niryo_one_bringup)/launch/robot_commander.launch">
-        <arg name="simulation_mode" value="true" />
-    </include> -->
+    <!-- This outside the group since they already publish in the right namespace. This is actually messy, and we might want to rectify this in future -->
+    <node name="niryo_one_tools" pkg="niryo_one_tools" type="tool_controller.py" output="screen" respawn="false"> 
+        <rosparam file="$(find niryo_one_tools)/config/end_effectors.yaml" />
+    </node>
 
     <!-- <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher"/>
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
