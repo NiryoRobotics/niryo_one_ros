@@ -63,13 +63,13 @@
 
             <group unless="$(arg without_gripper)">
                 <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/without_mesh_niryo_one.urdf.xacro" if="$(arg urdf_without_meshes)"/>
-                <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gripper.urdf.xacro" unless="$(arg urdf_without_meshes)"/>
-                <param name="robot_description_tf2" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/gripper.urdf.xacro" />
+                <param name="robot_description" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/niryo_one_gripper.urdf.xacro" unless="$(arg urdf_without_meshes)"/>
+                <param name="robot_description_tf2" command="$(find xacro)/xacro --inorder $(find niryo_one_description)/urdf/v2/niryo_one_gripper.urdf.xacro" />
             </group>
         </group>
 
         <!-- Mainly for launching move groups -->
-        <include file="$(find niryo_one_bringup)/launch/robot_commander.launch">
+        <include file="$(find niryo_one_bringup)/launch/robot_commander_gripper.launch">
             <arg name="simulation_mode" value="$(arg niryo_one_sim_mode)" />
         </include>
     
