@@ -68,21 +68,27 @@
             </group>
         </group>
 
-        <!-- Mainly for launching move groups -->
-        <include file="$(find niryo_one_bringup)/launch/robot_commander_gripper.launch">
-            <arg name="simulation_mode" value="$(arg niryo_one_sim_mode)" />
-        </include>
-    
-        <!-- Load controller settings -->
-        <rosparam file="$(find niryo_one_driver)/config/niryo_one_controllers.yaml" command="load" if="$(arg without_gripper)"/>
+        <!-- Launch Move groups and controllers -->
+        <group if="$(arg without_gripper)">
+            <include file="$(find niryo_one_bringup)/launch/robot_commander.launch">
+                <arg name="simulation_mode" value="$(arg niryo_one_sim_mode)" />
+            </include>
+            <rosparam file="$(find niryo_one_driver)/config/niryo_one_controllers.yaml" command="load"/>
+        
+            <node name="arm_controller_spawner" pkg="controller_manager" type="spawner"  args="--namespace=/niryo_one joint_state_controller niryo_one_follow_joint_trajectory_controller" respawn="false" output="screen"/>
+        </group>
 
-        <rosparam file="$(find niryo_one_driver)/config/niryo_gripper_controllers.yaml" command="load" unless="$(arg without_gripper)"/>
+        <group unless="$(arg without_gripper)">
+            <include file="$(find niryo_one_bringup)/launch/robot_commander_gripper.launch">
+                <arg name="simulation_mode" value="$(arg niryo_one_sim_mode)" />
+            </include>
+        
+            <rosparam file="$(find niryo_one_driver)/config/niryo_gripper_controllers.yaml" command="load" unless="$(arg without_gripper)"/>
+            
+            <node name="arm_controller_spawner" pkg="controller_manager" type="spawner"  args="--namespace=/niryo_one joint_state_controller niryo_one_follow_joint_trajectory_controller gazebo_tool_controller" respawn="false" output="screen" unless="$(arg without_gripper)"/>
+        </group>
 
-        <!-- spawn controllers -->
-        <node name="arm_controller_spawner" pkg="controller_manager" type="spawner"  args="--namespace=/niryo_one joint_state_controller niryo_one_follow_joint_trajectory_controller" respawn="false" output="screen" if="$(arg without_gripper)"/>
-
-        <node name="arm_controller_spawner" pkg="controller_manager" type="spawner"  args="--namespace=/niryo_one joint_state_controller niryo_one_follow_joint_trajectory_controller gazebo_tool_controller" respawn="false" output="screen" unless="$(arg without_gripper)"/>
-
+        <!-- State publisher -->
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
             <param name="publish_frequency" type="double" value="20.0" />
 			<remap from="joint_states" to="/niryo_one/joint_states" />
