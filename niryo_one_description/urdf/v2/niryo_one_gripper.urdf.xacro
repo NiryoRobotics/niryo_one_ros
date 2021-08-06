@@ -1,4 +1,4 @@
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="gripper">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="niryo_one">
 
     <xacro:include filename="$(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro"/>
 

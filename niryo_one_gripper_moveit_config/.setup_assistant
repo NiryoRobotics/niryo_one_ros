@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: niryo_one_description
+    relative_path: urdf/v2/niryo_one_gripper.urdf.xacro
+    xacro_args: "--inorder "
+  SRDF:
+    relative_path: config/niryo_one.srdf
+  CONFIG:
+    author_name: hsrwroboticsclub
+    author_email: hsrwroboticsclub@gmail.com
+    generated_timestamp: 1628262714
