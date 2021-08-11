@@ -70,7 +70,7 @@ You can now launch Gazebo with Niryo One:
 roslaunch niryo_one_gazebo gazebo_niryo_one.launch
 ```
 
-
+![niryo one moving in gazebo](./ezgif.com-gif-maker.gif)
 
 
 
