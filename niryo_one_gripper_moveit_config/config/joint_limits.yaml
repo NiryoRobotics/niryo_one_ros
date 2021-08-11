@@ -34,11 +34,11 @@ joint_limits:
     max_acceleration: 0
   joint_base_to_mors_1:
     has_velocity_limits: true
-    max_velocity: 5
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1
+    has_acceleration_limits: true
+    max_acceleration: 0.1
   joint_base_to_mors_2:
     has_velocity_limits: true
-    max_velocity: 5
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1
+    has_acceleration_limits: true
+    max_acceleration: 0.1
