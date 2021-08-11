@@ -187,4 +187,7 @@
         <material>Gazebo/Black</material>
     </gazebo>
 
+    <xacro:include filename="$(find niryo_one_description)/urdf/v2/niryo_one_gzp_grasp_fix.urdf.xacro"/>
+    <xacro:gzplugin_grasp_fix/>
+
 </robot>
