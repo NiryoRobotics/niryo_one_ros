@@ -72,7 +72,7 @@ roslaunch niryo_one_gazebo gazebo_niryo_one.launch
 
 ![niryo one moving in gazebo](./ezgif.com-gif-maker.gif)
 
-
+## :sparkles: Niryo One with Gripper
 
 
 

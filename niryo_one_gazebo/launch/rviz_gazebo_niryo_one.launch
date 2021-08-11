@@ -8,27 +8,26 @@
   <!-- By default, we are not in debug mode -->
   <arg name="debug" default="false" />
 
-  <!-- Load all related parameters and controllers-->
-	<include file="$(find niryo_one_bringup)/launch/niryo_one_bringup_minimal.launch">
+  <include file="$(find niryo_one_gazebo)/launch/gazebo_niryo_one.launch">
+    <arg name="x_pos" value="$(arg x_pos)"/>
+    <arg name="y_pos" value="$(arg y_pos)"/>
+    <arg name="z_pos" value="$(arg z_pos)"/>
+    <arg name="Y_ori" value="$(arg Y_ori)"/>
     <arg name="without_gripper" value="$(arg without_gripper)"/>
-  </include>
-
-  <!-- Open required Gazebo -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(arg world_name)"/>
-    <arg name="paused" value="false"/>
-    <arg name="use_sim_time" value="true"/>
-    <arg name="gui" value="true"/>
-    <arg name="headless" value="false"/>
-    <arg name="debug" value="false"/>
   </include>
-
-  <!-- Spawn the urdf model -->
-	<node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" output="screen" args="-urdf -model niryo -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg Y_ori) -param robot_description" ns="niryo_one"/>
-
   <!-- Run Rviz and load the default config to see the state of the move_group node -->
+  <group if="$(arg without_gripper)">
   <include file="$(find niryo_one_moveit_config)/launch/moveit_rviz.launch">
     <arg name="config" value="true"/>
     <arg name="debug" value="$(arg debug)"/>
   </include>
+  </group>
+
+  <group unless="$(arg without_gripper)">
+  <include file="$(find niryo_one_gripper_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="config" value="true"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+  </group>
 </launch>
