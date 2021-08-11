@@ -6,8 +6,20 @@ This package contains launch files to start Niryo One and related ROS parameters
 Loads the Niryo One urdf model in Gazebo along with the necessary controllers. By default, the empty world is loaded. 
 
 A new `bringup_minimal` launch file was created that loads the ROS parameters required for simulations.
+
 <h4 id="gazebo-args">Arguments</h4>
-- **Y_ori** (default: *0.0*)
+
+- **x_pos** (default: *0.0*)
+
+  Specifies the global X pose (in m) of the robot
+
+- **y_pos** (default: *0.0*)
+
+  Specifies the global Y pose (in m) of the robot
+
+- **z_pos** (default: *0.0*)
+
+  Specifies the global Z pose (in m) of the robot
 
   Specifies the Yaw orientation angle (in radians) of the robot
 
