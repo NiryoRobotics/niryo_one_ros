@@ -9,8 +9,8 @@ Licensed under GPLv3 (see [LICENSE file](https://github.com/NiryoRobotics/niryo_
 This repository contains all ROS packages used on Niryo One (Raspberry Pi 3B - Xubuntu for ARM).
 
 ## :sparkles: What's New :sparkles: 
-- :sparkles: [Gazebo support](#how-to-use-niryo-one-in-gazebo)
-- :sparkles: [Niryo One with Gripper](#niryo-one-with-gripper)
+- :sparkles: [Gazebo support](#sparkles-how-to-use-niryo-one-in-gazebo)
+- :sparkles: [Niryo One with Gripper](#bug-niryo-one-with-gripper)
 
 ## How to use Niryo One with a graphical interface ?
 
