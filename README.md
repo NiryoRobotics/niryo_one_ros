@@ -8,6 +8,10 @@ Licensed under GPLv3 (see [LICENSE file](https://github.com/NiryoRobotics/niryo_
 
 This repository contains all ROS packages used on Niryo One (Raspberry Pi 3B - Xubuntu for ARM).
 
+## :sparkles: What's New :sparkles: 
+- :sparkles: [Gazebo support](#how-to-use-niryo-one-in-gazebo)
+- :sparkles: [Niryo One with Gripper](#niryo-one-with-gripper)
+
 ## How to use Niryo One with a graphical interface ?
 
 You can [download Niryo One Studio](https://niryo.com/download/?utm_source=github) (Linux, Windows and MacOS compatible).
@@ -59,7 +63,7 @@ The main differences between this launch file and the launch file executed on Ra
 Note that Niryo One ROS packages have been developed with **ROS kinetic, on Ubuntu 16.04**. Other ROS versions and OS distributions are not supported.
 
 
-## :sparkles: How to use Niryo One with Gazebo
+## :sparkles: How to use Niryo One in Gazebo
 You'll need to install some additional ROS packages :
 ```
 sudo apt-get install ros-kinetic-gazebo-ros-control
@@ -72,9 +76,18 @@ roslaunch niryo_one_gazebo gazebo_niryo_one.launch
 
 ![niryo one moving in gazebo](./ezgif.com-gif-maker.gif)
 
-## :sparkles: Niryo One with Gripper
+## :bug: Niryo One with Gripper
+Theres a new urdf file that loads gripper onto Niryo One in Gazebo. The following command launches Niryo One with gripper and related controllers
+```bash
+roslaunch niryo_one_gazebo gazebo_niryo_one.launch without_gripper:=false
+```
+
+Thanks to the `gazebo_grasp_plugin` from @JenniferBuehler 's `gazebo-pkgs`, you should now be able to perform and visualise simple pick and place operations in Gazebo. 
 
 
+Currently our repo only supports gazebo visualizations. In order to visualize objects and develop a pipeline in Rviz, you need to clone the entire [gazebo-pkgs](https://github.com/JenniferBuehler/gazebo-pkgs) and follow the instructions and tutorials found in their [wiki](https://github.com/JenniferBuehler/gazebo-pkgs/wiki/Installation).
+
+> :exclamation: In case you run into issues while trying to build the `gazebo_grasp_plugin`s on ROS Kinetc, please follow these intructions in issue [#10](https://github.com/hsrwrobotics/niryo_one_ros/issues/10#issue-967215655) :exclamation:
 
 ---
 
