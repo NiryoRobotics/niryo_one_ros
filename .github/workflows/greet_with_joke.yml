@@ -1,0 +1,19 @@
+name: "Greet With A Random Joke"
+on:
+  issues:
+    types: [opened, reopened]
+  pull_request_target:
+    types: [opened, reopened]
+
+jobs:
+  test:
+    name: setup environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: mast joke mara
+        uses: deep5050/MastJokeMara@main
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          issue_msg: |
+            Heyyo {{author}}! Here's a cookie for all your hard work: 
+            {{joke}}

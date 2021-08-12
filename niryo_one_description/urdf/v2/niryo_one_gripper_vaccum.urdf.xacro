@@ -100,14 +100,14 @@
                 <color rgba="0.49804 0.49804 0.49804 1"/>
             </material>
         </visual>
-        <collision>
+        <!-- <collision>
             <origin xyz="0 0 0"
                     rpy="0 0 0"/>
             <geometry>
                 <mesh
                         filename="package://niryo_one_description/meshes/gripper_1/mors_1.STL"/>
             </geometry>
-        </collision>
+        </collision> -->
     </link>
     <joint
             name="joint_base_to_mors_1"
@@ -146,14 +146,14 @@
                         filename="package://niryo_one_description/meshes/gripper_1/mors_2.STL"/>
             </geometry>
         </visual>
-        <collision>
+        <!-- <collision>
             <origin xyz="0 0 0"
                     rpy="0 0 0"/>
             <geometry>
                 <mesh
                         filename="package://niryo_one_description/meshes/gripper_1/mors_2.STL"/>
             </geometry>
-        </collision>
+        </collision> -->
     </link>
 
     <joint name="joint_base_to_mors_2"
@@ -180,30 +180,48 @@
     </gazebo>
 
     <gazebo reference="mors_1">
-        <!-- <mu1>1000</mu1> -->
-        <!-- <mu2>1000</mu2> -->
-        <!-- <kp>1000000.0</kp> -->
-        <kd>100000.0</kd>
+        <!-- <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+        <kp>1000000</kp>
+        <kd>1000000</kd>
         <slip1>0</slip1>
         <slip2>0</slip2>
-        <!-- <minDepth>0.003</minDepth> -->
-        <maxVel>0</maxVel>
+        <minDepth>0.003</minDepth>  
+        <maxVel>0</maxVel>   -->
         <material>Gazebo/Black</material>
     </gazebo>
 
     <gazebo reference="mors_2">
-        <!-- <mu1>1000</mu1> -->
-        <!-- <mu2>1000</mu2> -->
-        <!-- <kp>1000000.0</kp> -->
-        <!-- <kd>100000.0</kd> -->
+        <!-- <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+        <kp>1000000</kp>
+        <kd>1000000</kd>
         <slip1>0</slip1>
         <slip2>0</slip2>
-        <!-- <minDepth>0.003</minDepth> -->
-        <maxVel>0</maxVel> 
+        <minDepth>0.003</minDepth>  
+        <maxVel>0</maxVel>     -->
         <material>Gazebo/Black</material>
     </gazebo>
 
-    <xacro:include filename="$(find niryo_one_description)/urdf/v2/niryo_one_gzp_grasp_fix.urdf.xacro"/>
-    <xacro:gzplugin_grasp_fix/>
+    <gazebo>
+        <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
+            <robotNamespace>/niryo_one/gripper_only/cmd_attach</robotNamespace>
+            <bodyName>mors_1</bodyName>
+            <topicName>cmd_attach</topicName>    
+        </plugin>
+    </gazebo>
+
+
+    <!-- We can use multiple vaccum grippers to increase the grasping force -->
+
+    <!-- 
+        <gazebo>
+        <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
+            <robotNamespace>/niryo_one/gripper_only/mors_2</robotNamespace>
+            <bodyName>mors_2</bodyName>
+            <topicName>grasping</topicName>    
+        </plugin>
+    </gazebo>     
+    -->
 
 </robot>
