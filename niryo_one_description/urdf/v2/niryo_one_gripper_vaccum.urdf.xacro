@@ -1,0 +1,227 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="niryo_one">
+
+    <xacro:include filename="$(find niryo_one_description)/urdf/v2/gazebo_niryo_one.urdf.xacro"/>
+
+    <xacro:property name="PI" value="3.14159265359"/>
+
+    <!-- Transmission macro -->
+  <xacro:macro name="SimpleTransmissionEffort" params="joint n">
+    <transmission name="transmission_${n}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${joint}">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="motor_${n}">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+  
+    <!-- gazebo joint state publisher for all joints. Necessary to control mors -->
+    <gazebo>
+        <plugin name="passive_joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+
+            <jointName>joint_1, joint_2, joint_3, joint_4, joint_5, joint_6,
+                joint_base_to_mors_1, joint_base_to_mors_2
+            </jointName>
+            <updateRate>50.0</updateRate>
+            <alwaysOn>true</alwaysOn>
+        </plugin>
+    </gazebo>
+
+
+    <!-- <link name="world" /> -->
+    <!-- <link name="base_link"> -->
+
+    <!-- Joint from tool_link to base_gripper -->
+    <joint name="joint_to_gripper" type="fixed">
+        <parent link="tool_link"/>
+        <child link="base_gripper_1"/>
+        <origin
+                xyz="0 0 0"
+                rpy="0 ${PI/2} ${PI/2}"/>
+    </joint>
+
+    <!-- Base Gripper -->
+    <link name="base_gripper_1">
+        <inertial>
+            <origin xyz="0.0028582 0.0022204 0.023772"
+                    rpy="0 0 0"/>
+            <mass value="0.001"/>
+            <inertia
+                    ixx="1E-06"
+                    ixy="0.0"
+                    ixz="0.0"
+                    iyy="1E-06"
+                    iyz="0.0"
+                    izz="1E-06"/>
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0"
+                    rpy="0 0 0"/>
+            <geometry>
+                <mesh
+                        filename="package://niryo_one_description/meshes/gripper_1/base_gripper_1.STL"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0"
+                    rpy="0 0 0"/>
+            <geometry>
+                <mesh
+                        filename="package://niryo_one_description/meshes/gripper_1/base_gripper_1.STL"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- Mors 1 -->
+    <link
+            name="mors_1">
+        <inertial>
+            <origin xyz="-0.0049739 0.0067393 -0.023929"
+                    rpy="0 0 0"/>
+            <mass value="0.0067248"/>
+            <inertia
+                    ixx="1.1778E-06"
+                    ixy="-2.1129E-08"
+                    ixz="1.0185E-07"
+                    iyy="1.3054E-06"
+                    iyz="1.7669E-07"
+                    izz="4.3534E-07"/>
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0"
+                    rpy="0 0 0"/>
+            <geometry>
+                <mesh
+                        filename="package://niryo_one_description/meshes/gripper_1/mors_1.STL"/>
+            </geometry>
+            <material name="">
+                <color rgba="0.49804 0.49804 0.49804 1"/>
+            </material>
+        </visual>
+        <!-- <collision>
+            <origin xyz="0 0 0"
+                    rpy="0 0 0"/>
+            <geometry>
+                <mesh
+                        filename="package://niryo_one_description/meshes/gripper_1/mors_1.STL"/>
+            </geometry>
+        </collision> -->
+    </link>
+    <joint
+            name="joint_base_to_mors_1"
+            type="prismatic">
+        <origin xyz="0.01455 -0.0796 0.0096137"
+                rpy="1.5708 0 0"/>
+        <parent link="base_gripper_1"/>
+        <child link="mors_1"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-0.01"
+               upper="0.01"
+               effort="1"
+               velocity="5"/>
+    </joint>
+
+    <!-- Mors 2 -->
+    <link
+            name="mors_2">
+        <inertial>
+            <origin xyz="-0.0049739 -0.0067393 -0.023929"
+                    rpy="0 0 0"/>
+            <mass value="0.0067248"/>
+            <inertia
+                    ixx="1.1778E-06"
+                    ixy="2.1129E-08"
+                    ixz="1.0185E-07"
+                    iyy="1.3054E-06"
+                    iyz="-1.7669E-07"
+                    izz="4.3534E-07"/>
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0"
+                    rpy="0 0 0"/>
+            <geometry>
+                <mesh
+                        filename="package://niryo_one_description/meshes/gripper_1/mors_2.STL"/>
+            </geometry>
+        </visual>
+        <!-- <collision>
+            <origin xyz="0 0 0"
+                    rpy="0 0 0"/>
+            <geometry>
+                <mesh
+                        filename="package://niryo_one_description/meshes/gripper_1/mors_2.STL"/>
+            </geometry>
+        </collision> -->
+    </link>
+
+    <joint name="joint_base_to_mors_2"
+           type="prismatic">
+        <origin xyz="0.01455 -0.0796 -0.011066"
+                rpy="1.5708 0 0"/>
+        <parent link="base_gripper_1"/>
+        <child link="mors_2"/>
+        <axis xyz="0 -1 0"/>
+        <limit lower="-0.01"
+               upper="0.01"
+               effort="1"
+               velocity="5"/>
+    </joint>
+
+    <!-- Transmissions -->
+    <xacro:SimpleTransmissionEffort n="7" joint="joint_base_to_mors_1"/>
+    <xacro:SimpleTransmissionEffort n="8" joint="joint_base_to_mors_2"/>
+
+
+    <!-- material -->
+    <gazebo reference="base_gripper_1">
+        <material>Gazebo/Blue</material>
+    </gazebo>
+
+    <gazebo reference="mors_1">
+        <!-- <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+        <kp>1000000</kp>
+        <kd>1000000</kd>
+        <slip1>0</slip1>
+        <slip2>0</slip2>
+        <minDepth>0.003</minDepth>  
+        <maxVel>0</maxVel>   -->
+        <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo reference="mors_2">
+        <!-- <mu1>1000.0</mu1>
+        <mu2>1000.0</mu2>
+        <kp>1000000</kp>
+        <kd>1000000</kd>
+        <slip1>0</slip1>
+        <slip2>0</slip2>
+        <minDepth>0.003</minDepth>  
+        <maxVel>0</maxVel>     -->
+        <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo>
+        <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
+            <robotNamespace>/niryo_one/gripper_only/cmd_attach</robotNamespace>
+            <bodyName>mors_1</bodyName>
+            <topicName>cmd_attach</topicName>    
+        </plugin>
+    </gazebo>
+
+
+    <!-- We can use multiple vaccum grippers to increase the grasping force -->
+
+    <!-- 
+        <gazebo>
+        <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
+            <robotNamespace>/niryo_one/gripper_only/mors_2</robotNamespace>
+            <bodyName>mors_2</bodyName>
+            <topicName>grasping</topicName>    
+        </plugin>
+    </gazebo>     
+    -->
+
+</robot>

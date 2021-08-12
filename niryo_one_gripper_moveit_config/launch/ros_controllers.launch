@@ -6,6 +6,6 @@
 
   <!-- Load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args=""/>
+    output="screen" args="gazebo_tool_controller niryo_one_follow_joint_trajectory_controller "/>
 
 </launch>
