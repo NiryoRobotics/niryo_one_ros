@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root 
+ xmlns:xacro="http://ros.org/wiki/xacro">
+
+
+<!-- MACRO FOR THE ROBOT ARM ON THE TABLE-->
+<xacro:macro name="gzplugin_grasp_fix">
+	<gazebo>
+		<plugin name="gazebo_grasp_fix" filename="libgazebo_grasp_fix.so">
+			<!--
+            NOTE: The finger tips are linked together with the links before, because they are connected with a
+			fixed joint. Gazebo makes one whole link out of this automatically. When listing the 9_*_tip links
+			here, they won't be found in the SDF.
+            -->
+            <arm>
+                <arm_name>niryo_one</arm_name>
+                <palm_link>hand_link</palm_link>
+                <gripper_link>mors_1</gripper_link>
+                <gripper_link>mors_2</gripper_link>
+            </arm>
+			<forces_angle_tolerance>100</forces_angle_tolerance>
+			<update_rate>4</update_rate>
+			<grip_count_threshold>4</grip_count_threshold>
+			<max_grip_count>8</max_grip_count>
+			<release_tolerance>0.02</release_tolerance>
+			<disable_collisions_on_attach>false</disable_collisions_on_attach>
+			<contact_topic>__default_topic__</contact_topic>
+		</plugin>
+	</gazebo>
+</xacro:macro>
+
+</root>

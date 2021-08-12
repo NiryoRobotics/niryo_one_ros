@@ -2,12 +2,14 @@
   <arg name="x_pos" default="0.0"/>
   <arg name="y_pos" default="0.0"/>
   <arg name="z_pos" default="0.0"/>
-   <arg name="Y_ori" default="0.0"/>
+  <arg name="Y_ori" default="0.0"/>
   <arg name="without_gripper" default="true"/>
   <arg name="world_name" default="$(find niryo_one_gazebo)/worlds/empty.world"/>
 
-  <!-- Launch all related parameters and controllers -->
-	<include file="$(find niryo_one_bringup)/launch/niryo_one_bringup_minimal.launch"/>
+  <!-- Load all related parameters and controllers -->
+	<include file="$(find niryo_one_bringup)/launch/niryo_one_bringup_minimal.launch">
+    <arg name="without_gripper" value="$(arg without_gripper)"/>
+  </include>
     
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(arg world_name)"/>

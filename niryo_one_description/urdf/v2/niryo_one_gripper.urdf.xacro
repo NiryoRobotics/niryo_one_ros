@@ -180,11 +180,30 @@
     </gazebo>
 
     <gazebo reference="mors_1">
+        <!-- <mu1>1000</mu1> -->
+        <!-- <mu2>1000</mu2> -->
+        <!-- <kp>1000000.0</kp> -->
+        <kd>100000.0</kd>
+        <slip1>0</slip1>
+        <slip2>0</slip2>
+        <!-- <minDepth>0.003</minDepth> -->
+        <maxVel>0</maxVel>
         <material>Gazebo/Black</material>
     </gazebo>
 
     <gazebo reference="mors_2">
+        <!-- <mu1>1000</mu1> -->
+        <!-- <mu2>1000</mu2> -->
+        <!-- <kp>1000000.0</kp> -->
+        <!-- <kd>100000.0</kd> -->
+        <slip1>0</slip1>
+        <slip2>0</slip2>
+        <!-- <minDepth>0.003</minDepth> -->
+        <maxVel>0</maxVel> 
         <material>Gazebo/Black</material>
     </gazebo>
+
+    <xacro:include filename="$(find niryo_one_description)/urdf/v2/niryo_one_gzp_grasp_fix.urdf.xacro"/>
+    <xacro:gzplugin_grasp_fix/>
 
 </robot>
