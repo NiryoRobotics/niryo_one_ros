@@ -22,7 +22,7 @@
 			<update_rate>4</update_rate>
 			<grip_count_threshold>4</grip_count_threshold>
 			<max_grip_count>8</max_grip_count>
-			<release_tolerance>0.02</release_tolerance>
+			<release_tolerance>0.001</release_tolerance>
 			<disable_collisions_on_attach>false</disable_collisions_on_attach>
 			<contact_topic>__default_topic__</contact_topic>
 		</plugin>
