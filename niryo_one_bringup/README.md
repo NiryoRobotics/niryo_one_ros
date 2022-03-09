@@ -24,6 +24,8 @@ Starts joystick interface (Xbox controller) and Blockly server (Blockly is a gra
 
 The main package to launch on a Raspberry Pi 3. Also launches _rosbridge_, _niryo\_one\_base_,  _controllers_, _robot\_commander_, and _user\_interface_. This package is automatically launched when Niryo One boots (Niryo One RPi3 image).
 
+[`rpi_ros_processes.yaml`](./config/rpi_ros_processes.yaml) controls which of the 5 packages need to be launched on startup. In this fork, the `robot_commander`,`vision` and `user_interface` are disabled. You can re-enable them by setting the `launch_on_startup` parameter to `true`.
+
 ### desktop\_rviz\_simulation
 
 This is the main package for simulation mode. It launches _niryo\_one\_base_, _controllers_, _robot\_commander_, _user\_interface_, _rosbridge_, and Rviz to see a 3D view of Niryo One. The _controllers_ package is launched with a simulation flag, so the hardware-related stuff is not used.

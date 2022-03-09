@@ -22,7 +22,7 @@ processes:
       dependencies:
           - controllers
     - name: 'user_interface'
-      launch_on_startup: true
+      launch_on_startup: false
       delay_before_start: 0.0
       cmd: 'roslaunch niryo_one_bringup user_interface.launch'
       args:
@@ -31,7 +31,7 @@ processes:
           - controllers
           - robot_commander
     - name: 'vision_node'
-      launch_on_startup: true
+      launch_on_startup: false
       delay_before_start: 5.0
       cmd: 'roslaunch niryo_one_bringup vision.launch'
       args:
