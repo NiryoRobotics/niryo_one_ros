@@ -31,7 +31,7 @@ class ToolCommander:
 
     def __init__(self):
         self.action_client = actionlib.SimpleActionClient(
-            'niryo_one/tool_action', ToolAction)
+            'tool_action', ToolAction)
         rospy.loginfo("Waiting for action server : niryo_one/tool_action...")
         self.action_client.wait_for_server()
         rospy.loginfo("Found action server : niryo_one/tool_action")

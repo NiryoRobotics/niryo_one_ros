@@ -37,7 +37,7 @@ class ToolController:
         self.ros_command_interface = ros_command_interface
 
         self.server = actionlib.SimpleActionServer(
-            'niryo_one/tool_action', ToolAction, self.tool_on_goal, False)
+            'tool_action', ToolAction, self.tool_on_goal, False)
 
         self.change_tool_server = rospy.Service(
             'niryo_one/change_tool', SetInt, self.callback_change_tool)

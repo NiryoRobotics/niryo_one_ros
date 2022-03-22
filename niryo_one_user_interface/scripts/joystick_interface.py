@@ -127,7 +127,7 @@ class JointMode:
             "/niryo_one/blockly/save_current_point", Int32, queue_size=10)
 
         self.tool_action_client = actionlib.SimpleActionClient(
-            'niryo_one/tool_action', ToolAction)
+            'tool_action', ToolAction)
         self.tool_action_client.wait_for_server()
 
         self.joint_mode_timer = rospy.Timer(rospy.Duration(self.timer_rate), self.send_joint_trajectory)

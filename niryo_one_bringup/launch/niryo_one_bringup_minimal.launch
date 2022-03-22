@@ -94,6 +94,8 @@
 			<remap from="joint_states" to="/niryo_one/joint_states" />
 	    </node>
 
+        	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
     </group>
 
     <!-- This outside the group since they already publish in the right namespace. This is actually messy, and we might want to rectify this in future -->
