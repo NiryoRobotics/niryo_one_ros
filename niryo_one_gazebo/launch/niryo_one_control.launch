@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <rosparam file="$(find niryo_one_gazebo)/config/niryo_one_controllers.yaml" command="load"/>
+
+    <!-- Load controllers-->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+        args="joint_state_controller niryo_one_follow_joint_trajectory_controller
+        --shutdown-timeout 1"/>
+
+    <!-- Convert joint states to TF transforms for rviz, etc -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        respawn="false" output="screen">
+    </node>
+
+    <!-- Moveit move_group -->
+    <include file="$(find niryo_one_moveit_config)/launch/move_group.launch" />
+</launch>
